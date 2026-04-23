@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}
+Retirar Senha
+{% endblock %}
+
+{% block content %}
+
+<div class="painel-box">
+
+    <h2>Retire sua senha</h2>
+
+    <form action="/filas/gerar/" method="">
+        {% csrf_token %}
+        <button type="submit">Senha Normal</button>
+        </form>
+
+    <form action="/filas/preferencial/" method="POST">
+        {% csrf_token %}
+        <button type="submit">Senha Preferencial</button>
+    </form>
+
+</div>
+
+{% endblock %}

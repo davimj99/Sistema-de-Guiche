@@ -1,0 +1,514 @@
+/* ========== RESET & BASE ========== */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&family=Open+Sans:wght@400;500;600&display=swap');
+
+:root {
+  --azul-iscon: #0d6efd;
+  --azul-escuro: #0a3d91;
+  --vermelho-iscon: #d32f2f;
+  --vermelho-escuro: #b71c1c;
+  --branco: #ffffff;
+  --cinza-claro: #f0f2f5;
+  --cinza-texto: #5a6070;
+  --sombra-azul: 0 4px 20px rgba(13, 110, 253, 0.15);
+  --sombra-vermelha: 0 4px 15px rgba(211, 47, 47, 0.25);
+  --sombra-card: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Open Sans', Arial, sans-serif;
+  background: var(--cinza-claro);
+  color: #1a1a2e;
+  line-height: 1.6;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Montserrat', sans-serif;
+}
+
+/* ========== LOGO ========== */
+.logo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 30px 20px;
+  background: linear-gradient(135deg, var(--azul-escuro), var(--azul-iscon));
+  border-bottom: 4px solid var(--vermelho-iscon);
+  width: 100%;
+}
+
+.logo img {
+  height: 160px;
+  object-fit: contain;
+  animation: flutuar 3s ease-in-out infinite;
+  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.3));
+}
+
+/* ========== HEADER ========== */
+header {
+  background: linear-gradient(135deg, var(--azul-escuro), var(--azul-iscon));
+  color: var(--branco);
+  padding: 24px 30px;
+  box-shadow: var(--sombra-azul);
+}
+
+header h1 {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+/* ========== NAV ========== */
+nav {
+  background: var(--branco);
+  padding: 16px 20px;
+  box-shadow: 0 3px 10px rgba(211, 47, 47, 0.15);
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  border-bottom: 3px solid var(--vermelho-iscon);
+}
+
+nav a {
+  text-decoration: none;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--azul-iscon);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+nav a::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 3px;
+  background: var(--vermelho-iscon);
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+nav a:hover {
+  color: var(--branco);
+  background: var(--azul-iscon);
+}
+
+nav a:hover::after {
+  width: 60%;
+  background: var(--branco);
+}
+
+/* ========== CONTAINER ========== */
+.container {
+  padding: 40px 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* ========== BOTÕES ========== */
+button {
+  padding: 14px 28px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--azul-iscon), var(--azul-escuro));
+  color: var(--branco);
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: var(--sombra-azul);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 25px rgba(13, 110, 253, 0.3);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+/* ========== PAINEL SENHA (Emissão) ========== */
+.painel-box {
+  text-align: center;
+  margin-top: 40px;
+  background: var(--branco);
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: var(--sombra-card);
+  border-top: 5px solid var(--azul-iscon);
+}
+
+.senha {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 120px;
+  font-weight: 900;
+  color: var(--azul-iscon);
+  text-shadow: 0 2px 8px rgba(13, 110, 253, 0.15);
+}
+
+/* ========== PAINEL TV ========== */
+.painel-tv {
+  text-align: center;
+  margin-top: 60px;
+  background: var(--branco);
+  padding: 50px 30px;
+  border-radius: 24px;
+  box-shadow: var(--sombra-card);
+  border-top: 6px solid var(--vermelho-iscon);
+}
+
+.painel-tv #senha-atual {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 130px;
+  font-weight: 900;
+  color: var(--azul-iscon);
+  text-shadow: 0 4px 12px rgba(13, 110, 253, 0.2);
+  line-height: 1;
+}
+
+.painel-tv #guiche-atual {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 56px;
+  font-weight: 700;
+  margin-top: 16px;
+  color: var(--vermelho-iscon);
+}
+
+.painel-tv #btnAudio {
+  font-size: 18px;
+  padding: 14px 32px;
+  margin-top: 24px;
+  background: linear-gradient(135deg, var(--vermelho-iscon), var(--vermelho-escuro));
+  box-shadow: var(--sombra-vermelha);
+}
+
+.painel-tv #btnAudio:hover {
+  box-shadow: 0 6px 25px rgba(211, 47, 47, 0.35);
+}
+
+/* ========== LISTAS ========== */
+#lista-chamadas, #fila-espera {
+  list-style: none;
+  padding: 0;
+}
+
+#lista-chamadas li {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 28px;
+  font-weight: 600;
+  padding: 12px 20px;
+  margin-bottom: 8px;
+  background: var(--cinza-claro);
+  border-radius: 10px;
+  border-left: 5px solid var(--azul-iscon);
+  transition: background 0.2s;
+}
+
+#lista-chamadas li:first-child {
+  background: rgba(13, 110, 253, 0.1);
+  border-left-color: var(--vermelho-iscon);
+}
+
+#fila-espera li {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 26px;
+  font-weight: 600;
+  padding: 10px 18px;
+  margin-bottom: 6px;
+  background: var(--branco);
+  border-radius: 10px;
+  border-left: 4px solid var(--vermelho-iscon);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+#fila-espera li:first-child {
+  background: rgba(211, 47, 47, 0.08);
+  font-weight: 800;
+  animation: pulse-fila 2s ease-in-out infinite;
+}
+
+/* ========== PAINEL ATENDIMENTO ========== */
+.painel-atendimento {
+  display: flex;
+  gap: 40px;
+  margin-top: 40px;
+  flex-wrap: wrap;
+}
+
+.fila-box {
+  width: 30%;
+  min-width: 280px;
+  background: var(--branco);
+  padding: 24px;
+  border-radius: 16px;
+  box-shadow: var(--sombra-card);
+  border-top: 4px solid var(--vermelho-iscon);
+}
+
+.fila-box h3 {
+  font-family: 'Montserrat', sans-serif;
+  color: var(--vermelho-iscon);
+  font-size: 20px;
+  font-weight: 800;
+  margin-bottom: 16px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.guiches-box {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+
+.guiche {
+  background: var(--branco);
+  padding: 28px 20px;
+  border-radius: 16px;
+  box-shadow: var(--sombra-card);
+  text-align: center;
+  border-top: 5px solid var(--azul-iscon);
+  transition: all 0.3s ease;
+}
+
+.guiche:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgba(13, 110, 253, 0.2);
+}
+
+.guiche h3 {
+  font-family: 'Montserrat', sans-serif;
+  color: var(--azul-iscon);
+  font-size: 22px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+
+.guiche .senha-guiche {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 48px;
+  font-weight: 900;
+  color: var(--azul-escuro);
+  margin: 12px 0;
+}
+
+/* ========== ANIMAÇÕES ========== */
+.destaque {
+  animation: piscar 1s ease-in-out 4;
+}
+
+@keyframes piscar {
+  0%, 100% {
+    transform: scale(1);
+    color: var(--azul-iscon);
+  }
+  50% {
+    transform: scale(1.2);
+    color: var(--vermelho-iscon);
+    text-shadow: 0 0 20px rgba(211, 47, 47, 0.4);
+  }
+}
+
+@keyframes flutuar {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
+}
+
+@keyframes pulse-fila {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(211, 47, 47, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(211, 47, 47, 0);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* ========== RESPONSIVO ========== */
+@media (max-width: 768px) {
+  .painel-atendimento {
+    flex-direction: column;
+  }
+
+  .fila-box {
+    width: 100%;
+  }
+
+  .guiches-box {
+    grid-template-columns: 1fr;
+  }
+
+  .painel-tv #senha-atual {
+    font-size: 80px;
+  }
+
+  .painel-tv #guiche-atual {
+    font-size: 36px;
+  }
+
+  .senha {
+    font-size: 80px;
+  }
+
+  nav {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  nav a {
+    font-size: 0.9rem;
+  }
+
+  header h1 {
+    font-size: 1.5rem;
+  }
+}
+
+/* ========== HEADER SUBTÍTULO ========== */
+.header-subtitulo {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 0.95rem;
+    opacity: 0.85;
+    margin-top: 6px;
+    letter-spacing: 0.5px;
+}
+
+/* ========== LINK ATIVO NO NAV ========== */
+nav a.ativo {
+    background: var(--azul-iscon);
+    color: var(--branco);
+    border-radius: 8px;
+}
+
+/* ========== RODAPÉ ========== */
+.footer {
+    text-align: center;
+    padding: 25px 15px;
+    background: linear-gradient(
+        135deg,
+        var(--azul-escuro),
+        var(--azul-iscon)
+    );
+    color: var(--branco);
+    font-family: 'Open Sans', sans-serif;
+    margin-top: 60px;
+
+    box-shadow: 0 -4px 15px rgba(0,0,0,0.15);
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.footer-content {
+    max-width: 900px;
+    margin: auto;
+}
+
+.footer-title {
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+}
+
+.footer-sub {
+    font-size: 0.85rem;
+    opacity: 0.9;
+}
+
+.footer-divider {
+    width: 60px;
+    height: 2px;
+    margin: 10px auto;
+    background: rgba(255,255,255,0.4);
+    border-radius: 10px;
+}
+/* CUPOM IMPRESSÃO */
+
+#cupom{
+    width:250px;
+    text-align:center;
+    font-family: monospace;
+    margin:auto;
+}
+
+#cupom h3{
+    font-size:18px;
+    margin:1px 0;
+}
+
+#cupom p{
+    font-size:20px;
+    margin:5px 0;
+}
+
+#cupom h1{
+    font-size:40px;
+    margin:5px 0;
+}
+
+
+/* impressão */
+
+@media print{
+
+    @page{
+        size:78mm auto;
+        margin:0;
+    }
+
+    body{
+        margin:0;
+        padding:0;
+    }
+
+    body *{
+        visibility:hidden;
+    }
+
+    #cupom, #cupom *{
+        visibility:visible;
+    }
+
+    #cupom{
+        position:absolute;
+        left:0;
+        top:0;
+        width:78mm;
+    }
+
+}

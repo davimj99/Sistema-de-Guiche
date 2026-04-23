@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="painel-tv">
+
+<h1>Painel de Atendimento</h1>
+
+<button onclick="ativarAudio()" id="btnAudio">
+🔊 Ativar áudio
+</button>
+
+<h2 id="senha-atual">Aguardando chamada..</h2>
+<h3 id="guiche-atual"></h3>
+
+<hr>
+
+<ul id="lista"></ul>
+
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+
+<script>
+
+let ultimaChamada = null;
+let audioLiberado = false;
+
+
+/* =========================
+   LIBERAR ÁUDIO
+========================= */
+
+function ativarAudio(){
+
+    const teste = new SpeechSynthesisUtterance("Áudio ativado");
+    teste.lang = "pt-BR";
+
+    window.speechSynthesis.speak(teste);
+
+    audioLiberado = true;
+
+    document.getElementById("btnAudio").style.display = "none";
+}
+
+
+/* =========================
+   FALAR SENHA
+========================= */
+
+function falarSenha(senha, guiche){
+
+    if(!audioLiberado) return;
+
+    const texto = `Senha ${senha}, dirigir-se ao guichê ${guiche}`;
+
+    const speech = new SpeechSynthesisUtterance(texto);
+
+    speech.lang = "pt-BR";
+    speech.rate = 0.9;
+    speech.pitch = 1;
+
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(speech);
+}
+
+
+/* =========================
+   ATUALIZA PAINEL
+========================= */
+
+async function atualizarPainel(){
+
+    const response = await fetch("/filas/tv/data/");
+    const data = await response.json();
+
+    if(!data.ultima) return;
+
+    const senha = data.ultima.senha;
+    const guiche = data.ultima.guiche;
+
+    const senhaEl = document.getElementById("senha-atual");
+    const guicheEl = document.getElementById("guiche-atual");
+
+    senhaEl.innerText = senha;
+    guicheEl.innerText = "Dirija-se ao guichê " + guiche;
+
+
+    // animação visual
+    senhaEl.classList.remove("destaque");
+    void senhaEl.offsetWidth;
+    senhaEl.classList.add("destaque");
+
+
+    // falar apenas se for nova
+    const chamadaAtual = senha + "-" + guiche;
+
+    if(ultimaChamada !== chamadaAtual){
+
+    ultimaChamada = chamadaAtual;
+
+    falarSenha(senha, guiche);
+
+}
+
+}
+
+
+/* =========================
+   AUTO UPDATE
+========================= */
+
+setInterval(atualizarPainel, 3000);
+
+atualizarPainel();
+
+</script>
+
+{% endblock %}

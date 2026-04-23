@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}
+Senha Gerada
+{% endblock %}
+
+{% block content %}
+
+<div id="cupom">
+    <h3>ATENDIMENTO AO ALUNO</h3>
+    <p>SUA SENHA</p>
+    <h1>{{ senha.prefixo }}{{ senha.numero }}</h1>
+    <p>Aguarde ser chamado</p>
+</div>
+
+<script>
+window.addEventListener("load", function () {
+
+    // pequena pausa para renderizar o cupom
+    setTimeout(() => {
+
+        window.print();
+
+        // volta automaticamente para o totem
+        setTimeout(() => {
+            window.location.replace("/filas/totem/");
+        }, 1500);
+
+    }, 400);
+
+});
+</script>
+
+{% endblock %}

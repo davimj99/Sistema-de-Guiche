@@ -1,0 +1,73 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Sistema de Atendimento ao Aluno — Faculdade ISCON">
+    <title>{% block title %}Sistema de Senhas — ISCON{% endblock %}</title>
+    <!-- Fontes -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Estilos -->
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    <link rel="stylesheet" href="{% static 'css/tv.css' %}">
+    <link rel="icon" href="{% static 'imagens/iscon_logo.png' %}" type="image/png">
+
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+
+    <!-- Logo Institucional -->
+    <div class="logo">
+        <a href="/" aria-label="Página inicial ISCON">
+            <img src="{% static 'imagens/iscon_logo.png' %}" alt="Logo Faculdade ISCON" loading="eager">
+        </a>
+    </div>
+
+    <!-- Cabeçalho -->
+    <header>
+        <h1>🎫 Sistema de Atendimento ao Aluno</h1>
+        <p class="header-subtitulo">Faculdade ISCON — Atendimento rápido e organizado</p>
+    </header>
+
+    <!-- Navegação -->
+    <nav aria-label="Navegação principal">
+        <a href="/painel/" {% if request.path == '/painel/' %}class="ativo"{% endif %}>
+            📺 Painel
+        </a>
+        <a href="/filas/gerar/" {% if request.path == '/filas/gerar/' %}class="ativo"{% endif %}>
+            🎫 Gerar Senha
+        </a>
+    </nav>
+
+    <!-- Conteúdo Principal -->
+    <main class="container" role="main">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <!-- Rodapé -->
+<footer class="footer">
+    <div class="footer-content">
+
+        <p class="footer-title">
+            &copy; {% now "Y" %} Faculdade ISCON — Sistema de Senhas
+        </p>
+
+        <div class="footer-divider"></div>
+
+        <p class="footer-sub">
+            Desenvolvido por <strong>Davi Souza</strong>
+        </p>
+
+    </div>
+</footer>
+
+{% block extra_js %}{% endblock %}
+
+</body>
+</html>

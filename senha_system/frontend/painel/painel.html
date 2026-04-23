@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}
+Painel de Atendimento
+{% endblock %}
+
+{% block content %}
+<h2>Painel de Atendimento</h2>
+<div class="painel-box">
+    <h3>Senha Atual</h3>
+    <h1 id="senha-atual" class="senha">---</h1>
+    <h3 id="guiche-atual"></h3>
+</div>
+<hr>
+
+<div class="painel-atendimento">
+    <!-- FILA -->
+    <div class="fila-box">
+        <h3>Fila de Espera</h3>
+        <ul id="fila-espera">
+        </ul>
+    </div>
+
+    <!-- GUICHÊS -->
+    <div class="guiches-box">
+        {% for guiche in guiches %}
+        <div class="guiche">
+            <h3>Guichê {{ guiche.nome }}</h3>
+            <form action="/filas/chamar/{{ guiche.id }}/" method="POST">
+                {% csrf_token %}
+                <button type="submit">Chamar Próxima</button>
+            </form>
+        </div>
+        {% empty %}
+        <p>Nenhum guichê cadastrado.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+
+<script>
+
+let ultimaSenhaFalada = null;
+
+function atualizarPainel() {
+
+    fetch("/filas/painel/dados/")
+    .then(response => response.json())
+    .then(data => {
+
+        const senhaEl = document.getElementById("senha-atual")
+        const guicheEl = document.getElementById("guiche-atual")
+        const filaEl = document.getElementById("fila-espera")
+
+        if(data.senha){
+
+            senhaEl.innerText = data.senha
+            guicheEl.innerText = "Dirija-se ao " + data.guiche
+
+            if (ultimaSenhaFalada !== data.senha){
+
+                senhaEl.classList.remove("destaque")
+                void senhaEl.offsetWidth
+                senhaEl.classList.add("destaque")
+
+                ultimaSenhaFalada = data.senha
+            }
+        }
+
+        filaEl.innerHTML = ""
+
+        data.fila.forEach(function(senha){
+
+            const li = document.createElement("li")
+            li.innerText = senha
+
+            filaEl.appendChild(li)
+
+        })
+
+    })
+}
+setInterval(atualizarPainel, 3000)
+atualizarPainel()
+</script>
+{% endblock %}
