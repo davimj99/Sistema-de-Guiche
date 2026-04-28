@@ -15,19 +15,20 @@ Senha Gerada
 
 <script>
 window.addEventListener("load", function () {
+    // Garante que a janela está focada para o comando de impressão
+    window.focus();
 
-    // pequena pausa para renderizar o cupom
     setTimeout(() => {
-
+        // Dispara a impressão
         window.print();
 
-        // volta automaticamente para o totem
+        // Aumentamos para 3 segundos (3000ms)
+        // Isso dá tempo da impressora térmica receber os dados antes da página mudar
         setTimeout(() => {
             window.location.replace("/filas/totem/");
-        }, 1500);
+        }, 3000);
 
-    }, 400);
-
+    }, 500);
 });
 </script>
 
