@@ -25,12 +25,13 @@ O projeto está organizado nos seguintes módulos:
 * **Framework Web:** Django
 * **API:** Django REST Framework (DRF)
 * **Base de Dados:** SQLite (Desenvolvimento) / PostgreSQL (Produção)
+* **Frontend:** HTML5, CSS3 (Bootstrap)
 
-* ⚙️ Funcionalidades Planeadas / Implementadas
+## ⚙️ Funcionalidades Planeadas / Implementadas
 [x] Autenticação e Níveis de Acesso.
 [x] Geração de Senhas (Normal e Prioritária).
 [x] Painel Visual de Chamada (TV).
 [x] API REST para integração.
 [ ] Relatórios de tempo médio de atendimento.
-* **Frontend:** HTML5, CSS3 (Bootstrap)
+
 
