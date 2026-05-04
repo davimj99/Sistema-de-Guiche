@@ -1,121 +1,262 @@
-body {
-    background: #eaeaea;
-    font-family: Arial, sans-serif;
+/* =============================================
+   SISTEMA DE ATENDIMENTO ISCON — filas.css
+   ============================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;700;900&family=Barlow:wght@400;600;700&display=swap');
+
+:root {
+  --azul:     #0d47a1;
+  --azul-cl:  #1976d2;
+  --vermelho: #c62828;
+  --fundo:    #e8edf3;
+  --branco:   #ffffff;
+  --borda:    #cfd8e3;
 }
 
-/* CONTAINER PRINCIPAL */
+/* ── ESCAPAR DO main.container DO BASE ── */
+main.container {
+  padding: 0 !important;
+  margin: 0 !important;
+  max-width: 100% !important;
+  width: 100% !important;
+}
+
+/* ── PAINEL RAIZ ── */
 .painel-tv {
-    max-width: 1300px;
-    margin: 30px auto;
-    padding: 20px;
-    background: white;
-    border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-    text-align: center;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  background: var(--fundo);
+  font-family: 'Barlow', sans-serif;
+  box-sizing: border-box;
 }
 
-/* TÍTULO */
-h1 {
-    margin-bottom: 20px;
+/* ── CABEÇALHO INTERNO DO PAINEL ── */
+.painel-tv > h1 {
+  background: linear-gradient(135deg, var(--azul) 0%, var(--azul-cl) 100%);
+  color: #fff;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: clamp(1.2rem, 2.5vw, 2rem);
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 20px 40px;
+  margin: 0;
+  position: relative;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  border-bottom: 5px solid var(--vermelho);
 }
 
-/* BOTÃO */
-#btnAudio {
-    padding: 10px 15px;
-    margin-bottom: 20px;
-    cursor: pointer;
-}
 
-/* LAYOUT LADO A LADO */
+/* ── GRID PRINCIPAL: propaganda | senha | listas ── */
 .layout {
-    display: flex;
-    gap: 30px;
-    align-items: stretch;
+  display: grid;
+  grid-template-columns: 1fr 2fr 240px;
+  grid-template-areas: "banner senha listas";
+  gap: 20px;
+  padding: 20px;
+  flex: 1;
+  align-items: stretch;
+  box-sizing: border-box;
 }
 
-/* SENHA (ESQUERDA) */
+/* ── PROPAGANDA (esquerda) ── */
+.propaganda {
+  grid-area: banner;
+  background: #111;
+  border-radius: 14px;
+  overflow: hidden;
+  position: relative;
+  min-height: 420px;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.25);
+}
+
+.propaganda img,
+.propaganda video {
+
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 1s ease-in-out;
+}
+.propaganda .ativo { opacity: 1; }
+
+/* ── SENHA (centro) ── */
 .container-senha {
-    flex: 2;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    background: #f9f9f9;
-    border-radius: 15px;
-    padding: 40px;
+  grid-area: senha;
+  background: var(--branco);
+  border-radius: 14px;
+  border-top: 8px solid var(--vermelho);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 30px 20px;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.10);
 }
 
-/* SENHA GRANDE */
 #senha-atual {
-    font-size: 120px;
-    color: #007bff;
-    font-weight: bold;
-    margin: 0;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: clamp(80px, 13vw, 220px);
+  font-weight: 900;
+  color: var(--azul-cl);
+  line-height: 1;
+  margin: 0;
 }
 
-/* GUICHÊ */
+#senha-atual.destaque {
+  animation: pulso 0.6s ease-out;
+}
+
+@keyframes pulso {
+  0%   { transform: scale(0.88); opacity: 0.5; }
+  60%  { transform: scale(1.06); opacity: 1; }
+  100% { transform: scale(1);    opacity: 1; }
+}
+
 #guiche-atual {
-    font-size: 35px;
-    color: #d32f2f;
-    font-weight: bold;
-    margin-top: 10px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: clamp(1.4rem, 3vw, 2.8rem);
+  font-weight: 700;
+  color: var(--vermelho);
+  margin-top: 12px;
 }
 
-/* LISTAS (DIREITA) */
+/* ── LISTAS (direita) ── */
 .container-listas {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+  grid-area: listas;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
-/* BOX */
 .box {
-    background: #f5f5f5;
-    padding: 20px;
-    border-radius: 10px;
-    text-align: left;
+  background: var(--branco);
+  border-radius: 12px;
+  padding: 14px 12px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.07);
+  overflow-y: auto;
+  max-height: 40vh;
 }
 
-/* TITULO BOX */
 .box h3 {
-    margin-bottom: 10px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--azul);
+  text-align: center;
+  border-bottom: 2px solid var(--borda);
+  padding-bottom: 8px;
+  margin: 0 0 10px 0;
 }
 
-/* LISTAS */
-ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
+.box ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
-/* ITENS */
-li {
-    font-size: 18px;
+.box li {
+  font-size: 0.88rem;
+  font-weight: 600;
+  padding: 10px;
+  background: #e3f0fc;
+  border-left: 5px solid var(--azul-cl);
+  border-radius: 6px;
+  text-align: center;
+}
+
+.box li.highlight {
+  background: var(--azul-cl);
+  color: #fff;
+  border-left-color: var(--vermelho);
+}
+
+/* ── RESPONSIVO ── */
+
+/* Tablet paisagem: banner+senha lado a lado, listas embaixo em linha */
+@media (max-width: 1100px) {
+  .layout {
+    grid-template-columns: 1fr 2fr;
+    grid-template-areas:
+      "banner senha"
+      "listas listas";
+    gap: 16px;
+  }
+  .container-listas {
+    flex-direction: row;
+  }
+  .box {
+    flex: 1;
+    max-height: 200px;
+  }
+}
+
+/* Tablet retrato: senha no topo, banner no meio, listas embaixo */
+@media (max-width: 768px) {
+  .layout {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "senha"
+      "banner"
+      "listas";
+    padding: 14px;
+    gap: 14px;
+  }
+  .container-listas {
+    flex-direction: row;
+  }
+  .box {
+    flex: 1;
+    max-height: 180px;
+  }
+  .propaganda {
+    min-height: 280px;
+  }
+  #senha-atual {
+    font-size: clamp(70px, 20vw, 140px);
+  }
+  #guiche-atual {
+    font-size: clamp(1.2rem, 4vw, 2rem);
+  }
+}
+
+/* Mobile: tudo em coluna única */
+@media (max-width: 480px) {
+  .painel-tv > h1 {
+    font-size: 1rem;
+    padding: 14px 16px;
+  }
+  #btnAudio {
+    right: 12px;
+    padding: 8px 12px;
+    font-size: 0.8rem;
+  }
+  .layout {
     padding: 10px;
-    margin-bottom: 5px;
-    background: white;
-    border-left: 5px solid #007bff;
-    border-radius: 5px;
-}
-
-/* FILA COR DIFERENTE */
-#fila-lista li {
-    border-left: 5px solid #ff9800;
-}
-
-/* DESTAQUE */
-.highlight {
-    background: #e3f2fd;
-    font-weight: bold;
-}
-
-/* ANIMAÇÃO SENHA */
-.destaque {
-    animation: zoom 0.5s;
-}
-
-@keyframes zoom {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.2); }
-    100% { transform: scale(1); }
+    gap: 12px;
+  }
+  .container-listas {
+    flex-direction: column;
+  }
+  .box {
+    max-height: 160px;
+  }
+  .propaganda {
+    min-height: 220px;
+  }
+  #senha-atual {
+    font-size: clamp(55px, 22vw, 110px);
+  }
+  #guiche-atual {
+    font-size: 1.1rem;
+  }
 }

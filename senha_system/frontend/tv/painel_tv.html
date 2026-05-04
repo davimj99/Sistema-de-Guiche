@@ -3,27 +3,39 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/filas.css' %}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;700;900&family=Barlow:wght@400;600;700&display=swap" rel="stylesheet">
 {% endblock %}
 
 {% block content %}
 
 <div class="painel-tv">
 
-    <h1>Painel de Atendimento</h1>
-
-    <button onclick="ativarAudio()" id="btnAudio">
-        🔊 Ativar áudio
-    </button>
+    <h1>
+        Painel de Atendimento ISCON
+        <button onclick="ativarAudio()" id="btnAudio">
+            🔊 Ativar áudio
+        </button>
+    </h1>
 
     <div class="layout">
 
-        <!-- ESQUERDA -->
+        <!-- BANNER / PROPAGANDA (agora dentro do layout) -->
+        <div class="propaganda">
+            <img id="banner-img" class="ativo" alt="Banner" />
+            <video id="banner-video" muted autoplay loop>
+                <source id="video-source" src="" />
+            </video>
+        </div>
+
+        <!-- SENHA ATUAL -->
         <div class="container-senha">
             <h2 id="senha-atual">Aguardando...</h2>
             <h3 id="guiche-atual"></h3>
         </div>
 
-        <!-- DIREITA -->
+        <!-- LISTAS LATERAIS -->
         <div class="container-listas">
 
             <div class="box">
@@ -45,6 +57,7 @@
 {% endblock %}
 
 {% block extra_js %}
+{{ propagandas|json_script:"banners-data" }}
 
 <script>
 
@@ -149,6 +162,67 @@ async function atualizarPainel(){
 setInterval(atualizarPainel, 3000);
 atualizarPainel();
 
+const banners = JSON.parse(
+    document.getElementById("banners-data").textContent
+);
+ 
+let bannerIndex = 0;
+let timerBanner = null;
+ 
+function trocarBanner() {
+    const imgEl    = document.getElementById("banner-img");
+    const videoEl  = document.getElementById("banner-video");
+    const sourceEl = document.getElementById("video-source");
+ 
+    // Sem banners cadastrados
+    if (banners.length === 0) {
+        imgEl.src = "/static/img/sem-propaganda.png";
+        imgEl.classList.add("ativo");
+        videoEl.classList.remove("ativo");
+        return;
+    }
+ 
+    const arquivo = banners[bannerIndex];
+    const isVideo = arquivo.endsWith(".mp4") || arquivo.endsWith(".webm");
+ 
+    // Limpa timer anterior (evita sobreposição)
+    if (timerBanner) clearTimeout(timerBanner);
+ 
+    if (isVideo) {
+        // Remove evento anterior para não acumular listeners
+        videoEl.onended = null;
+ 
+        sourceEl.src = "/media/" + arquivo;
+        videoEl.load();
+        videoEl.play();
+ 
+        videoEl.classList.add("ativo");
+        imgEl.classList.remove("ativo");
+ 
+        // Avança só quando o vídeo terminar
+        videoEl.onended = () => {
+            bannerIndex = (bannerIndex + 1) % banners.length;
+            trocarBanner();
+        };
+ 
+    } else {
+        // Remove listener de vídeo se tinha
+        videoEl.onended = null;
+ 
+        imgEl.src = "/media/" + arquivo;
+        imgEl.classList.add("ativo");
+        videoEl.classList.remove("ativo");
+ 
+        // Imagem fica 8 segundos e avança
+        timerBanner = setTimeout(() => {
+            bannerIndex = (bannerIndex + 1) % banners.length;
+            trocarBanner();
+        }, 8000);
+    }
+}
+ 
+// Inicia
+trocarBanner();
 </script>
 
 {% endblock %}

@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.db import transaction
 
 from accounts.models import Guiche
-from .models import Senha, ControleFila
+from .models import Senha, ControleFila, Propaganda
 
 
 # =========================
@@ -158,10 +158,16 @@ def painel_tv(request):
         status="espera"
     ).order_by("criada_em")[:10]
 
+    propagandas = list(
+    Propaganda.objects.filter(ativa=True)
+    .values_list('imagem', flat=True)
+    )
+
     context = {
         "ultima": ultima,
         "ultimas": ultimas,
         "fila": fila,
+        "propagandas": propagandas,
         "modo_tv": True
     }
 

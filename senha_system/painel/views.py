@@ -35,3 +35,4 @@ def painel_dados(request):
         data["senha"] = f"{ultima.prefixo}{ultima.numero}"
         data["guiche"] = ultima.guiche.nome if ultima.guiche else ""
     return JsonResponse(data)
+
