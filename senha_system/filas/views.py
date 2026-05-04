@@ -161,11 +161,11 @@ def painel_tv(request):
     context = {
         "ultima": ultima,
         "ultimas": ultimas,
-        "fila": fila
+        "fila": fila,
+        "modo_tv": True
     }
 
     return render(request, "tv/painel_tv.html", context)
-
 
 # =========================
 # API PARA TV

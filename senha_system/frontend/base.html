@@ -34,16 +34,16 @@
         <p class="header-subtitulo">Faculdade ISCON — Atendimento rápido e organizado</p>
     </header>
 
-    {% if not modo_totem %}
-        <nav aria-label="Navegação principal">
-            <a href="/painel/" {% if request.path == '/painel/' %}class="ativo"{% endif %}>
-                📺 Painel
-            </a>
-            <a href="/filas/gerar/" {% if request.path == '/filas/gerar/' %}class="ativo"{% endif %}>
-                🎫 Gerar Senha
-            </a>
-        </nav>
-    {% endif %}
+        {% if not modo_totem and not modo_tv %}
+            <nav aria-label="Navegação principal">
+                <a href="/painel/" {% if request.path == '/painel/' %}class="ativo"{% endif %}>
+                    📺 Painel
+                </a>
+                <a href="/filas/gerar/" {% if request.path == '/filas/gerar/' %}class="ativo"{% endif %}>
+                    🎫 Gerar Senha
+                </a>
+            </nav>
+        {% endif %}
 
     <!-- Conteúdo Principal -->
     <main class="container" role="main">
