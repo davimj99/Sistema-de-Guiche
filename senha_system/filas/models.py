@@ -40,3 +40,6 @@ class Senha(models.Model):
 
     def __str__(self):
         return f"{self.prefixo}{self.numero}"
+    
+class ControleFila(models.Model):
+    contador = models.IntegerField(default=0)

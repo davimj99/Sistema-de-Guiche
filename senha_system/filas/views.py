@@ -2,8 +2,10 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required 
+from django.db import transaction
+
 from accounts.models import Guiche
-from .models import Senha
+from .models import Senha, ControleFila
 
 
 # =========================
@@ -11,7 +13,7 @@ from .models import Senha
 # =========================
 def gerar_senha(request):
 
-    ultima = Senha.objects.filter(tipo="normal").last()
+    ultima = Senha.objects.filter(tipo="normal").order_by("-numero").first()
     numero = 1 if not ultima else ultima.numero + 1
 
     senha = Senha.objects.create(
@@ -29,7 +31,7 @@ def gerar_senha(request):
 # =========================
 def gerar_senha_preferencial(request):
 
-    ultima = Senha.objects.filter(tipo="preferencial").last()
+    ultima = Senha.objects.filter(tipo="preferencial").order_by("-numero").first()
     numero = 1 if not ultima else ultima.numero + 1
 
     senha = Senha.objects.create(
@@ -69,7 +71,7 @@ def tela_guiche(request, guiche_id):
 
 
 # =========================
-# CHAMAR PRÓXIMA SENHA
+# CHAMAR PRÓXIMA SENHA (VERSÃO PROFISSIONAL)
 # =========================
 @login_required
 @require_POST
@@ -77,30 +79,57 @@ def chamar_proxima(request, guiche_id):
 
     guiche = get_object_or_404(Guiche, id=guiche_id)
 
-    # FINALIZA QUALQUER SENHA ATIVA NO SISTEMA
-    Senha.objects.filter(
-        status="chamando"
-    ).update(status="finalizado")
+    with transaction.atomic():
 
-    # prioridade preferencial
-    senha = Senha.objects.filter(
-        status="espera",
-        tipo="preferencial"
-    ).order_by("criada_em").first()
+        # 🔒 TRAVA O CONTROLE GLOBAL
+        controle = ControleFila.objects.select_for_update().first()
 
-    # se não houver preferencial
-    if not senha:
-        senha = Senha.objects.filter(
-            status="espera",
-            tipo="normal"
-        ).order_by("criada_em").first()
+        if not controle:
+            controle = ControleFila.objects.create(contador=0)
 
-    if senha:
-        senha.status = "chamando"
-        senha.guiche = guiche
-        senha.save()
+        # FINALIZA APENAS A SENHA DESSE GUICHÊ
+        Senha.objects.filter(
+            guiche=guiche,
+            status="chamando"
+        ).update(status="finalizado")
+
+        # INCREMENTA CONTADOR GLOBAL
+        controle.contador += 1
+        controle.save()
+
+        # DEFINE REGRA: 1 PREFERENCIAL + 2 NORMAIS
+        if controle.contador % 3 == 1:
+            tipo_prioritario = "preferencial"
+        else:
+            tipo_prioritario = "normal"
+
+        # BUSCA SENHA COM LOCK
+        senha = (
+            Senha.objects.select_for_update()
+            .filter(status="espera", tipo=tipo_prioritario)
+            .order_by("criada_em")
+            .first()
+        )
+
+        # FALLBACK (se não tiver do tipo esperado)
+        if not senha:
+            outro_tipo = "normal" if tipo_prioritario == "preferencial" else "preferencial"
+
+            senha = (
+                Senha.objects.select_for_update()
+                .filter(status="espera", tipo=outro_tipo)
+                .order_by("criada_em")
+                .first()
+            )
+
+        # ATUALIZA SENHA
+        if senha:
+            senha.status = "chamando"
+            senha.guiche = guiche
+            senha.save()
 
     return redirect(f"/filas/guiche/{guiche_id}/")
+
 
 # =========================
 # TOTEM
@@ -109,34 +138,34 @@ def totem(request):
     return render(request, "totem/retirar.html", {
         "modo_totem": True
     })
+
+
 # =========================
 # PAINEL TV
 # =========================
 @login_required
 def painel_tv(request):
 
-    # SENHA ATUAL (CORRETO)
     ultima = Senha.objects.filter(
         status="chamando"
     ).order_by("-id").first()
 
-    # HISTÓRICO (CORRETO)
     ultimas = Senha.objects.filter(
         status="finalizado"
     ).order_by("-id")[:10]
 
-    # FILA
     fila = Senha.objects.filter(
         status="espera"
     ).order_by("criada_em")[:10]
 
     context = {
-        "ultima": ultima,   
+        "ultima": ultima,
         "ultimas": ultimas,
         "fila": fila
     }
 
     return render(request, "tv/painel_tv.html", context)
+
 
 # =========================
 # API PARA TV
@@ -146,11 +175,11 @@ def painel_tv_data(request):
 
     ultima = Senha.objects.filter(
         status="chamando"
-    ).order_by("-criada_em").first()
+    ).order_by("-id").first()
 
     ultimas = Senha.objects.filter(
-        status="chamando"
-    ).order_by("-criada_em")[:10]
+        status="finalizado"
+    ).order_by("-id")[:10]
 
     fila = Senha.objects.filter(
         status="espera"
@@ -188,7 +217,7 @@ def painel_dados(request):
 
     ultima = Senha.objects.filter(
         status="chamando"
-    ).order_by("-criada_em").first()
+    ).order_by("-id").first()
 
     fila = Senha.objects.filter(
         status="espera"
