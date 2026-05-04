@@ -1,21 +1,44 @@
 {% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/filas.css' %}">
+{% endblock %}
 
 {% block content %}
 
 <div class="painel-tv">
 
-<h1>Painel de Atendimento</h1>
+    <h1>Painel de Atendimento</h1>
 
-<button onclick="ativarAudio()" id="btnAudio">
-🔊 Ativar áudio
-</button>
+    <button onclick="ativarAudio()" id="btnAudio">
+        🔊 Ativar áudio
+    </button>
 
-<h2 id="senha-atual">Aguardando chamada..</h2>
-<h3 id="guiche-atual"></h3>
+    <div class="layout">
 
-<hr>
+        <!-- ESQUERDA -->
+        <div class="container-senha">
+            <h2 id="senha-atual">Aguardando...</h2>
+            <h3 id="guiche-atual"></h3>
+        </div>
 
-<ul id="lista"></ul>
+        <!-- DIREITA -->
+        <div class="container-listas">
+
+            <div class="box">
+                <h3>Últimas chamadas</h3>
+                <ul id="ultimas-lista"></ul>
+            </div>
+
+            <div class="box">
+                <h3>Fila de espera</h3>
+                <ul id="fila-lista"></ul>
+            </div>
+
+        </div>
+
+    </div>
 
 </div>
 
@@ -29,27 +52,19 @@ let ultimaChamada = null;
 let audioLiberado = false;
 
 
-/* =========================
-   LIBERAR ÁUDIO
-========================= */
-
+/* ATIVAR ÁUDIO */
 function ativarAudio(){
-
     const teste = new SpeechSynthesisUtterance("Áudio ativado");
     teste.lang = "pt-BR";
 
     window.speechSynthesis.speak(teste);
-
     audioLiberado = true;
 
     document.getElementById("btnAudio").style.display = "none";
 }
 
 
-/* =========================
-   FALAR SENHA
-========================= */
-
+/* FALAR SENHA */
 function falarSenha(senha, guiche){
 
     if(!audioLiberado) return;
@@ -57,63 +72,81 @@ function falarSenha(senha, guiche){
     const texto = `Senha ${senha}, dirigir-se ao guichê ${guiche}`;
 
     const speech = new SpeechSynthesisUtterance(texto);
-
     speech.lang = "pt-BR";
     speech.rate = 0.9;
-    speech.pitch = 1;
 
     window.speechSynthesis.cancel();
     window.speechSynthesis.speak(speech);
 }
 
 
-/* =========================
-   ATUALIZA PAINEL
-========================= */
-
+/* ATUALIZAR PAINEL */
 async function atualizarPainel(){
 
-    const response = await fetch("/filas/tv/data/");
-    const data = await response.json();
+    try {
 
-    if(!data.ultima) return;
+        const response = await fetch("/filas/tv/data/");
+        const data = await response.json();
 
-    const senha = data.ultima.senha;
-    const guiche = data.ultima.guiche;
+        // SENHA ATUAL
+        if(data.ultima){
 
-    const senhaEl = document.getElementById("senha-atual");
-    const guicheEl = document.getElementById("guiche-atual");
+            const senha = data.ultima.senha;
+            const guiche = data.ultima.guiche;
 
-    senhaEl.innerText = senha;
-    guicheEl.innerText = "Dirija-se ao guichê " + guiche;
+            const senhaEl = document.getElementById("senha-atual");
+            const guicheEl = document.getElementById("guiche-atual");
 
+            senhaEl.innerText = senha;
+            guicheEl.innerText = "Dirija-se ao guichê " + guiche;
 
-    // animação visual
-    senhaEl.classList.remove("destaque");
-    void senhaEl.offsetWidth;
-    senhaEl.classList.add("destaque");
+            // animação
+            senhaEl.classList.remove("destaque");
+            void senhaEl.offsetWidth;
+            senhaEl.classList.add("destaque");
 
+            // áudio
+            const chamadaAtual = senha + "-" + guiche;
 
-    // falar apenas se for nova
-    const chamadaAtual = senha + "-" + guiche;
+            if(ultimaChamada !== chamadaAtual){
+                ultimaChamada = chamadaAtual;
+                falarSenha(senha, guiche);
+            }
+        }
 
-    if(ultimaChamada !== chamadaAtual){
+        // ÚLTIMAS CHAMADAS
+        const ultimasLista = document.getElementById("ultimas-lista");
+        ultimasLista.innerHTML = "";
 
-    ultimaChamada = chamadaAtual;
+        data.ultimas.forEach((item, index) => {
+            const li = document.createElement("li");
+            li.innerText = `Senha ${item.senha} - Guichê ${item.guiche}`;
 
-    falarSenha(senha, guiche);
+            if(index === 0){
+                li.classList.add("highlight");
+            }
 
+            ultimasLista.appendChild(li);
+        });
+
+        // FILA
+        const filaLista = document.getElementById("fila-lista");
+        filaLista.innerHTML = "";
+
+        data.fila.forEach(s => {
+            const li = document.createElement("li");
+            li.innerText = s;
+            filaLista.appendChild(li);
+        });
+
+    } catch (error){
+        console.error("Erro:", error);
+    }
 }
 
-}
 
-
-/* =========================
-   AUTO UPDATE
-========================= */
-
+// AUTO UPDATE
 setInterval(atualizarPainel, 3000);
-
 atualizarPainel();
 
 </script>
