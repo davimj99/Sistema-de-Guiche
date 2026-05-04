@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST
 from django.http import JsonResponse
-
+from django.contrib.auth.decorators import login_required 
 from accounts.models import Guiche
 from .models import Senha
 
@@ -45,6 +45,7 @@ def gerar_senha_preferencial(request):
 # =========================
 # TELA DO GUICHÊ
 # =========================
+@login_required
 def tela_guiche(request, guiche_id):
 
     guiche = get_object_or_404(Guiche, id=guiche_id)
@@ -70,6 +71,7 @@ def tela_guiche(request, guiche_id):
 # =========================
 # CHAMAR PRÓXIMA SENHA
 # =========================
+@login_required
 @require_POST
 def chamar_proxima(request, guiche_id):
 
@@ -104,12 +106,13 @@ def chamar_proxima(request, guiche_id):
 # TOTEM
 # =========================
 def totem(request):
-    return render(request, "totem/retirar.html")
-
-
+    return render(request, "totem/retirar.html", {
+        "modo_totem": True
+    })
 # =========================
 # PAINEL TV
 # =========================
+@login_required
 def painel_tv(request):
 
     # SENHA ATUAL (CORRETO)
@@ -138,6 +141,7 @@ def painel_tv(request):
 # =========================
 # API PARA TV
 # =========================
+@login_required
 def painel_tv_data(request):
 
     ultima = Senha.objects.filter(
@@ -179,6 +183,7 @@ def painel_tv_data(request):
 # =========================
 # API PAINEL FUNCIONÁRIOS
 # =========================
+@login_required
 def painel_dados(request):
 
     ultima = Senha.objects.filter(
