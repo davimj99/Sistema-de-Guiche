@@ -10,7 +10,7 @@ def painel_publico(request):
     ).order_by("-criada_em").first()
 
     ultimas = Senha.objects.filter(
-        status="finalizado"
+        status="chamando"
     ).order_by("-criada_em")[:10]
 
     context = {
