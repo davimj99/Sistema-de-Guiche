@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'atendimentos',
     'painel',
     'api',
+
 ]
 
 MIDDLEWARE = [

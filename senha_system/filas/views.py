@@ -229,12 +229,21 @@ def painel_dados(request):
         status="espera"
     ).order_by("criada_em")[:10]
 
-    data = {
-        "senha": f"{ultima.prefixo}{ultima.numero}" if ultima else "",
-        "guiche": ultima.guiche.nome if ultima and ultima.guiche else "",
+    if not ultima:
+        return JsonResponse({
+            "status": "vazio",
+            "mensagem": "Nenhuma senha sendo chamada",
+            "fila": [f"{s.prefixo}{s.numero}" for s in fila]
+        })
+
+    return JsonResponse({
+        "status": "sucesso",
+        "dados": {
+            "senha": f"{ultima.prefixo}{ultima.numero}",
+            "guiche": ultima.guiche.nome if ultima.guiche else "",
+            "tipo": ultima.tipo
+        },
         "fila": [
             f"{s.prefixo}{s.numero}" for s in fila
         ]
-    }
-
-    return JsonResponse(data)
+    })

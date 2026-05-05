@@ -145,7 +145,7 @@ main.container {
 .box h3 {
   font-family: 'Barlow Condensed', sans-serif;
   font-size: 0.95rem;
-  font-weight: 700;
+  font-weight: 900;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--azul);

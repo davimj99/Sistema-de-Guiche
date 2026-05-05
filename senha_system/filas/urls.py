@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import gerar_senha, tela_guiche, chamar_proxima, totem, painel_tv, painel_tv_data, painel_dados, gerar_senha_preferencial
+from .views import gerar_senha, tela_guiche, chamar_proxima, totem, painel_tv, painel_tv_data, gerar_senha_preferencial,painel_dados
 
 urlpatterns = [
     path("gerar/", gerar_senha),
@@ -8,6 +8,6 @@ urlpatterns = [
     path("totem/", totem),
     path("tv/", painel_tv, name="painel_tv"),
     path("tv/data/", painel_tv_data, name="tv_data"),
-    path("painel/dados/", painel_dados),
+    #path("painel/dados/", painel_dados),
     path("preferencial/", gerar_senha_preferencial, name="senha_preferencial"),
 ]

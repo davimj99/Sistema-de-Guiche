@@ -1,3 +1,5 @@
 from django.contrib import admin
+from .models import Senha, Guiche
 
-# Register your models here.
+admin.site.register(Senha)
+admin.site.register(Guiche)

@@ -40,12 +40,11 @@ Painel de Atendimento
 {% block extra_js %}
 
 <script>
-
 let ultimaSenhaFalada = null;
 
 function atualizarPainel() {
 
-    fetch("/filas/painel/dados/")
+    fetch("/painel/dados/")
     .then(response => response.json())
     .then(data => {
 
@@ -53,34 +52,39 @@ function atualizarPainel() {
         const guicheEl = document.getElementById("guiche-atual")
         const filaEl = document.getElementById("fila-espera")
 
-        if(data.senha){
+        if(data.status === "sucesso"){
 
-            senhaEl.innerText = data.senha
-            guicheEl.innerText = "Dirija-se ao " + data.guiche
+            const senha = data.dados.senha
+            const guiche = data.dados.guiche
 
-            if (ultimaSenhaFalada !== data.senha){
+            senhaEl.innerText = senha
+            guicheEl.innerText = "Dirija-se ao " + guiche
+
+            if (ultimaSenhaFalada !== senha){
 
                 senhaEl.classList.remove("destaque")
                 void senhaEl.offsetWidth
                 senhaEl.classList.add("destaque")
 
-                ultimaSenhaFalada = data.senha
+                ultimaSenhaFalada = senha
             }
+
+        } else {
+            senhaEl.innerText = "---"
+            guicheEl.innerText = ""
         }
 
         filaEl.innerHTML = ""
 
         data.fila.forEach(function(senha){
-
             const li = document.createElement("li")
             li.innerText = senha
-
             filaEl.appendChild(li)
-
         })
 
     })
 }
+
 setInterval(atualizarPainel, 3000)
 atualizarPainel()
 </script>
