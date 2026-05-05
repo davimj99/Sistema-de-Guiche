@@ -73,7 +73,7 @@ def tela_guiche(request, guiche_id):
 # =========================
 # CHAMAR PRÓXIMA SENHA (VERSÃO PROFISSIONAL)
 # =========================
-@login_required
+#@login_required
 @require_POST
 def chamar_proxima(request, guiche_id):
 
@@ -143,7 +143,7 @@ def totem(request):
 # =========================
 # PAINEL TV
 # =========================
-@login_required
+#@login_required
 def painel_tv(request):
 
     ultima = Senha.objects.filter(
@@ -176,7 +176,7 @@ def painel_tv(request):
 # =========================
 # API PARA TV
 # =========================
-@login_required
+#@login_required
 def painel_tv_data(request):
 
     ultima = Senha.objects.filter(
