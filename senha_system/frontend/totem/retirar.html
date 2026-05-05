@@ -10,23 +10,24 @@ Retirar Senha
 
     <h2>Retire sua senha</h2>
 
-    <form action="/filas/gerar/" method="">
-        {% csrf_token %}
-        <button type="submit">Senha Normal</button>
+    <div class="container-botoes">
+        <form action="/filas/gerar/" method="POST">
+            {% csrf_token %}
+            <button type="submit">Senha Normal</button>
         </form>
 
-    <form action="/filas/preferencial/" method="POST">
-        {% csrf_token %}
-        <button type="submit">Senha Preferencial</button>
-    </form>
+        <form action="/filas/preferencial/" method="POST">
+            {% csrf_token %}
+            <button type="submit">Senha Preferencial</button>
+        </form>
+    </div>
+
 </div>
+
 <div style="margin-top: 20px; text-align: center;">
-
     <p>Acesse o painel pelo celular: <br> <strong>OBS: TEM QUE ESTAR NO WIFI ISCON</strong></p>
-
     <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=http://10.20.1.14:8000/filas/tv" 
          alt="QR Code Painel TV">
-
 </div>
 
 {% endblock %}

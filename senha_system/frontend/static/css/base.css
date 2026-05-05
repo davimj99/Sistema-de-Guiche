@@ -122,9 +122,9 @@ nav a:hover::after {
 
 /* ========== BOTÕES ========== */
 button {
-  padding: 14px 28px;
+  padding: 18px 48px;
   font-family: 'Montserrat', sans-serif;
-  font-size: 16px;
+  font-size: 35px;
   font-weight: 700;
   background: linear-gradient(135deg, var(--azul-iscon), var(--azul-escuro));
   color: var(--branco);
@@ -137,6 +137,12 @@ button {
   letter-spacing: 0.5px;
 }
 
+.container-botoes {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px; /* espaço entre os botões */
+}
 button:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 25px rgba(13, 110, 253, 0.3);
