@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.db import transaction
 
 from accounts.models import Guiche
-from .models import Senha, ControleFila, Propaganda
+from .models import Senha, ControleFila, Propaganda, Historico
 
 
 # =========================
@@ -81,29 +81,39 @@ def chamar_proxima(request, guiche_id):
 
     with transaction.atomic():
 
-        # 🔒 TRAVA O CONTROLE GLOBAL
+        # 🔒 CONTROLE GLOBAL
         controle = ControleFila.objects.select_for_update().first()
 
         if not controle:
             controle = ControleFila.objects.create(contador=0)
 
-        # FINALIZA APENAS A SENHA DESSE GUICHÊ
-        Senha.objects.filter(
+        # 🔴 FINALIZA SENHAS ANTERIORES
+        senhas_anteriores = Senha.objects.filter(
             guiche=guiche,
             status="chamando"
-        ).update(status="finalizado")
+        )
 
-        # INCREMENTA CONTADOR GLOBAL
+        for s in senhas_anteriores:
+            s.status = "finalizado"
+            s.save()
+
+            Historico.objects.create(
+                senha=s,
+                guiche=guiche,
+                acao="finalizado"
+            )
+
+        # 🔢 INCREMENTA CONTADOR (UMA VEZ SÓ!)
         controle.contador += 1
         controle.save()
 
-        # DEFINE REGRA: 1 PREFERENCIAL + 2 NORMAIS
+        # 🎯 REGRA DE PRIORIDADE
         if controle.contador % 3 == 1:
             tipo_prioritario = "preferencial"
         else:
             tipo_prioritario = "normal"
 
-        # BUSCA SENHA COM LOCK
+        # 🔍 BUSCA SENHA
         senha = (
             Senha.objects.select_for_update()
             .filter(status="espera", tipo=tipo_prioritario)
@@ -111,7 +121,7 @@ def chamar_proxima(request, guiche_id):
             .first()
         )
 
-        # FALLBACK (se não tiver do tipo esperado)
+        # 🔁 FALLBACK
         if not senha:
             outro_tipo = "normal" if tipo_prioritario == "preferencial" else "preferencial"
 
@@ -122,14 +132,19 @@ def chamar_proxima(request, guiche_id):
                 .first()
             )
 
-        # ATUALIZA SENHA
+        # 🟢 CHAMA NOVA SENHA
         if senha:
             senha.status = "chamando"
             senha.guiche = guiche
             senha.save()
 
-    return redirect(f"/filas/guiche/{guiche_id}/")
+            Historico.objects.create(
+                senha=senha,
+                guiche=guiche,
+                acao="chamando"
+            )
 
+    return redirect(f"/filas/guiche/{guiche_id}/")
 
 # =========================
 # TOTEM

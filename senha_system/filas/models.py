@@ -53,3 +53,23 @@ class Propaganda(models.Model):
 
     def __str__(self):
         return self.titulo
+    
+class Historico(models.Model):
+    senha = models.ForeignKey(
+        "Senha",
+        on_delete=models.CASCADE
+    )
+
+    guiche = models.ForeignKey(
+        "accounts.Guiche",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL
+    )
+
+    acao = models.CharField(max_length=20)  # chamando / finalizado
+
+    criada_em = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.senha} - {self.acao}"
