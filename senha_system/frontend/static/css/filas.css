@@ -9,13 +9,17 @@
 --borda:#cfd8e3;
 }
 
-*{
+.painel-tv *{
 margin:0;
 padding:0;
 box-sizing:border-box;
 }
 
-body{
+.painel-tv{
+display:flex;
+flex-direction:column;
+width:100%;
+min-height:100vh;
 background:var(--fundo);
 font-family:'Barlow',sans-serif;
 overflow-x:hidden;
@@ -26,15 +30,6 @@ padding:0!important;
 margin:0!important;
 max-width:100%!important;
 width:100%!important;
-}
-
-.painel-tv{
-display:flex;
-flex-direction:column;
-width:100%;
-min-height:100vh;
-background:var(--fundo);
-font-family:'Barlow',sans-serif;
 }
 
 .painel-tv>h1{
@@ -237,10 +232,6 @@ min-height:500px;
 }
 
 @media(max-width:768px){
-body{
-overflow:auto;
-}
-
 .layout{
 grid-template-columns:1fr;
 grid-template-areas:
