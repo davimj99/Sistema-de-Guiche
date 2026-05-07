@@ -25,7 +25,7 @@ urlpatterns = [
     path('filas/', include('filas.urls')),
     path('painel/', include('painel.urls')),
     #path('', include('api.urls')),
-
+    
     # rota raiz
     #path('', include('painel.urls')),
 ]

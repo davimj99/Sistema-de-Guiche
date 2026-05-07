@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Página não encontrada</title>
+    <link rel="stylesheet" href="">
+
+    <style>
+
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family:Arial, Helvetica, sans-serif;
+        }
+
+        body{
+            height:100vh;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            background:linear-gradient(135deg, #0f172a, #1e3a8a);
+            overflow:hidden;
+            color:white;
+        }
+
+        .container{
+            text-align:center;
+            background:rgba(255,255,255,0.08);
+            padding:60px 40px;
+            border-radius:25px;
+            backdrop-filter:blur(12px);
+            box-shadow:0 10px 40px rgba(0,0,0,0.4);
+            width:90%;
+            max-width:600px;
+            animation:fade 1s ease;
+        }
+
+        h1{
+            font-size:120px;
+            margin-bottom:10px;
+            color:#60a5fa;
+        }
+
+        h2{
+            font-size:32px;
+            margin-bottom:20px;
+        }
+
+        p{
+            color:#cbd5e1;
+            font-size:18px;
+            margin-bottom:35px;
+            line-height:1.6;
+        }
+
+        a{
+            text-decoration:none;
+        }
+
+        .btn{
+            display:inline-block;
+            padding:15px 35px;
+            border-radius:12px;
+            background:#2563eb;
+            color:white;
+            font-size:18px;
+            font-weight:bold;
+            transition:0.3s;
+        }
+
+        .btn:hover{
+            background:#1d4ed8;
+            transform:scale(1.05);
+        }
+
+        .circle{
+            position:absolute;
+            border-radius:50%;
+            background:rgba(255,255,255,0.05);
+            animation:float 6s infinite ease-in-out;
+        }
+
+        .circle1{
+            width:300px;
+            height:300px;
+            top:-100px;
+            left:-100px;
+        }
+
+        .circle2{
+            width:200px;
+            height:200px;
+            bottom:-60px;
+            right:-60px;
+        }
+
+        @keyframes float{
+            0%,100%{
+                transform:translateY(0px);
+            }
+            50%{
+                transform:translateY(20px);
+            }
+        }
+
+        @keyframes fade{
+            from{
+                opacity:0;
+                transform:translateY(20px);
+            }
+            to{
+                opacity:1;
+                transform:translateY(0);
+            }
+        }
+
+    </style>
+
+</head>
+<body>
+
+    <div class="circle circle1"></div>
+    <div class="circle circle2"></div>
+
+    <div class="container">
+
+        <h1>404</h1>
+
+        <h2>Página não encontrada</h2>
+
+        <p>
+            A página que você tentou acessar não existe
+            ou foi movida para outro endereço.
+            <br>Tecnologia ISCON
+        </p>
+
+        <a href="filas/tv">
+            <span class="btn">
+                Guichê Aqui
+            </span>
+        </a>
+
+    </div>
+
+</body>
+</html>
