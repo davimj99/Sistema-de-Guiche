@@ -24,8 +24,14 @@
         <!-- BANNER / PROPAGANDA (agora dentro do layout) -->
         <div class="propaganda">
             <img id="banner-img" class="ativo" alt="Banner" />
-            <video id="banner-video" muted autoplay loop>
-                <source id="video-source" src="" />
+            <video
+                id="banner-video"
+                muted
+                autoplay
+                playsinline
+                preload="auto"
+            >
+                <source id="video-source" src="" type="video/mp4">
             </video>
         </div>
 
@@ -165,63 +171,85 @@ atualizarPainel();
 const banners = JSON.parse(
     document.getElementById("banners-data").textContent
 );
- 
+
 let bannerIndex = 0;
 let timerBanner = null;
- 
-function trocarBanner() {
-    const imgEl    = document.getElementById("banner-img");
-    const videoEl  = document.getElementById("banner-video");
+
+function trocarBanner(){
+
+    const imgEl = document.getElementById("banner-img");
+    const videoEl = document.getElementById("banner-video");
     const sourceEl = document.getElementById("video-source");
- 
-    // Sem banners cadastrados
-    if (banners.length === 0) {
+
+    if(banners.length === 0){
+
         imgEl.src = "/static/img/sem-propaganda.png";
+
         imgEl.classList.add("ativo");
         videoEl.classList.remove("ativo");
+
         return;
     }
- 
+
     const arquivo = banners[bannerIndex];
-    const isVideo = arquivo.endsWith(".mp4") || arquivo.endsWith(".webm");
- 
-    // Limpa timer anterior (evita sobreposição)
-    if (timerBanner) clearTimeout(timerBanner);
- 
-    if (isVideo) {
-        // Remove evento anterior para não acumular listeners
-        videoEl.onended = null;
- 
-        sourceEl.src = "/media/" + arquivo;
-        videoEl.load();
-        videoEl.play();
- 
-        videoEl.classList.add("ativo");
+
+    const arquivoLower = arquivo.toLowerCase();
+
+    const isVideo =
+        arquivoLower.includes(".mp4") ||
+        arquivoLower.includes(".webm") ||
+        arquivoLower.includes(".ogg");
+
+    clearTimeout(timerBanner);
+
+    if(isVideo){
+
+        console.log("VIDEO:", arquivo);
+
         imgEl.classList.remove("ativo");
- 
-        // Avança só quando o vídeo terminar
+
+        videoEl.pause();
+
+        sourceEl.src = "/media/" + arquivo;
+
+        videoEl.load();
+
+        videoEl.classList.add("ativo");
+
+        videoEl.play()
+        .then(() => {
+
+            console.log("Vídeo iniciado");
+
+        })
+        .catch((erro) => {
+
+            console.log("Erro vídeo:", erro);
+
+        });
+
         videoEl.onended = () => {
+
             bannerIndex = (bannerIndex + 1) % banners.length;
+
             trocarBanner();
         };
- 
-    } else {
-        // Remove listener de vídeo se tinha
-        videoEl.onended = null;
- 
+
+    }else{
+
+        console.log("IMAGEM:", arquivo);
+        videoEl.pause();
+        videoEl.classList.remove("ativo");
         imgEl.src = "/media/" + arquivo;
         imgEl.classList.add("ativo");
-        videoEl.classList.remove("ativo");
- 
-        // Imagem fica 8 segundos e avança
         timerBanner = setTimeout(() => {
             bannerIndex = (bannerIndex + 1) % banners.length;
             trocarBanner();
+
         }, 8000);
     }
 }
- 
-// Inicia
+
 trocarBanner();
 </script>
 

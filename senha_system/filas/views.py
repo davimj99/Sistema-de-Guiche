@@ -173,10 +173,15 @@ def painel_tv(request):
         status="espera"
     ).order_by("criada_em")[:10]
 
-    propagandas = list(
-    Propaganda.objects.filter(ativa=True)
-    .values_list('imagem', flat=True)
-    )
+    propagandas_db = Propaganda.objects.filter(ativa=True)
+    propagandas = []
+    for p in propagandas_db:
+
+        if p.imagem:
+            propagandas.append(p.imagem.name)
+
+        if p.video:
+            propagandas.append(p.video.name)
 
     context = {
         "ultima": ultima,
