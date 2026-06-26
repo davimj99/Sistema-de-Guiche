@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+
+  {% load static %}
+
+  <style>
+    body {
+      font-family: Arial;
+      font-size: 12px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .logo {
+      width: 120px;
+      margin-bottom: 10px;
+    }
+
+    h1 {
+      color: #0d6efd;
+      margin: 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th {
+      background: #0d6efd;
+      color: white;
+      padding: 8px;
+    }
+
+    td {
+      border: 1px solid #ccc;
+      padding: 6px;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="header">
+
+  <img src="frontend/static/imagens/iscon_logo.png" class="logo">
+
+  <h1>Relatório de Atendimentos ISCON</h1>
+
+</div>
+
+<table>
+  <tr>
+    <th>Senha</th>
+    <th>Tipo</th>
+    <th>Início</th>
+    <th>Fim</th>
+  </tr>
+
+  {% for a in atendimentos %}
+  <tr>
+    <td>{{ a.senha }}</td>
+    <td>{{ a.tipo }}</td>
+    <td>{{ a.inicio|date:"d/m/Y H:i" }}</td>
+    <td>{{ a.fim|date:"d/m/Y H:i" }}</td>
+  </tr>
+  {% endfor %}
+
+</table>
+
+</body>
+</html>

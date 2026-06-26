@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block title %}Relatório de Atendimentos{% endblock %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+  <h2 class="mb-4">Relatório de Atendimentos</h2>
+
+  <div class="card p-3 mb-4 shadow-sm">
+
+    <form method="get" class="row g-3 align-items-end">
+
+      <div class="col-md-4">
+        <label class="form-label">Tipo de Atendimento</label>
+        <select name="tipo" class="form-select">
+          <option value="">Todos</option>
+          <option value="matricula">Matrícula</option>
+          <option value="financeiro">Financeiro</option>
+          <option value="secretaria">Secretaria</option>
+          <option value="suporte">Suporte</option>
+        </select>
+      </div>
+
+      <div class="col-md-4">
+        <button type="submit" class="btn btn-primary w-100">
+          Filtrar
+        </button>
+      </div>
+
+      <div class="col-md-4">
+        <a href="{% url 'gerar_pdf' %}" class="btn btn-danger w-100">
+          Gerar PDF
+        </a>
+      </div>
+
+    </form>
+
+  </div>
+
+  <div class="card shadow-sm">
+    <div class="card-body">
+
+      <table class="table table-striped table-hover">
+
+        <thead class="table-dark">
+          <tr>
+            <th>Senha</th>
+            <th>Tipo</th>
+            <th>Início</th>
+            <th>Fim</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {% for a in atendimentos %}
+          <tr>
+            <td>{{ a.senha }}</td>
+            <td>{{ a.tipo }}</td>
+            <td>{{ a.inicio }}</td>
+            <td>{{ a.fim }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+
+      </table>
+
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}
