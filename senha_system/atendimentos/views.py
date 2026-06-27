@@ -9,17 +9,12 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required, user_passes_test
 
 
-# 🔐 PERMISSÃO ADMIN
+# 🔐 SUPER ADMIN
 def is_super_admin(user):
     return user.is_superuser
 
 @login_required
 @user_passes_test(is_super_admin)
-def relatorio_atendimentos(request):
-    return render(request, 'atendimentos/atendimento.html')
-
-
-
 def relatorio_atendimentos(request):
     atendimentos = get_atendimentos(request)
 
@@ -27,6 +22,8 @@ def relatorio_atendimentos(request):
         'atendimentos': atendimentos
     })
 
+@login_required
+@user_passes_test(is_super_admin)
 def gerar_pdf(request):
     atendimentos = get_atendimentos(request)
 
