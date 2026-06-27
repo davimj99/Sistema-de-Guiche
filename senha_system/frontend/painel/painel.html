@@ -35,6 +35,13 @@ Painel de Atendimento
         <p>Nenhum guichê cadastrado.</p>
         {% endfor %}
     </div>
+
+    {% if user.is_superuser %}
+        <a href="{% url 'relatorio_atendimentos' %}" class="btn-iscon mb-3">
+            Ir para Atendimentos
+        </a>
+    {% endif %}
+
 </div>
 {% endblock %}
 {% block extra_js %}
