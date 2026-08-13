@@ -8,9 +8,11 @@ class Atendimento(models.Model):
         ('secretaria', 'Secretaria'),
         ('declaração', 'Declaração'),
         ('grade', 'Grade'),
+        ('requerimento', 'Requerimento'),
         ('suporte', 'Suporte'),
+        ('ti', 'TI'),
     ]
-
+    guiche = models.IntegerField(null=True, blank=True)
     senha = models.ForeignKey("filas.Senha", on_delete=models.CASCADE)
     inicio = models.DateTimeField(auto_now_add=True)
     tipo = models.CharField(
@@ -22,4 +24,4 @@ class Atendimento(models.Model):
     fim = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
-        return f'{self.senha} - {self.tipo}'
+        return f'{self.senha} - {self.tipo} - {self.guiche}'

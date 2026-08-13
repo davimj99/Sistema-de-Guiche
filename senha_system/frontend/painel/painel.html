@@ -1,39 +1,50 @@
 {% extends "base.html" %}
 
-{% block title %}
-Painel de Atendimento
-{% endblock %}
+{% block title %}Painel de Atendimento{% endblock %}
 
 {% block content %}
+
 <h2>Painel de Atendimento</h2>
+
 <div class="painel-box">
     <h3>Senha Atual</h3>
     <h1 id="senha-atual" class="senha">---</h1>
     <h3 id="guiche-atual"></h3>
 </div>
+
 <hr>
 
 <div class="painel-atendimento">
-    <!-- FILA -->
+
     <div class="fila-box">
         <h3>Fila de Espera</h3>
-        <ul id="fila-espera">
-        </ul>
+        <ul id="fila-espera"></ul>
     </div>
 
-    <!-- GUICHÊS -->
     <div class="guiches-box">
+
         {% for guiche in guiches %}
+
         <div class="guiche">
             <h3>Guichê {{ guiche.nome }}</h3>
+
             <form action="/filas/chamar/{{ guiche.id }}/" method="POST">
                 {% csrf_token %}
                 <button type="submit">Chamar Próxima</button>
             </form>
+
+            <form action="/filas/chamar-novamente/{{ guiche.id }}/" method="POST">
+                {% csrf_token %}
+                <button type="submit" class="btn-senha">🔊 Chamar Novamente</button>
+            </form>
         </div>
+
         {% empty %}
+
         <p>Nenhum guichê cadastrado.</p>
+
         {% endfor %}
+
     </div>
 
     {% if user.is_superuser %}
@@ -43,56 +54,82 @@ Painel de Atendimento
     {% endif %}
 
 </div>
+
 {% endblock %}
+
 {% block extra_js %}
 
 <script>
-let ultimaSenhaFalada = null;
+let ultimaChamada = null;
+
+function falarSenha(senha, guiche) {
+    speechSynthesis.cancel();
+
+    const texto = `Senha ${senha}, dirigir-se ao guichê ${guiche}.`;
+
+    function falar() {
+        const voz = new SpeechSynthesisUtterance(texto);
+        voz.lang = "pt-BR";
+        voz.rate = 0.9;
+        voz.pitch = 1;
+        speechSynthesis.speak(voz);
+    }
+
+    falar();
+
+    setTimeout(falar, 3000);
+    setTimeout(falar, 6000);
+}
 
 function atualizarPainel() {
-
-    fetch("/painel/dados/")
+    fetch("/painel/dados/?t=" + Date.now(), {
+        cache: "no-store"
+    })
     .then(response => response.json())
     .then(data => {
 
-        const senhaEl = document.getElementById("senha-atual")
-        const guicheEl = document.getElementById("guiche-atual")
-        const filaEl = document.getElementById("fila-espera")
+        const senhaEl = document.getElementById("senha-atual");
+        const guicheEl = document.getElementById("guiche-atual");
+        const filaEl = document.getElementById("fila-espera");
 
-        if(data.status === "sucesso"){
+        if (data.status === "sucesso") {
 
-            const senha = data.dados.senha
-            const guiche = data.dados.guiche
+            const senha = data.dados.senha;
+            const guiche = data.dados.guiche;
+            const chamadaId = data.dados.chamada_id;
 
-            senhaEl.innerText = senha
-            guicheEl.innerText = "Dirija-se ao " + guiche
+            senhaEl.innerText = senha;
+            guicheEl.innerText = "Dirija-se ao " + guiche;
 
-            if (ultimaSenhaFalada !== senha){
+            if (ultimaChamada !== chamadaId) {
 
-                senhaEl.classList.remove("destaque")
-                void senhaEl.offsetWidth
-                senhaEl.classList.add("destaque")
+                senhaEl.classList.remove("destaque");
+                void senhaEl.offsetWidth;
+                senhaEl.classList.add("destaque");
 
-                ultimaSenhaFalada = senha
+                falarSenha(senha, guiche);
+
+                ultimaChamada = chamadaId;
             }
 
         } else {
-            senhaEl.innerText = "---"
-            guicheEl.innerText = ""
+
+            senhaEl.innerText = "---";
+            guicheEl.innerText = "";
         }
 
-        filaEl.innerHTML = ""
+        filaEl.innerHTML = "";
 
-        data.fila.forEach(function(senha){
-            const li = document.createElement("li")
-            li.innerText = senha
-            filaEl.appendChild(li)
-        })
-
+        data.fila.forEach(senha => {
+            const li = document.createElement("li");
+            li.innerText = senha;
+            filaEl.appendChild(li);
+        });
     })
+    .catch(error => console.error("Erro:", error));
 }
 
-setInterval(atualizarPainel, 3000)
-atualizarPainel()
+setInterval(atualizarPainel, 3000);
+atualizarPainel();
 </script>
 {% endblock %}

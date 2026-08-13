@@ -43,6 +43,8 @@ class Senha(models.Model):
     
 class ControleFila(models.Model):
     contador = models.IntegerField(default=0)
+    def __str__(self):
+        return f"Contador: {self.contador}"
 
 class Propaganda(models.Model):
     titulo = models.CharField(max_length=100)

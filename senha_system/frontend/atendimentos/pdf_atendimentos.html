@@ -49,15 +49,16 @@
 
 <div class="header">
 
-  <img src="frontend/static/imagens/iscon_logo.png" class="logo">
-
-  <h1>Relatório de Atendimentos ISCON</h1>
-
+  <img src="frontend/static/imagens/iscon2.png" class="logo">
+{% if atendimentos %}
+<h1>Relatório de Atendimentos ISCON <br> Dia: {{ atendimentos.0.fim|date:"d/m/Y" }}</h1>
+{% endif %}
 </div>
 
 <table>
   <tr>
     <th>Senha</th>
+    <th>Guichê</th>
     <th>Tipo</th>
     <th>Início</th>
     <th>Fim</th>
@@ -66,6 +67,13 @@
   {% for a in atendimentos %}
   <tr>
     <td>{{ a.senha }}</td>
+    <td>
+      {% if a.guiche %}
+          {{ a.guiche }}
+      {% else %}
+          Não informado
+      {% endif %}
+  </td>
     <td>{{ a.tipo }}</td>
     <td>{{ a.inicio|date:"d/m/Y H:i" }}</td>
     <td>{{ a.fim|date:"d/m/Y H:i" }}</td>

@@ -137,6 +137,21 @@ button {
   letter-spacing: 0.5px;
 }
 
+.btn-senha {
+    display: block;
+    width: 100%;
+    margin-top: 28px;
+    background: #ff1d1d;
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 6px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
 .container-botoes {
   display: flex;
   flex-direction: column;
