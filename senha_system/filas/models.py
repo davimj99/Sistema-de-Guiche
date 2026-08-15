@@ -14,8 +14,8 @@ class Senha(models.Model):
         ("preferencial", "Preferencial"),
     )
 
-    numero = models.IntegerField()
     prefixo = models.CharField(max_length=2)
+    numero = models.IntegerField()
 
     tipo = models.CharField(
         max_length=20,

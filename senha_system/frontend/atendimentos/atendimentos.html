@@ -39,6 +39,11 @@
             <option value="matricula">Matrícula</option>
             <option value="financeiro">Financeiro</option>
             <option value="secretaria">Secretaria</option>
+            <option value="declaração">Declaração</option>
+            <option value="grade">Grade</option>
+            <option value="requerimento">Requerimento</option>
+            <option value="ementario/historico">Ementário/Histórico</option>
+            <option value="ti">TI</option>
             <option value="suporte">Suporte</option>
           </select>
         </div>
@@ -70,7 +75,10 @@
             <thead class="table-dark">
               <tr>
                 <th>Senha</th>
+                <th>Aluno</th>
                 <th>Tipo</th>
+                <th>Guichê</th>
+                <th>Atendente</th>
                 <th>Início</th>
                 <th>Fim</th>
               </tr>
@@ -80,7 +88,10 @@
               {% for a in atendimentos %}
               <tr>
                 <td>{{ a.senha }}</td>
+                <td>{{ a.aluno }}</td>
                 <td>{{ a.tipo }}</td>
+                <td>{{ a.guiche }}</td>
+                <td>{{ a.atendente }}</td>
                 <td>{{ a.inicio }}</td>
                 <td>{{ a.fim }}</td>
               </tr>

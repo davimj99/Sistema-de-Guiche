@@ -5,3 +5,4 @@ class AtendimentoForm(forms.ModelForm):
     class Meta:
         model = Atendimento
         fields = "__all__"
+

@@ -2,45 +2,53 @@
 <html>
 <head>
   <meta charset="utf-8">
-
   {% load static %}
 
   <style>
+    @page {
+      size: A4;
+      margin: 15mm;
+    }
+
     body {
       font-family: Arial;
-      font-size: 12px;
+      font-size: 9px;
     }
 
     .header {
       text-align: center;
-      margin-bottom: 20px;
+      margin-bottom: 10px;
     }
 
     .logo {
-      width: 120px;
-      margin-bottom: 10px;
+      width: 100px;
+      margin-bottom: 5px;
     }
 
     h1 {
       color: #0d6efd;
+      font-size: 16px;
       margin: 0;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 20px;
+      margin-top: 10px;
     }
 
     th {
       background: #0d6efd;
       color: white;
-      padding: 8px;
+      padding: 3px;
+      font-size: 8px;
     }
 
     td {
       border: 1px solid #ccc;
-      padding: 6px;
+      padding: 3px;
+      font-size: 8px;
+      text-align: center;
     }
   </style>
 </head>
@@ -48,18 +56,20 @@
 <body>
 
 <div class="header">
-
   <img src="frontend/static/imagens/iscon2.png" class="logo">
-{% if atendimentos %}
-<h1>Relatório de Atendimentos ISCON <br> Dia: {{ atendimentos.0.fim|date:"d/m/Y" }}</h1>
-{% endif %}
+
+  {% if atendimentos %}
+    <h1>Relatório de Atendimentos ISCON<br>Dia: {{ atendimentos.0.fim|date:"d/m/Y" }}</h1>
+  {% endif %}
 </div>
 
 <table>
   <tr>
     <th>Senha</th>
-    <th>Guichê</th>
+    <th>Aluno</th>
     <th>Tipo</th>
+    <th>Guichê</th>
+    <th>Atendente</th>
     <th>Início</th>
     <th>Fim</th>
   </tr>
@@ -67,19 +77,14 @@
   {% for a in atendimentos %}
   <tr>
     <td>{{ a.senha }}</td>
-    <td>
-      {% if a.guiche %}
-          {{ a.guiche }}
-      {% else %}
-          Não informado
-      {% endif %}
-  </td>
-    <td>{{ a.tipo }}</td>
-    <td>{{ a.inicio|date:"d/m/Y H:i" }}</td>
-    <td>{{ a.fim|date:"d/m/Y H:i" }}</td>
+    <td>{{ a.aluno }}</td>
+    <td>{{ a.get_tipo_display }}</td>
+    <td>{% if a.guiche %}{{ a.guiche }}{% else %}Não informado{% endif %}</td>
+    <td>{{ a.atendente }}</td>
+    <td>{% if a.inicio %}{{ a.inicio|time:"H:i" }}{% else %}-{% endif %}</td>
+    <td>{% if a.fim %}{{ a.fim|date:"d/m/Y H:i" }}{% else %}-{% endif %}</td>
   </tr>
   {% endfor %}
-
 </table>
 
 </body>
