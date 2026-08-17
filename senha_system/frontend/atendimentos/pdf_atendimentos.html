@@ -59,11 +59,11 @@
   <img src="frontend/static/imagens/iscon2.png" class="logo">
 
   {% if atendimentos %}
-    <h1>Relatório de Atendimentos ISCON<br>Dia: {{ atendimentos.0.fim|date:"d/m/Y" }}</h1>
+    <h1>Relatório de Atendimentos ISCON<br>Data: {{ atendimentos.0.fim|date:"l, d \d\e F \d\e Y" }}</h1>
   {% endif %}
 </div>
 
-<table>
+<table> 
   <tr>
     <th>Senha</th>
     <th>Aluno</th>
