@@ -59,7 +59,7 @@ class Propaganda(models.Model):
 class Historico(models.Model):
     senha = models.ForeignKey(
         "Senha",
-        on_delete=models.CASCADE
+        on_delete=models.PROTECT
     )
 
     guiche = models.ForeignKey(

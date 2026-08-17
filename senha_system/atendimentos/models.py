@@ -26,7 +26,7 @@ class Atendimento(models.Model):
     atendente = models.CharField(max_length=100,choices=ATENDENTES,null=True,blank=True)
     aluno = models.CharField(max_length=100, null=True, blank=True)
     guiche = models.IntegerField(null=True, blank=True)
-    senha = models.ForeignKey("filas.Senha", on_delete=models.CASCADE)
+    senha = models.ForeignKey("filas.Senha", on_delete=models.PROTECT)
     tipo = models.CharField(
         max_length=20,
         choices=TIPOS_ATENDIMENTO,

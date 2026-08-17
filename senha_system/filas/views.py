@@ -1,4 +1,5 @@
 from django.shortcuts import render,redirect,get_object_or_404
+from django.utils import timezone
 from django.views.decorators.http import require_POST
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
@@ -11,12 +12,15 @@ from .models import Senha,ControleFila,Propaganda,Historico
 # GERAR SENHA NORMAL
 # =========================
 def gerar_senha(request):
+    hoje = timezone.localdate()
+
     ultima = (
         Senha.objects
-        .filter(tipo="normal")
+        .filter(tipo="normal",criada_em__date=hoje)
         .order_by("-numero")
         .first()
     )
+
     numero = 1 if not ultima else ultima.numero + 1
     senha = Senha.objects.create(
         numero=numero,
@@ -24,23 +28,26 @@ def gerar_senha(request):
         tipo="normal",
         status="espera"
     )
+
     return render(
         request,
         "totem/senha_gerada.html",
         {"senha": senha}
     )
 
-
 # =========================
 # GERAR SENHA PREFERENCIAL
 # =========================
 def gerar_senha_preferencial(request):
+    hoje = timezone.localdate()
+
     ultima = (
         Senha.objects
-        .filter(tipo="preferencial")
+        .filter(tipo="preferencial",criada_em__date=hoje)
         .order_by("-numero")
         .first()
     )
+
     numero = 1 if not ultima else ultima.numero + 1
     senha = Senha.objects.create(
         numero=numero,
@@ -48,6 +55,7 @@ def gerar_senha_preferencial(request):
         tipo="preferencial",
         status="espera"
     )
+
     return render(
         request,
         "totem/senha_gerada.html",
@@ -73,9 +81,11 @@ def tela_guiche(request, guiche_id):
         .order_by("-id")
         .first()
     )
+    hoje = timezone.localdate()
     fila = (
         Senha.objects
-        .filter(status="espera")
+        .filter(status="espera",
+                criada_em__date=hoje)
         .order_by("criada_em", "id")[:5]
     )
     context = {
@@ -100,14 +110,13 @@ def chamar_proxima(request, guiche_id):
         Guiche,
         id=guiche_id
     )
-
+    hoje = timezone.localdate()
     with transaction.atomic():
         controle = (
             ControleFila.objects
             .select_for_update()
             .first()
         )
-
         if not controle:
 
             controle = ControleFila.objects.create(
@@ -140,7 +149,8 @@ def chamar_proxima(request, guiche_id):
             Senha.objects
             .filter(
                 status="espera",
-                tipo="preferencial"
+                tipo="preferencial",
+                criada_em__date=hoje
             )
             .exists()
         )
@@ -149,7 +159,8 @@ def chamar_proxima(request, guiche_id):
             Senha.objects
             .filter(
                 status="espera",
-                tipo="normal"
+                tipo="normal",
+                criada_em__date=hoje
             )
             .exists()
         )
@@ -175,7 +186,8 @@ def chamar_proxima(request, guiche_id):
             .select_for_update()
             .filter(
                 status="espera",
-                tipo=tipo_prioritario
+                tipo=tipo_prioritario,
+                criada_em__date=hoje
             )
             .order_by(
                 "criada_em",
@@ -195,7 +207,8 @@ def chamar_proxima(request, guiche_id):
                 .select_for_update()
                 .filter(
                     status="espera",
-                    tipo=outro_tipo
+                    tipo=outro_tipo,
+                    criada_em__date=hoje
                 )
                 .order_by(
                     "criada_em",
@@ -273,7 +286,6 @@ def chamar_novamente(request, guiche_id):
 # =========================
 # PAINEL TV
 # =========================
-
 def painel_tv(request):
     ultima = (
         Senha.objects
@@ -287,10 +299,11 @@ def painel_tv(request):
         .filter(status="finalizado")
         .order_by("-id")[:10]
     )
-
+    hoje = timezone.localdate()
     fila = (
         Senha.objects
-        .filter(status="espera")
+        .filter(status="espera",
+                criada_em__date=hoje)
         .order_by("criada_em", "id")[:10]
     )
 
@@ -351,10 +364,10 @@ def painel_tv_data(request):
         )
         .order_by("-id")[:10]
     )
-
+    hoje = timezone.localdate()
     fila = (
         Senha.objects
-        .filter(status="espera")
+        .filter(status="espera", criada_em__date=hoje)
         .order_by(
             "criada_em",
             "id"
@@ -422,10 +435,11 @@ def painel_dados(request):
         .order_by("-id")
         .first()
     )
-
+    hoje = timezone.localdate()
     fila = (
         Senha.objects
-        .filter(status="espera")
+        .filter(status="espera", 
+                criada_em__date=hoje)
         .order_by("criada_em", "id")[:10]
     )
 
