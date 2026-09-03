@@ -10,6 +10,7 @@ class Atendimento(models.Model):
         ('grade', 'Grade'),
         ('requerimento', 'Requerimento'),
         ('ementario/historico', 'Ementário/Histórico'),
+        ('lançamento de notas', 'Lançamento de Notas'),
         ('suporte', 'Suporte'),
         ('ti', 'TI'),
     ]
@@ -21,6 +22,7 @@ class Atendimento(models.Model):
     ('Fátima', 'Fátima'),
     ('Fernando', 'Fernando'),
     ('Jane', 'Jane'),
+    ('Ana Paula', 'Ana Paula'),
     ]
 
     atendente = models.CharField(max_length=100,choices=ATENDENTES,null=True,blank=True)
