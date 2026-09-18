@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/filas.css' %}">
+<link rel="stylesheet" href="{% static 'frontend/css/filas.css' %}">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;700;900&family=Barlow:wght@400;600;700&display=swap" rel="stylesheet">
@@ -64,5 +64,5 @@
 
 {% block extra_js %}
 {{ propagandas|json_script:"banners-data" }}
-<script src="{% static 'js/painel_tv.js' %}"></script>
+<script src="{% static 'frontend/js/painel_tv.js' %}"></script>
 {% endblock %}
