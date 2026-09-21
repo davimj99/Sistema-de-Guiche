@@ -1,4 +1,5 @@
 from django.db import models
+from .models_chat import ChatbotMensagem
 
 class Senha(models.Model):
 
