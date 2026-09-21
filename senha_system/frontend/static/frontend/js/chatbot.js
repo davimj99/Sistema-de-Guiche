@@ -269,7 +269,7 @@ document.addEventListener("DOMContentLoaded", function () {
             );
 
             adicionarMensagem(
-                "Não foi possível conectar ao assistente. Verifique sua conexão com o sistema.",
+                "Não foi possível conectar ao assistente. Verifique sua conexão com o sistema e tente novamente.",
                 "bot"
             );
 

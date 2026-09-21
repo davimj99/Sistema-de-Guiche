@@ -59,18 +59,11 @@
 </div>
 
 <!-- CHATBOT ISCON -->
-
 <div class="chatbot-container">
-
     <!-- Janela -->
-
-    <div
-        id="chatbot-window"
-        class="chatbot-window"
-    >
+    <div id="chatbot-window" class="chatbot-window" >
 
         <div class="chatbot-header">
-
             <div class="chatbot-header-info">
 
                 <span class="chatbot-title">
@@ -83,24 +76,14 @@
 
             </div>
 
-            <button
-                id="chatbot-close"
-                class="chatbot-close"
-                type="button"
-                aria-label="Fechar chatbot"
-            >
-                ×
-            </button>
+            <button id="chatbot-close" class="chatbot-close" type="button" 
+            aria-label="Fechar chatbot"> × </button>
 
         </div>
 
 
         <!-- Mensagens -->
-
-        <div
-            id="chatbot-messages"
-            class="chatbot-messages"
-        >
+        <div id="chatbot-messages" class="chatbot-messages">
 
             <div class="chat-message bot">
 
@@ -116,24 +99,21 @@
                 <button
                     class="chatbot-suggestion"
                     type="button"
-                    onclick="document.getElementById('chatbot-input').value='Como chamar a próxima senha?'; document.getElementById('chatbot-send').click();"
-                >
+                    onclick="document.getElementById('chatbot-input').value='Como chamar a próxima senha?'; document.getElementById('chatbot-send').click();">
                     Como chamar a próxima senha?
                 </button>
 
                 <button
                     class="chatbot-suggestion"
                     type="button"
-                    onclick="document.getElementById('chatbot-input').value='Como chamar novamente?'; document.getElementById('chatbot-send').click();"
-                >
+                    onclick="document.getElementById('chatbot-input').value='Como chamar novamente?'; document.getElementById('chatbot-send').click();">
                     Como chamar novamente?
                 </button>
 
                 <button
                     class="chatbot-suggestion"
                     type="button"
-                    onclick="document.getElementById('chatbot-input').value='A senha não aparece na TV'; document.getElementById('chatbot-send').click();"
-                >
+                    onclick="document.getElementById('chatbot-input').value='A senha não aparece na TV'; document.getElementById('chatbot-send').click();">
                     Senha não aparece na TV
                 </button>
 
@@ -145,37 +125,30 @@
         <!-- Entrada -->
 
         <div class="chatbot-input-area">
-
             <input
                 type="text"
                 id="chatbot-input"
                 class="chatbot-input"
                 placeholder="Digite sua dúvida..."
-                autocomplete="off"
-            >
+                autocomplete="off">
 
             <button
                 type="button"
                 id="chatbot-send"
                 class="chatbot-send"
-                aria-label="Enviar mensagem"
-            >
+                aria-label="Enviar mensagem">
                 ➤
             </button>
 
         </div>
 
     </div>
-
-
     <!-- Botão -->
-
     <button
         type="button"
         id="chatbot-button"
         class="chatbot-button"
-        aria-label="Abrir Assistente ISCON"
-    >
+        aria-label="Abrir Assistente ISCON">
         💬
     </button>
 
