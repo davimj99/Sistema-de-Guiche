@@ -6,7 +6,8 @@ from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from accounts.models import Guiche
 from .models import Senha,ControleFila,Propaganda,Historico
-from .service.spring_api import listar_filas
+# from .service.spring_api import listar_filas
+from .service.spring_api import listar_guiches, buscar_guiche
 
 
 # =========================
@@ -464,3 +465,11 @@ def painel_dados(request):
 def testar_filas_spring(request):
     filas = listar_filas()
     return JsonResponse({"filas": filas})
+
+def testar_guiches_spring(request):
+
+    guiches = listar_guiches()
+
+    return JsonResponse({
+        "guiches": guiches
+    })

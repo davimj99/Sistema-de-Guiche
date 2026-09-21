@@ -1,8 +1,11 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Painel de Atendimento{% endblock %}
 
 {% block content %}
+
+<link rel="stylesheet"href="{% static 'frontend/css/chatbot.css' %}">
 
 <h2>Painel de Atendimento</h2>
 
@@ -55,86 +58,133 @@
 
 </div>
 
+<!-- CHATBOT ISCON -->
+
+<div class="chatbot-container">
+
+    <!-- Janela -->
+
+    <div
+        id="chatbot-window"
+        class="chatbot-window"
+    >
+
+        <div class="chatbot-header">
+
+            <div class="chatbot-header-info">
+
+                <span class="chatbot-title">
+                    Assistente ISCON
+                </span>
+
+                <span class="chatbot-status">
+                    Assistente do Sistema de Guichê
+                </span>
+
+            </div>
+
+            <button
+                id="chatbot-close"
+                class="chatbot-close"
+                type="button"
+                aria-label="Fechar chatbot"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+        <!-- Mensagens -->
+
+        <div
+            id="chatbot-messages"
+            class="chatbot-messages"
+        >
+
+            <div class="chat-message bot">
+
+                Olá! Sou o Assistente ISCON.
+
+                Posso ajudar você com dúvidas
+                sobre o Sistema de Guichê.
+
+            </div>
+
+            <div class="chatbot-suggestions">
+
+                <button
+                    class="chatbot-suggestion"
+                    type="button"
+                    onclick="document.getElementById('chatbot-input').value='Como chamar a próxima senha?'; document.getElementById('chatbot-send').click();"
+                >
+                    Como chamar a próxima senha?
+                </button>
+
+                <button
+                    class="chatbot-suggestion"
+                    type="button"
+                    onclick="document.getElementById('chatbot-input').value='Como chamar novamente?'; document.getElementById('chatbot-send').click();"
+                >
+                    Como chamar novamente?
+                </button>
+
+                <button
+                    class="chatbot-suggestion"
+                    type="button"
+                    onclick="document.getElementById('chatbot-input').value='A senha não aparece na TV'; document.getElementById('chatbot-send').click();"
+                >
+                    Senha não aparece na TV
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- Entrada -->
+
+        <div class="chatbot-input-area">
+
+            <input
+                type="text"
+                id="chatbot-input"
+                class="chatbot-input"
+                placeholder="Digite sua dúvida..."
+                autocomplete="off"
+            >
+
+            <button
+                type="button"
+                id="chatbot-send"
+                class="chatbot-send"
+                aria-label="Enviar mensagem"
+            >
+                ➤
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- Botão -->
+
+    <button
+        type="button"
+        id="chatbot-button"
+        class="chatbot-button"
+        aria-label="Abrir Assistente ISCON"
+    >
+        💬
+    </button>
+
+</div>
+
 {% endblock %}
 
 {% block extra_js %}
+<script src="{% static 'frontend/js/chatbot.js' %}"></script>
 
-<script>
-// Controla se já animamos/tratamos essa chamada, mesmo com o áudio desativado.
-let ultimaChamada = null;
-
-/* Áudio desativado por enquanto.
-function falarSenha(senha, guiche) {
-    speechSynthesis.cancel();
-
-    const texto = `Senha ${senha}, dirigir-se ao guichê ${guiche}.`;
-
-    function falar() {
-        const voz = new SpeechSynthesisUtterance(texto);
-        voz.lang = "pt-BR";
-        voz.rate = 0.9;
-        voz.pitch = 1;
-        speechSynthesis.speak(voz);
-    }
-
-    falar();
-
-    setTimeout(falar, 3000);
-    setTimeout(falar, 6000);
-}
-*/
-
-function atualizarPainel() {
-    fetch("/painel/dados/?t=" + Date.now(), {
-        cache: "no-store"
-    })
-    .then(response => response.json())
-    .then(data => {
-
-        const senhaEl = document.getElementById("senha-atual");
-        const guicheEl = document.getElementById("guiche-atual");
-        const filaEl = document.getElementById("fila-espera");
-
-        if (data.status === "sucesso") {
-
-            const senha = data.dados.senha;
-            const guiche = data.dados.guiche;
-            const chamadaId = data.dados.chamada_id;
-
-            senhaEl.innerText = senha;
-            guicheEl.innerText = "Dirija-se ao " + guiche;
-
-            if (ultimaChamada !== chamadaId) {
-
-                senhaEl.classList.remove("destaque");
-                void senhaEl.offsetWidth;
-                senhaEl.classList.add("destaque");
-
-                // Áudio desativado por enquanto — descomente a função acima
-                // e a linha abaixo para reativar o anúncio por voz.
-                // falarSenha(senha, guiche);
-
-                ultimaChamada = chamadaId;
-            }
-
-        } else {
-
-            senhaEl.innerText = "---";
-            guicheEl.innerText = "";
-        }
-
-        filaEl.innerHTML = "";
-
-        data.fila.forEach(senha => {
-            const li = document.createElement("li");
-            li.innerText = senha;
-            filaEl.appendChild(li);
-        });
-    })
-    .catch(error => console.error("Erro:", error));
-}
-
-setInterval(atualizarPainel, 3000);
-atualizarPainel();
-</script>
+<script src="{% static 'frontend/js/painel_funcionario.js' %}"></script>
 {% endblock %}
