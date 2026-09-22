@@ -102,16 +102,24 @@ class EPI(models.Model):
 
 class EntregaEPI(models.Model):
 
+    funcionario = models.ForeignKey(
+        Funcionario,
+        on_delete=models.PROTECT,
+        related_name="entregas_epi"
+    )
+
+    funcionario_nome = models.CharField(
+        max_length=150
+    )
+
     epi = models.ForeignKey(
         EPI,
         on_delete=models.PROTECT,
         related_name="entregas"
     )
 
-    funcionario = models.ForeignKey(
-        Funcionario,
-        on_delete=models.PROTECT,
-        related_name="entregas_epi"
+    epi_nome = models.CharField(
+        max_length=100
     )
 
     quantidade = models.PositiveIntegerField()
@@ -137,8 +145,14 @@ class EntregaEPI(models.Model):
         db_table = "entregas_epi"
         ordering = ["-data_entrega"]
 
+    def save(self, *args, **kwargs):
+        self.funcionario_nome = self.funcionario.nome
+        self.epi_nome = self.epi.nome
+
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return (
-            f"{self.epi.nome} - "
-            f"{self.funcionario.nome}"
+            f"{self.epi_nome} - "
+            f"{self.funcionario_nome}"
         )
