@@ -1,0 +1,55 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Página não encontrada</title>
+
+    <link rel="stylesheet" href="{% static 'frontend/css/404.css' %}">
+    <link rel="icon" href="{% static 'frontend/img/iscon2.png' %}" type="image/png">
+    <script src="{% static 'frontend/js/404.js' %}"></script>
+</head>
+<body>
+
+    <div class="circle circle1"></div>
+    <div class="circle circle2"></div>
+
+    <div class="logo">
+        <img src="{% static 'frontend/img/iscon2.png' %}" alt="Logo ISCON">
+        <span> Faculdade ISCON <br></span>
+    </div>
+
+    <div class="container">
+
+        <h1><span>404</span>⚠️</h1>
+        
+
+        <h2><span>Acesso Negado !</span> </h2>
+
+        <p>
+            Você não tem permissão para acessar esta página. <br>
+            Por favor, entre em contato com o administrador do sistema.
+        </p>
+
+        <a href="/filas/tv/">
+            <span class="btn">
+               TV Do Guichê <br>Clique Aqui
+            </span>
+        </a>
+
+    </div>
+
+    <footer>
+        &copy; <span id="ano"></span> Tecnologia
+        <span>ISCON</span>. Todos os direitos reservados.<br>
+        Desenvolvido por <span>Davi Souza</span>
+    </footer>
+
+    <script>
+        document.getElementById('ano').textContent = new Date().getFullYear();
+    </script>
+
+</body>
+</html>

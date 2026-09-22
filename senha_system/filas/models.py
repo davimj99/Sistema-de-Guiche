@@ -1,10 +1,12 @@
 from django.db import models
+from .models_chat import ChatbotMensagem
 
 class Senha(models.Model):
 
     STATUS = (
         ("espera", "Em Espera"),
         ("chamando", "Chamando"),
+        ("chamando_novamente", "Chamando_Novamente"),
         ("atendimento", "Em Atendimento"),
         ("finalizado", "Finalizado"),
     )
@@ -14,8 +16,8 @@ class Senha(models.Model):
         ("preferencial", "Preferencial"),
     )
 
-    numero = models.IntegerField()
     prefixo = models.CharField(max_length=2)
+    numero = models.IntegerField()
 
     tipo = models.CharField(
         max_length=20,
@@ -43,6 +45,8 @@ class Senha(models.Model):
     
 class ControleFila(models.Model):
     contador = models.IntegerField(default=0)
+    def __str__(self):
+        return f"Contador: {self.contador}"
 
 class Propaganda(models.Model):
     titulo = models.CharField(max_length=100)
@@ -57,7 +61,7 @@ class Propaganda(models.Model):
 class Historico(models.Model):
     senha = models.ForeignKey(
         "Senha",
-        on_delete=models.CASCADE
+        on_delete=models.PROTECT
     )
 
     guiche = models.ForeignKey(

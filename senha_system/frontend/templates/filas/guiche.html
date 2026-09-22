@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}
+Guichê {{ guiche.nome }}
+{% endblock %}
+
+{% block content %}
+
+<h2>Guichê {{ guiche.nome }}</h2>
+
+<h3>Senha Atual:</h3>
+
+{% if senha_atual %}
+    <h1>{{ senha_atual.prefixo }}{{ senha_atual.numero }}</h1>
+{% else %}
+    <p>Nenhuma senha sendo chamada</p>
+{% endif %}
+
+<h3>Fila:</h3>
+<ul>
+    {% for senha in fila %}
+        <li>{{ senha.prefixo }}{{ senha.numero }}</li>
+    {% endfor %}
+</ul>
+
+{% endblock %}

@@ -1,0 +1,148 @@
+:root {
+  --iscon-navy: #f8f9fb;
+  --iscon-navy-dark: #0d6efd;
+  --iscon-navy-light: #efeff4;
+  --iscon-accent: #126f0f;
+  --iscon-surface: #1a1aaa22;
+}
+
+html, body {
+  background-color: var(--iscon-navy);
+  color: #e8eaf6;
+  min-height: 100vh;
+  height: 100%;
+}
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* HEADER */
+.iscon-header {
+  background-color: var(--iscon-navy-dark);
+  border-bottom: 3px solid var(--iscon-accent);
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+}
+
+.iscon-header img {
+  height: auto;
+  filter: brightness(0) invert(1);
+}
+
+/* TÍTULO */
+.page-title {
+  color: #0d6efd;
+  font-weight: 700;
+  letter-spacing: .5px;
+}
+
+/* CARDS */
+.card {
+  background-color: #0d6efd;
+  border: 1px solid #fbfbfc;
+  color: #e8eaf6;
+}
+
+/* FORM */
+.card .form-label {
+  color: #c5cae9;
+  font-weight: 500;
+}
+
+.card .form-select {
+  background-color: #fffdfd;
+  border: 1px solid #030303;
+  color: #0e0e0f;
+}
+
+.card .form-select option {
+  background-color: #f9f9fb;
+  color: #0b0b0b;
+}
+
+/* BOTÕES */
+.btn-primary {
+  background-color: #2929d6;
+  border-color: #3333e8;
+}
+
+.btn-primary:hover {
+  background-color: #3333e8;
+  border-color: #4444f0;
+}
+
+.btn-danger {
+  background-color: var(--iscon-accent);
+  border-color: #f4f4f4;
+}
+
+/* TABELA */
+.table {
+  color: #e8eaf6;
+  border-color: #c3c3ea;
+}
+
+.table-striped > tbody > tr:nth-of-type(odd) > * {
+  background-color: rgba(255,255,255,0.05);
+  color: #e8eaf6;
+}
+
+.table-hover > tbody > tr:hover > * {
+  background-color: rgba(255,255,255,0.1);
+  color: #ffffff;
+}
+
+.table-dark {
+  --bs-table-bg: var(--iscon-navy-dark);
+  --bs-table-border-color: #2828cc;
+}
+
+.table > :not(caption) > * > * {
+  border-bottom-color: #f3f3f4;
+}
+
+/* LOGO */
+.logo-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
+.footer {
+  background-color: var(--iscon-navy-dark);
+  color: #ffffff;
+  padding: 20px 0;
+  text-align: center;
+  margin-top: auto;
+}
+
+.footer-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.footer-title {
+  font-size: 14px;
+  font-weight: 500;
+  margin: 0;
+}
+
+.footer-sub {
+  font-size: 13px;
+  opacity: 0.9;
+  margin: 0;
+}
+
+.footer-divider {
+  width: 120px;
+  height: 2px;
+  background: var(--iscon-accent);
+  border-radius: 5px;
+  margin: 6px 0;
+}

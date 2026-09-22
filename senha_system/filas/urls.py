@@ -1,5 +1,6 @@
 from django.urls import path
-from .views import gerar_senha, tela_guiche, chamar_proxima, totem, painel_tv, painel_tv_data, gerar_senha_preferencial,painel_dados
+from .views import chamar_novamente, gerar_senha, tela_guiche, chamar_proxima, totem, painel_tv, painel_tv_data, gerar_senha_preferencial,painel_dados, testar_guiches_spring
+from .views_chat import chatbot_api
 
 urlpatterns = [
     path("gerar/", gerar_senha),
@@ -9,5 +10,8 @@ urlpatterns = [
     path("tv/", painel_tv, name="painel_tv"),
     path("tv/data/", painel_tv_data, name="tv_data"),
     #path("painel/dados/", painel_dados),
+    path("chamar-novamente/<int:guiche_id>/",chamar_novamente),
     path("preferencial/", gerar_senha_preferencial, name="senha_preferencial"),
+    path("testar/guiches/spring/", testar_guiches_spring, name="testar_guiches_spring"),
+    path("chatbot/", chatbot_api, name="chatbot_api")
 ]

@@ -19,3 +19,7 @@ db.sqlite3
 Thumbs.db
 
 .env
+media/
+
+# Arquivos estáticos coletados (gerados pelo collectstatic)
+staticfiles/
