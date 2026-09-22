@@ -1,0 +1,195 @@
+/* ============================================================
+   FILTROS
+============================================================ */
+
+.estoque-filtros {
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    margin-bottom: 25px;
+}
+
+.estoque-filtro {
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    min-height: 40px;
+
+    padding: 0 15px;
+
+    border: 1px solid #d7dce3;
+
+    border-radius: 7px;
+
+    background: white;
+
+    color: #596273;
+
+    text-decoration: none;
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    transition: .2s;
+}
+
+.estoque-filtro:hover {
+    border-color: #185ec7;
+
+    color: #185ec7;
+
+    background: #f8fbff;
+}
+
+.estoque-filtro.active {
+    background: #185ec7;
+
+    border-color: #185ec7;
+
+    color: white;
+}
+
+.estoque-filtros label {
+    display: block;
+
+    margin-bottom: 7px;
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    color: #374151;
+}
+
+.estoque-filtros select {
+    min-height: 40px;
+
+    padding: 0 12px;
+
+    border: 1px solid #d7dce3;
+
+    border-radius: 7px;
+
+    background: white;
+
+    color: #596273;
+
+    font-size: 13px;
+
+    outline: none;
+}
+
+.estoque-filtros select:focus {
+    border-color: #185ec7;
+}
+
+
+/* ============================================================
+   TABELA
+============================================================ */
+
+.estoque-tabela-wrapper {
+    width: 100%;
+
+    overflow-x: auto;
+}
+
+.estoque-tabela {
+    width: 100%;
+
+    border-collapse: collapse;
+
+    font-size: 14px;
+}
+
+.estoque-tabela th {
+    padding: 14px 15px;
+
+    text-align: left;
+
+    background: #f7f8fa;
+
+    border-bottom: 1px solid #e1e5ea;
+
+    color: #596273;
+
+    font-size: 12px;
+
+    text-transform: uppercase;
+
+    letter-spacing: .4px;
+}
+
+.estoque-tabela td {
+    padding: 16px 15px;
+
+    border-bottom: 1px solid #edf0f3;
+
+    color: #596273;
+}
+
+.estoque-tabela tbody tr:hover {
+    background: #fafcff;
+}
+
+.estoque-tabela td strong {
+    color: #172033;
+}
+
+
+/* ============================================================
+   STATUS DO ESTOQUE
+============================================================ */
+
+.estoque-status {
+    display: inline-flex;
+
+    padding: 5px 10px;
+
+    border-radius: 20px;
+
+    font-size: 12px;
+
+    font-weight: 700;
+}
+
+.estoque-status.normal {
+    background: #eaf7ed;
+
+    color: #287a39;
+}
+
+.estoque-status.baixo {
+    background: #fff7e6;
+
+    color: #b54708;
+}
+
+.estoque-status.zerado {
+    background: #fff1f1;
+
+    color: #b42318;
+}
+
+
+/* ============================================================
+   RESPONSIVO
+============================================================ */
+
+@media (max-width: 650px) {
+
+    .estoque-filtros {
+        flex-wrap: wrap;
+    }
+
+    .estoque-filtro {
+        flex: 1;
+    }
+}

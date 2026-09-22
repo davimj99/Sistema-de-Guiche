@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'filas',
     'atendimentos',
     'painel',
+    "epis",
     'api',
 
 ]

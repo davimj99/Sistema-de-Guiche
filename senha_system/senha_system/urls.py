@@ -28,6 +28,7 @@ urlpatterns = [
     path('filas/', include('filas.urls')),
     path('painel/', include('painel.urls')),
     path('atendimentos/', include('atendimentos.urls')),
+    path("epis/", include("epis.urls")),
 ]
 
 # Serve media manualmente, funciona mesmo com DEBUG=False
