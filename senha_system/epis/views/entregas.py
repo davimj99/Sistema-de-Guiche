@@ -114,6 +114,7 @@ def entrega_nova(request):
         }
     )
 
+@login_required
 def entrega_excluir(request, pk):
     if request.method == "POST":
         entrega = get_object_or_404(EntregaEPI, pk=pk)

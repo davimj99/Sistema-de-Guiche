@@ -19,6 +19,7 @@ from .epis import (
 from .entregas import (
     entregas_lista,
     entrega_nova,
+    entrega_excluir,
 )
 
 from .estoque import (
