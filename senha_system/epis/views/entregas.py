@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.shortcuts import get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.db import models
 from django.shortcuts import redirect, render
@@ -112,3 +113,16 @@ def entrega_nova(request):
             "acao": "Registrar entrega",
         }
     )
+
+def entrega_excluir(request, pk):
+    if request.method == "POST":
+        entrega = get_object_or_404(EntregaEPI, pk=pk)
+
+        entrega.delete()
+
+        messages.success(
+            request,
+            "Entrega de EPI excluída com sucesso."
+        )
+
+    return redirect("epis:entregas")
