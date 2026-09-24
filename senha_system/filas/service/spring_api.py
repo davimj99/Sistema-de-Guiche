@@ -1,13 +1,3 @@
-# import requests
-
-# SPRING_API_URL = "http://10.20.0.7:8080"  # Replace with your Spring API URL
-
-# def listar_filas():
-#     response = requests.get(f"{SPRING_API_URL}/filas", timeout=5)
-
-#     response.raise_for_status()  # Raise an exception for HTTP errors
-#     return response.json()  # Return the JSON response from the Spring API
-
 import requests
 
 SPRING_API_URL = "http://localhost:8080"
@@ -30,6 +20,17 @@ def listar_guiches():
     return response.json()
 
 
+def listar_filas():
+    response = requests.get(
+        f"{SPRING_API_URL}/filas",
+        timeout=5
+    )
+
+    response.raise_for_status()
+
+    return response.json()
+
+
 def buscar_guiche(guiche_id):
     response = requests.get(
         f"{SPRING_API_URL}/guiches/{guiche_id}",
@@ -39,6 +40,9 @@ def buscar_guiche(guiche_id):
     response.raise_for_status()
 
     return response.json()
+
+
+def excluir_guiche(guiche_id):
     response = requests.delete(
         f"{SPRING_API_URL}/guiches/{guiche_id}",
         timeout=5
