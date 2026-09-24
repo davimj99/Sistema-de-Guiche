@@ -20,3 +20,4 @@ from .spring import (
     testar_filas_spring,
     testar_guiches_spring,
 )
+from .chatbot_views import chatbot_api

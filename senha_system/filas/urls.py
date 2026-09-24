@@ -4,7 +4,7 @@ from .views.guiche import tela_guiche, chamar_proxima, chamar_novamente
 from .views.painel import painel_tv, painel_tv_data
 #painel_dados
 from .views.spring import testar_guiches_spring, testar_filas_spring
-from .views_chat import chatbot_api
+from .views import chatbot_api
 
 
 urlpatterns = [
