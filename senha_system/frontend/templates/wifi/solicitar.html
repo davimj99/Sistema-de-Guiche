@@ -1,0 +1,210 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Solicitação de Wi-Fi</title>
+
+    <link
+        rel="stylesheet"
+        href="{% static 'frontend/css/wifi/solicitar.css' %}"
+    >
+
+</head>
+
+<body>
+
+    <header class="wifi-header">
+
+        <img
+            src="{% static 'frontend/img/iscon2.png' %}"
+            alt="ISCON"
+            class="logo"
+        >
+
+        <div>
+            <h1>Solicitação de Wi-Fi</h1>
+            <p>Portal do aluno</p>
+        </div>
+
+    </header>
+
+    <main class="container">
+
+    <main class="container">
+
+        <section class="form-card">
+
+            <div class="form-header">
+
+                <h1>Solicitação de Wi-Fi</h1>
+
+                <p>
+                    Preencha os dados abaixo para solicitar acesso
+                    à rede Wi-Fi da instituição. <br>
+                    Os campos com *** são obrigatórios
+                </p>
+
+            </div>
+
+            <form method="POST">
+
+                {% csrf_token %}
+
+                <div class="form-group">
+
+                    <label for="nome_aluno">
+                        Nome do aluno
+                        <span>***</span>
+                    </label>
+
+                    <input
+                        type="text"
+                        id="nome_aluno"
+                        name="nome_aluno"
+                        placeholder="Digite seu nome completo"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="matricula">
+                        Matrícula
+                        <span>***</span>
+                    </label>
+
+                    <input
+                        type="text"
+                        id="matricula"
+                        name="matricula"
+                        placeholder="Digite sua matrícula"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="curso">
+                        Curso
+                        <span>***</span>
+                    </label>
+
+                    <input
+                        type="text"
+                        id="curso"
+                        name="curso"
+                        placeholder="Digite seu curso"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="email">
+                        E-mail
+                    </label>
+
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        placeholder="Digite seu e-mail"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="dispositivo">
+                        Dispositivo
+                    </label>
+
+                    <select
+                        id="dispositivo"
+                        name="dispositivo"
+                    >
+
+                        <option value="">
+                            Selecione o dispositivo
+                        </option>
+
+                        <option value="Celular">
+                            Celular
+                        </option>
+
+                        <option value="Notebook">
+                            Notebook
+                        </option>
+
+                        <option value="Tablet">
+                            Tablet
+                        </option>
+
+                        <option value="Outro">
+                            Outro
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="motivo">
+                        Motivo
+                    </label>
+
+                    <textarea
+                        id="motivo"
+                        name="motivo"
+                        placeholder="Informe o motivo da solicitação"
+                    ></textarea>
+
+                </div>
+
+
+                <div class="form-actions">
+
+                    <a
+                        href="{% url 'wifi:minhas_solicitacoes' %}"
+                        class="btn-secondary"
+                    >
+                        Cancelar
+                    </a>
+
+                    <button
+                        type="submit"
+                        class="btn-primary"
+                    >
+                        Solicitar acesso
+                    </button>
+
+                </div>
+
+            </form>
+
+        </section>
+
+    </main>
+
+</body>
+
+</html>
