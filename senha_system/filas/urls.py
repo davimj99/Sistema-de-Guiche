@@ -27,7 +27,8 @@ urlpatterns = [
 
     # Spring API
     path("testar/filas/spring/", testar_filas_spring, name="testar_filas_spring"),
-    path("testar/guiches/spring/", testar_guiches_spring, name="testar_guiches_spring"),path("testar/guiches/spring/", testar_guiches_spring, name="testar_guiches_spring"),
+    path("testar/guiches/spring/", testar_guiches_spring, name="testar_guiches_spring"),
+    
 
     # Chatbot
     path("chatbot/", chatbot_api, name="chatbot_api"),
