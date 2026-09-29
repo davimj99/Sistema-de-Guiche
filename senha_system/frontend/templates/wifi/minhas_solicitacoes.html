@@ -1,78 +1,35 @@
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
-
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Consultar solicitação | Wi-Fi ISCON</title>
-
-    <link
-        rel="stylesheet"
-        href="{% static 'frontend/css/wifi/minhas_solicitacoes.css' %}"
-    >
-
+    <link rel="stylesheet" href="{% static 'frontend/css/wifi/minhas_solicitacoes.css' %}">
 </head>
 
 <body>
-
     <header class="wifi-header">
-
-        <img
-            src="{% static 'frontend/img/iscon2.png' %}"
-            alt="ISCON"
-            class="logo"
-        >
-
+        <img src="{% static 'frontend/img/iscon2.png' %}" alt="ISCON" class="logo">
         <div>
-
             <h1>Wi-Fi ISCON</h1>
-
             <p>Portal do aluno</p>
-
         </div>
-
     </header>
 
-
     <main class="container">
-
         <section class="consulta-card">
-
-            <div class="consulta-icon">
-                ?
-            </div>
-
-
-            <h1>
-                Consultar solicitação
-            </h1>
-
+            <div class="consulta-icon"> ? </div>
+            <h1> Consultar solicitação</h1>
 
             <p class="descricao">
                 Informe o protocolo recebido após realizar
                 sua solicitação de acesso ao Wi-Fi.
             </p>
 
-
-            <form
-                method="GET"
-                action="{% url 'wifi:minhas_solicitacoes' %}"
-            >
-
+            <form method="GET" action="{% url 'wifi:minhas_solicitacoes' %}">
                 <div class="form-group">
-
-                    <label for="protocolo">
-                        Protocolo
-                    </label>
-
+                    <label for="protocolo"> Protocolo </label>
                     <input
                         type="text"
                         id="protocolo"
@@ -80,46 +37,25 @@
                         placeholder="WIFI-2026-000001"
                         maxlength="30"
                         autocomplete="off"
-                        required
-                    >
-
+                        required >
                 </div>
 
-
-                <button
-                    type="submit"
-                    class="btn-consultar"
-                >
+                <button type="submit" class="btn-consultar">
                     Consultar solicitação
                 </button>
-
             </form>
 
 
             {% if erro %}
-
-                <div class="erro">
-                    {{ erro }}
-                </div>
-
+                <div class="erro"> {{ erro }}</div>
             {% endif %}
 
-
             <div class="acoes">
-
-                <a
-                    href="{% url 'wifi:solicitar' %}"
-                    class="btn-nova"
-                >
+                <a href="{% url 'wifi:solicitar' %}" class="btn-nova">
                     Nova solicitação
                 </a>
-
             </div>
-
         </section>
-
     </main>
-
 </body>
-
 </html>

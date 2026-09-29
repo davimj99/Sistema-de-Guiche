@@ -1,203 +1,93 @@
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
-
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
+    <meta name="viewport"content="width=device-width, initial-scale=1.0">
     <title>Detalhes da solicitação | Wi-Fi ISCON</title>
-
-    <link
-        rel="stylesheet"
-        href="{% static 'frontend/css/wifi/detalhes.css' %}"
-    >
-
+    <link rel="stylesheet" href="{% static 'frontend/css/wifi/detalhes.css' %}">
 </head>
 
 <body>
-
     <header class="wifi-header">
-
-        <img
-            src="{% static 'frontend/img/iscon2.png' %}"
-            alt="ISCON"
-            class="logo"
-        >
-
+        <img src="{% static 'frontend/img/iscon2.png' %}" alt="ISCON" class="logo">
         <div>
-
             <h1>Wi-Fi ISCON</h1>
-
             <p>Detalhes da solicitação</p>
-
         </div>
-
     </header>
 
-
     <main class="container">
-
         <section class="details-card">
-
-            <h2>
-                Solicitação de Wi-Fi
-            </h2>
-
+            <h2> Solicitação de Wi-Fi</h2>
 
             <div class="protocol">
-
-                <span>
-                    Protocolo
-                </span>
-
-                <strong>
-                    {{ solicitacao.protocolo }}
-                </strong>
-
+                <span> Protocolo</span>
+                <strong>{{ solicitacao.protocolo }}</strong>
             </div>
 
-
             <div class="info-row">
-
-                <span class="info-label">
-                    Nome:
-                </span>
-
-                <span class="info-value">
-                    {{ solicitacao.nome_aluno }}
-                </span>
-
+                <span class="info-label">Nome:</span>
+                <span class="info-value">{{ solicitacao.nome_aluno }}</span>
             </div>
 
-
             <div class="info-row">
-
-                <span class="info-label">
-                    Matrícula:
-                </span>
-
-                <span class="info-value">
-                    {{ solicitacao.matricula }}
-                </span>
-
+                <span class="info-label">Matrícula:</span>
+                <span class="info-value"> {{ solicitacao.matricula }}</span>
             </div>
 
-
             <div class="info-row">
-
-                <span class="info-label">
-                    Curso:
-                </span>
-
-                <span class="info-value">
-                    {{ solicitacao.curso }}
-                </span>
-
+                <span class="info-label">Curso:</span>
+                <span class="info-value">{{ solicitacao.curso }}</span>
             </div>
 
-
             <div class="info-row">
-
-                <span class="info-label">
-                    E-mail:
-                </span>
-
-                <span class="info-value">
-                    {{ solicitacao.email|default:"Não informado" }}
-                </span>
-
+                <span class="info-label"> E-mail:</span>
+                <span class="info-value">{{ solicitacao.email|default:"Não informado" }}</span>
             </div>
 
-
             <div class="info-row">
-
-                <span class="info-label">
-                    Dispositivo:
-                </span>
-
+                <span class="info-label"> Dispositivo:</span>
                 <span class="info-value">
                     {{ solicitacao.dispositivo|default:"Não informado" }}
                 </span>
-
             </div>
 
-
             <div class="info-row">
-
-                <span class="info-label">
-                    Motivo:
-                </span>
-
+                <span class="info-label">Motivo:</span>
                 <span class="info-value">
                     {{ solicitacao.motivo|default:"Não informado" }}
                 </span>
-
             </div>
 
-
             <div class="info-row">
-
-                <span class="info-label">
-                    Status:
-                </span>
-
+                <span class="info-label">Status:</span>
                 <span class="info-value">
-
-                    <span
-                        class="status-badge status-{{ solicitacao.status|lower }}"
-                    >
+                    <span class="status-badge status-{{ solicitacao.status|lower }}">
                         {{ solicitacao.get_status_display }}
                     </span>
-
                 </span>
-
             </div>
 
-
             <div class="info-row">
-
-                <span class="info-label">
-                    Observação da TI:
-                </span>
-
+                <span class="info-label"> Observação da TI:</span>
                 <span class="info-value">
                     {{ solicitacao.observacao_ti|default:"Nenhuma observação" }}
                 </span>
-
             </div>
 
-
             <div class="info-row">
-
-                <span class="info-label">
-                    Solicitado em:
-                </span>
-
+                <span class="info-label"> Solicitado em:</span>
                 <span class="info-value">
                     {{ solicitacao.criado_em|date:"d/m/Y H:i" }}
                 </span>
-
             </div>
 
-
-            <a
-                href="{% url 'wifi:minhas_solicitacoes' %}"
-                class="btn-voltar"
-            >
+            <a href="{% url 'wifi:minhas_solicitacoes' %}"class="btn-voltar">
                 Consultar outra solicitação
             </a>
-
         </section>
-
     </main>
-
 </body>
 
 </html>
