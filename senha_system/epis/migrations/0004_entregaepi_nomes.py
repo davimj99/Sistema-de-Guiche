@@ -32,15 +32,31 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="entregaepi",
             name="funcionario_nome",
-            field=models.CharField(max_length=150),
+            field=models.CharField(
+                max_length=150,
+                null=True,
+            ),
         ),
         migrations.AddField(
             model_name="entregaepi",
             name="epi_nome",
-            field=models.CharField(max_length=100),
+            field=models.CharField(
+                max_length=100,
+                null=True,
+            ),
         ),
         migrations.RunPython(
             preencher_nomes_entregas,
             migrations.RunPython.noop,
+        ),
+        migrations.AlterField(
+            model_name="entregaepi",
+            name="funcionario_nome",
+            field=models.CharField(max_length=150),
+        ),
+        migrations.AlterField(
+            model_name="entregaepi",
+            name="epi_nome",
+            field=models.CharField(max_length=100),
         ),
     ]
