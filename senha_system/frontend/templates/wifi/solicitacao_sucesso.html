@@ -1,0 +1,49 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solicitação enviada | Wi-Fi ISCON</title>
+    <link rel="stylesheet" href="{% static 'frontend/css/wifi/solicitacao_sucesso.css' %}">
+    <link rel="icon" href="{% static 'frontend/img/iscon_logo.png' %}" type="image/png">
+</head>
+
+
+<body>
+    <header class="wifi-header">
+        <img src="{% static 'frontend/img/iscon2.png' %}" alt="ISCON" class="logo">
+        <div>
+            <h1>Wi-Fi ISCON</h1>
+            <p>Solicitação de acesso</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="success-card">
+            <div class="success-icon"> ✓ </div>
+            <h1>Solicitação enviada!</h1>
+            <p class="description"> Sua solicitação de acesso ao Wi-Fi foi registrada com sucesso.</p>
+
+            <div class="protocol-box">
+                <span>Seu protocolo</span>
+                <strong> {{ solicitacao.protocolo }}</strong>
+            </div>
+
+            <p class="warning">
+                Guarde este protocolo. Ele será utilizado para consultar
+                o andamento da sua solicitação.
+            </p>
+
+            <div class="acoes">
+                <a href="{% url 'wifi:minhas_solicitacoes' %}" class="btn btn-consultar">
+                    Consultar solicitação
+                </a>
+                <a href="{% url 'wifi:solicitar' %}" class="btn btn-nova">
+                    Nova solicitação
+                </a>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

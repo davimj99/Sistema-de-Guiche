@@ -28,8 +28,9 @@ SECRET_KEY = 'django-insecure-q#+qmk$19u(sd*#@2$ku%s^ldo76nm34#y-hm6t71gnw%5@aph
 
 DEBUG = False
 
-##ALLOWED_HOSTS = ALLOWED_HOSTS = ["10.20.1.86", "localhost", "127.0.0.1"]
-ALLOWED_HOSTS = ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
+
+ALLOWED_HOSTS = ALLOWED_HOSTS = ["10.20.1.86", "localhost", "127.0.0.1"]
+#ALLOWED_HOSTS = ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 
 # Application definition
 
@@ -44,7 +45,9 @@ INSTALLED_APPS = [
     'filas',
     'atendimentos',
     'painel',
+    "epis",
     'api',
+    'wifi',
 
 ]
 
