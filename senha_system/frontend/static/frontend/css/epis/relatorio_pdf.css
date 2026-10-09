@@ -1,0 +1,114 @@
+
+@page {
+    size: A4 landscape;
+    margin: 12mm;
+}
+
+body {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 9px;
+    color: #333333;
+}
+
+.header {
+    text-align: center;
+    border-bottom: 2px solid #0d6efd;
+    padding-bottom: 10px;
+}
+
+.logo-iscon {
+    width: 90px;
+    height: auto;
+}
+
+h1 {
+    font-size: 17px;
+    color: #0d6efd;
+    margin-bottom: 5px;
+}
+
+h2 {
+    color: #0d6efd;
+    font-size: 12px;
+    margin-top: 22px;
+}
+
+.subtitulo {
+    font-size: 9px;
+    color: #666666;
+}
+
+.filtros {
+    margin-top: 12px;
+    padding: 8px;
+    background-color: #f1f5fb;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 9px;
+}
+
+th {
+    background-color: #0d6efd;
+    color: #ffffff;
+    padding: 6px 4px;
+    border: 1px solid #0d6efd;
+}
+
+td {
+    border: 1px solid #d5dce5;
+    padding: 5px 4px;
+    text-align: center;
+}
+
+.esquerda {
+    text-align: left;
+}
+
+.baixo {
+    color: #b42318;
+    font-weight: bold;
+}
+
+.normal {
+    color: #18794e;
+    font-weight: bold;
+}
+
+/* Assinaturas lado a lado */
+.tabela-assinaturas {
+    width: 100%;
+    margin-top: 35px;
+    border-collapse: collapse;
+}
+
+.tabela-assinaturas td {
+    width: 50%;
+    padding: 10px 20px;
+    border: none;
+    text-align: center;
+    vertical-align: top;
+}
+
+.linha-assinatura {
+    border-top: 1px solid #333333;
+    margin-top: 25px;
+    margin-bottom: 8px;
+}
+
+.tabela-assinaturas p {
+    margin-top: 10px;
+    margin-bottom: 5px;
+}
+
+.rodape {
+    margin-top: 20px;
+    padding-top: 8px;
+    border-top: 1px solid #cccccc;
+    color: #666666;
+    text-align: center;
+    font-size: 8px;
+}
+

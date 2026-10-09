@@ -1,0 +1,87 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Relatório de EPIs</title>
+    
+    <link rel="stylesheet" href="{% static 'frontend/css/epis/relatorios.css' %}">
+
+</head>
+<body>
+<div class="container">
+    <div class="cabecalho">
+        <img
+            src="{% static 'frontend/img/iscon2.png' %}"
+            alt="Logo ISCON"
+            class="logo-iscon"
+        >
+
+        <div>
+            <h1>Relatório de Controle de EPIs</h1>
+            <p>Selecione os filtros para gerar o relatório em PDF.</p>
+        </div>
+    </div>
+
+    {% for erro in erros %}
+        <div class="erro">{{ erro }}</div>
+    {% endfor %}
+
+    <form method="get">
+        <div class="grid">
+            <div>
+                <label for="funcionario">Funcionário</label>
+                <select name="funcionario" id="funcionario">
+                    <option value="">Todos os funcionários</option>
+                    {% for funcionario in funcionarios %}
+                        <option value="{{ funcionario.pk }}"
+                            {% if filtros.funcionario == funcionario.pk|stringformat:"s" %}
+                                selected
+                            {% endif %}>
+                            {{ funcionario.nome }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div>
+                <label for="epi">Equipamento (EPI)</label>
+                <select name="epi" id="epi">
+                    <option value="">Todos os EPIs</option>
+                    {% for item in epis %}
+                        <option value="{{ item.pk }}"
+                            {% if filtros.epi == item.pk|stringformat:"s" %}
+                                selected
+                            {% endif %}>
+                            {{ item.nome }} — {{ item.codigo }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div>
+                <label for="data_inicio">Data inicial das entregas</label>
+                <input type="date" name="data_inicio" id="data_inicio"
+                       value="{{ filtros.data_inicio|default:'' }}">
+            </div>
+
+            <div>
+                <label for="data_fim">Data final das entregas</label>
+                <input type="date" name="data_fim" id="data_fim"
+                       value="{{ filtros.data_fim|default:'' }}">
+            </div>
+        </div>
+
+        <div class="acoes">
+            <button type="submit" name="pdf" value="1">
+                Gerar relatório PDF
+            </button>
+
+            <a class="limpar" href="{% url 'epis:relatorio_controle_epi' %}">
+                Limpar filtros
+            </a>
+        </div>
+    </form>
+</div>
+</body>
+</html>

@@ -26,4 +26,6 @@ urlpatterns = [
     path("entregas/<int:pk>/excluir/", views.entrega_excluir, name="entrega_excluir"),
 
     path("estoque/",views.estoque,name="estoque"),
+
+    path("relatorios/controle-epi/",views.relatorio_controle_epi,name="relatorio_controle_epi"),
 ]

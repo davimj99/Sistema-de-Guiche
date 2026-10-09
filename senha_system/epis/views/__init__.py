@@ -25,3 +25,4 @@ from .entregas import (
 from .estoque import (
     estoque,
 )
+from .relatorios import relatorio_controle_epi
