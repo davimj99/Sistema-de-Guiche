@@ -22,15 +22,19 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-q#+qmk$19u(sd*#@2$ku%s^ldo76nm34#y-hm6t71gnw%5@aph'
+SECRET_KEY = config("DJANGO_SECRET_KEY")
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = config("DEBUG", default=False, cast=bool)
 
-DEBUG = False
 
+ALLOWED_HOSTS = config("ALLOWED_HOSTS",default="localhost,127.0.0.1",
+    cast=lambda value: [host.strip() for host in value.split(",")if host.strip()]
+)
 
-ALLOWED_HOSTS = ALLOWED_HOSTS = ["10.20.0.98", "localhost", "127.0.0.1"]
-#ALLOWED_HOSTS = ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
+CSRF_TRUSTED_ORIGINS = config("CSRF_TRUSTED_ORIGINS",default="",cast=lambda value: [ origin.strip()for origin in value.split(",")if origin.strip()],
+)
 
 # Application definition
 
@@ -53,6 +57,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -60,6 +65,30 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+# Segurança HTTP
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_REFERRER_POLICY = "same-origin"
+
+# Configurações explícitas para produção.
+# Ativar no .env de produção somente após configurar o Nginx e HTTPS.
+SECURE_SSL_REDIRECT = config("SECURE_SSL_REDIRECT",default=False,cast=bool)
+
+SESSION_COOKIE_SECURE = config("SESSION_COOKIE_SECURE",default=False,cast=bool)
+
+CSRF_COOKIE_SECURE = config("CSRF_COOKIE_SECURE",default=False,cast=bool)
+
+# Usar somente quando o proxy confiável estiver configurado
+# para encaminhar corretamente X-Forwarded-Proto.
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO","https")
+
+# Ativar HSTS somente após validar o HTTPS em produção.
+#SECURE_HSTS_SECONDS = config("SECURE_HSTS_SECONDS",default=0,cast=int)
+
+#SECURE_HSTS_INCLUDE_SUBDOMAINS = config("SECURE_HSTS_INCLUDE_SUBDOMAINS",
+#default=False,cast=bool)
+
+#SECURE_HSTS_PRELOAD = config("SECURE_HSTS_PRELOAD",default=False,cast=bool,)
 
 ROOT_URLCONF = 'senha_system.urls'
 
@@ -96,6 +125,7 @@ DATABASES = {
         'PASSWORD': config('DB_PASSWORD'),
         'HOST': config('DB_HOST'),
         'PORT': config('DB_PORT'),
+        "CONN_MAX_AGE": 60,
     }
 }
 

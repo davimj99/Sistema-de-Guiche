@@ -1,0 +1,38 @@
+# Ambientes virtuais Python
+venv/
+.venv/
+env/
+
+# Cache Python
+__pycache__/
+*.py[cod]
+
+# Git
+.git/
+
+# Segredos e variáveis locais
+.env
+.env.*
+!.env.example
+
+# Arquivos estáticos gerados
+staticfiles/
+
+# Arquivos de mídia e uploads
+media/
+
+# Testes e ferramentas de análise
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Logs
+*.log
+
+# Editores e sistema operacional
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
