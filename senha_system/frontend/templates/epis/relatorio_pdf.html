@@ -1,0 +1,243 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        @page {
+            size: A4 landscape;
+            margin: 12mm;
+        }
+
+        body {
+            font-family: Helvetica, Arial, sans-serif;
+            font-size: 9px;
+            color: #333;
+        }
+
+        .header {
+            border-bottom: 2px solid #0d6efd;
+            padding-bottom: 10px;
+        }
+
+        h1 {
+            font-size: 17px;
+            color: #0d6efd;
+            margin-bottom: 5px;
+        }
+
+        h2 {
+            color: #0d6efd;
+            font-size: 12px;
+            margin-top: 22px;
+        }
+
+        .subtitulo {
+            font-size: 9px;
+            color: #666;
+        }
+
+        .filtros {
+            margin-top: 12px;
+            padding: 8px;
+            background-color: #f1f5fb;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 9px;
+        }
+
+        th {
+            background-color: #0d6efd;
+            color: white;
+            padding: 7px 5px;
+            border: 1px solid #0d6efd;
+        }
+
+        td {
+            border: 1px solid #d5dce5;
+            padding: 6px 5px;
+            text-align: center;
+        }
+
+        .sem-borda td {
+            border: none;
+        }
+
+        .esquerda {
+            text-align: left;
+        }
+
+        .baixo {
+            color: #b42318;
+            font-weight: bold;
+        }
+
+        .normal {
+            color: #18794e;
+            font-weight: bold;
+        }
+
+        .rodape {
+            margin-top: 20px;
+            padding-top: 8px;
+            border-top: 1px solid #ccc;
+            color: #666;
+            text-align: center;
+            font-size: 8px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <table class="sem-borda" style="margin-top: 0;">
+        <tr>
+            <td style="width: 20%; text-align: left; vertical-align: middle;">
+
+<img src="{% static 'frontend/img/Iscon2.png' %}" alt="Logo ISCON" class="logo">
+            </td>
+
+            <td style="width: 80%; text-align: center; vertical-align: middle;">
+                <h1>RELATÓRIO DE CONTROLE DE EPIs</h1>
+                <div><strong>INSTITUTO SUPERIOR CONAMAD — ISCON</strong></div>
+                <div class="subtitulo">
+                    Estoque atual e histórico de entregas
+                </div>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<div class="filtros">
+    <strong>Funcionário:</strong>
+    {% if funcionario_selecionado %}
+        {{ funcionario_selecionado.nome }}
+    {% else %}
+        Todos
+    {% endif %}
+
+    &nbsp;&nbsp; | &nbsp;&nbsp;
+
+    <strong>EPI:</strong>
+    {% if epi_selecionado %}
+        {{ epi_selecionado.nome }}
+    {% else %}
+        Todos
+    {% endif %}
+
+    &nbsp;&nbsp; | &nbsp;&nbsp;
+
+    <strong>Período das entregas:</strong>
+    {{ data_inicio|date:"d/m/Y"|default:"Início não definido" }}
+    até
+    {{ data_fim|date:"d/m/Y"|default:"Fim não definido" }}
+</div>
+
+<h2>1. Posição atual do estoque</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>Código</th>
+            <th>EPI</th>
+            <th>Categoria</th>
+            <th>Unidade</th>
+            <th>Estoque atual</th>
+            <th>Estoque mínimo</th>
+            <th>Situação</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in estoque %}
+        <tr>
+            <td>{{ item.codigo }}</td>
+            <td class="esquerda">{{ item.nome }}</td>
+            <td>{{ item.categoria }}</td>
+            <td>{{ item.get_unidade_display }}</td>
+            <td>{{ item.quantidade_estoque }}</td>
+            <td>{{ item.estoque_minimo }}</td>
+            <td>
+                {% if item.quantidade_estoque <= item.estoque_minimo %}
+                    <span class="baixo">Estoque baixo</span>
+                {% else %}
+                    <span class="normal">Normal</span>
+                {% endif %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="7">Nenhum EPI encontrado.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<h2>2. Histórico de entregas</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>Data da entrega</th>
+            <th>Funcionário</th>
+            <th>Matrícula</th>
+            <th>EPI</th>
+            <th>Código</th>
+            <th>Quantidade</th>
+            <th>Próxima troca</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for entrega in entregas %}
+        <tr>
+            <td>{{ entrega.data_entrega|date:"d/m/Y" }}</td>
+            <td class="esquerda">{{ entrega.funcionario_nome }}</td>
+            <td>{{ entrega.funcionario.matricula|default:"-" }}</td>
+            <td class="esquerda">{{ entrega.epi_nome }}</td>
+            <td>{{ entrega.epi.codigo }}</td>
+            <td>{{ entrega.quantidade }}</td>
+            <td>
+                {{ entrega.data_proxima_troca|date:"d/m/Y"|default:"-" }}
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="7">Nenhuma entrega encontrada para os filtros.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+    <div style="margin-top: 55px; width: 100%;">
+        <table style="width: 100%; border: none;">
+            <tr>
+                <td style="width: 45%; border: none; text-align: center; padding-top: 35px;">
+                    ______________________________________
+                    <br />
+                    <strong>Responsável pelo estoque</strong>
+                    <br />
+                    <span style="font-size: 8px;">Nome e assinatura</span>
+                </td>
+
+                <td style="width: 10%; border: none;"></td>
+
+                <td style="width: 45%; border: none; text-align: center; padding-top: 35px;">
+                    ______________________________________
+                    <br />
+                    <strong>Responsável pela conferência</strong>
+                    <br />
+                    <span style="font-size: 8px;">Nome e assinatura</span>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+<div class="rodape">
+    Relatório emitido em {{ data_emissao|date:"d/m/Y" }} —
+    Sistema de Controle de EPIs ISCON
+</div>
+
+</body>
+</html>

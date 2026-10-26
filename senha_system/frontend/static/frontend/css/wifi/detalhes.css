@@ -1,0 +1,233 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+
+    background: #f4f8fc;
+
+    color: #1f2937;
+
+    min-height: 100vh;
+}
+
+/* HEADER */
+
+.wifi-header {
+    width: 100%;
+    min-height: 82px;
+
+    display: flex;
+    align-items: center;
+
+    padding: 14px 6%;
+
+    background: #ffffff;
+
+    border-bottom: 3px solid #005baa;
+
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.logo {
+    width: 115px;
+
+    height: auto;
+
+    object-fit: contain;
+
+    margin-right: 25px;
+}
+
+.wifi-header h1 {
+    color: #005baa;
+
+    font-size: 22px;
+
+    margin-bottom: 4px;
+}
+
+.wifi-header p {
+    color: #6b7280;
+
+    font-size: 13px;
+}
+
+/* CONTAINER */
+
+.container {
+    width: 90%;
+
+    max-width: 850px;
+
+    margin: 45px auto;
+}
+
+/* CARD */
+
+.details-card {
+    background: #ffffff;
+
+    padding: 30px;
+
+    border-radius: 12px;
+
+    border: 1px solid #dbe7f2;
+
+    border-top: 4px solid #005baa;
+
+    box-shadow: 0 4px 15px rgba(0, 91, 170, 0.07);
+}
+
+.details-card h2 {
+    color: #005baa;
+
+    font-size: 24px;
+
+    margin-bottom: 25px;
+}
+
+/* INFORMAÇÕES */
+
+.info-row {
+    display: flex;
+
+    padding: 15px 0;
+
+    border-bottom: 1px solid #edf2f7;
+
+    font-size: 14px;
+}
+
+.info-row:last-child {
+    border-bottom: none;
+}
+
+.info-label {
+    width: 180px;
+
+    font-weight: 600;
+
+    color: #374151;
+}
+
+.info-value {
+    flex: 1;
+
+    color: #6b7280;
+}
+
+/* BADGES */
+
+.status-badge {
+    display: inline-block;
+
+    padding: 6px 12px;
+
+    border-radius: 20px;
+
+    font-size: 12px;
+
+    font-weight: 700;
+}
+
+.status-pendente {
+    background: #fff4cc;
+    color: #946200;
+}
+
+.status-em_analise {
+    background: #dceeff;
+    color: #005baa;
+}
+
+.status-aprovado {
+    background: #dff5e6;
+    color: #18713b;
+}
+
+.status-rejeitado {
+    background: #fde2e2;
+    color: #a32626;
+}
+
+.status-cancelado {
+    background: #e5e7eb;
+    color: #4b5563;
+}
+
+/* BOTÃO */
+
+.btn-voltar {
+    display: inline-block;
+
+    margin-top: 25px;
+
+    padding: 11px 20px;
+
+    background: #005baa;
+
+    color: #ffffff;
+
+    text-decoration: none;
+
+    border-radius: 6px;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    transition: 0.2s ease;
+}
+
+.btn-voltar:hover {
+    background: #004b8d;
+}
+
+/* RESPONSIVO */
+
+@media (max-width: 600px) {
+
+    .wifi-header {
+        padding: 12px 5%;
+    }
+
+    .logo {
+        width: 90px;
+
+        margin-right: 15px;
+    }
+
+    .wifi-header h1 {
+        font-size: 18px;
+    }
+
+    .container {
+        width: 94%;
+
+        margin: 25px auto;
+    }
+
+    .details-card {
+        padding: 22px;
+    }
+
+    .info-row {
+        flex-direction: column;
+
+        gap: 5px;
+    }
+
+    .info-label {
+        width: 100%;
+    }
+
+    .btn-voltar {
+        width: 100%;
+
+        text-align: center;
+    }
+}

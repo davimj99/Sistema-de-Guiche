@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Painel de Atendimento{% endblock %}
+
+{% block content %}
+
+<link rel="stylesheet"href="{% static 'frontend/css/chatbot.css' %}">
+
+<h2>Painel de Atendimento</h2>
+
+<div class="painel-box">
+    <h3>Senha Atual</h3>
+    <h1 id="senha-atual" class="senha">---</h1>
+    <h3 id="guiche-atual"></h3>
+</div>
+
+<hr>
+
+<div class="painel-atendimento">
+
+    <div class="fila-box">
+        <h3>Fila de Espera</h3>
+        <ul id="fila-espera"></ul>
+    </div>
+
+    <div class="guiches-box">
+
+        {% for guiche in guiches %}
+
+        <div class="guiche">
+            <h3>Guichê {{ guiche.nome }}</h3>
+
+            <form action="/filas/chamar/{{ guiche.id }}/" method="POST">
+                {% csrf_token %}
+                <button type="submit">Chamar Próxima</button>
+            </form>
+
+            <form action="/filas/chamar-novamente/{{ guiche.id }}/" method="POST">
+                {% csrf_token %}
+                <button type="submit" class="btn-senha">🔊 Chamar Novamente</button>
+            </form>
+        </div>
+
+        {% empty %}
+
+        <p>Nenhum guichê cadastrado.</p>
+
+        {% endfor %}
+
+    </div>
+
+    {% if user.is_superuser %}
+        <a href="{% url 'relatorio_atendimentos' %}" class="btn-iscon mb-3">
+            Ir para Atendimentos
+        </a>
+    {% endif %}
+
+</div>
+
+<!-- CHATBOT ISCON -->
+<div class="chatbot-container">
+    <!-- Janela -->
+    <div id="chatbot-window" class="chatbot-window" >
+
+        <div class="chatbot-header">
+            <div class="chatbot-header-info">
+
+                <span class="chatbot-title">
+                    Assistente ISCON
+                </span>
+
+                <span class="chatbot-status">
+                    Assistente do Sistema de Guichê
+                </span>
+
+            </div>
+
+            <button id="chatbot-close" class="chatbot-close" type="button" 
+            aria-label="Fechar chatbot"> × </button>
+
+        </div>
+
+
+        <!-- Mensagens -->
+        <div id="chatbot-messages" class="chatbot-messages">
+
+            <div class="chat-message bot">
+
+                Olá! Sou o Assistente ISCON.
+
+                Posso ajudar você com dúvidas
+                sobre o Sistema de Guichê.
+
+            </div>
+
+            <div class="chatbot-suggestions">
+
+                <button
+                    class="chatbot-suggestion"
+                    type="button"
+                    onclick="document.getElementById('chatbot-input').value='Como chamar a próxima senha?'; document.getElementById('chatbot-send').click();">
+                    Como chamar a próxima senha?
+                </button>
+
+                <button
+                    class="chatbot-suggestion"
+                    type="button"
+                    onclick="document.getElementById('chatbot-input').value='Como chamar novamente?'; document.getElementById('chatbot-send').click();">
+                    Como chamar novamente?
+                </button>
+
+                <button
+                    class="chatbot-suggestion"
+                    type="button"
+                    onclick="document.getElementById('chatbot-input').value='A senha não aparece na TV'; document.getElementById('chatbot-send').click();">
+                    Senha não aparece na TV
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- Entrada -->
+
+        <div class="chatbot-input-area">
+            <input
+                type="text"
+                id="chatbot-input"
+                class="chatbot-input"
+                placeholder="Digite sua dúvida..."
+                autocomplete="off">
+
+            <button
+                type="button"
+                id="chatbot-send"
+                class="chatbot-send"
+                aria-label="Enviar mensagem">
+                ➤
+            </button>
+
+        </div>
+
+    </div>
+    <!-- Botão -->
+    <button
+        type="button"
+        id="chatbot-button"
+        class="chatbot-button"
+        aria-label="Abrir Assistente ISCON">
+        💬
+    </button>
+
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'frontend/js/chatbot.js' %}"></script>
+
+<script src="{% static 'frontend/js/painel_funcionario.js' %}"></script>
+{% endblock %}

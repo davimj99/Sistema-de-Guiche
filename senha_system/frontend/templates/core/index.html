@@ -1,0 +1,375 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Plataforma Integrada de Gestão de Filas, Atendimento, EPIs e Operações.">
+    <title>Sistema de Atendimento e Operações | Portal & Vitrine</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Favicon -->
+    <link rel="icon" href="{% static 'frontend/img/iscon_logo.png' %}" type="image/png">
+
+    <!-- CSS do Portal -->
+    <link rel="stylesheet" href="{% static 'frontend/css/core/index.css' %}">
+    <link rel="stylesheet" href="{% static 'frontend/css/core/index-responsive.css' %}">
+</head>
+<body>
+
+    <!-- ========================================================
+         HEADER / TOPBAR
+         ======================================================== -->
+    <header class="core-header">
+        <div class="core-header-inner">
+            <a href="/" class="core-brand">
+                <img src="{% static 'frontend/img/iscon_logo.png' %}" alt="Logo">
+                <div class="core-brand-text">
+                    <h1>SISTEMA INTEGRADO</h1>
+                    <span>Gestão de Atendimento & Operações</span>
+                </div>
+            </a>
+
+            <nav>
+                <ul class="core-nav-links">
+                    <li><a href="#modulos" data-i18n="nav_modules">Módulos</a></li>
+                    <li><a href="#solucoes-clientes" data-i18n="nav_solutions">Para Empresas & Clientes</a></li>
+                    <li><a href="/filas/tv/" data-i18n="nav_tv">Painel TV</a></li>
+                    <li><a href="/filas/totem/" data-i18n="nav_totem">Totem</a></li>
+                </ul>
+            </nav>
+
+            <div class="core-header-controls">
+                <!-- Seletor de Idioma (PT / EN) -->
+                <div class="core-lang-switch" role="group" aria-label="Seletor de Idioma">
+                    <button class="core-lang-btn active" data-lang="pt" type="button" aria-pressed="true">
+                        <span>🇧🇷</span> PT
+                    </button>
+                    <button class="core-lang-btn" data-lang="en" type="button" aria-pressed="false">
+                        <span>🇺🇸</span> EN
+                    </button>
+                </div>
+
+                <!-- Botão Alternador de Tema (Dark / Light) -->
+                <button id="themeToggle" class="core-theme-toggle" type="button" title="Alternar tema" aria-label="Alternar tema">
+                    🌙
+                </button>
+
+                <!-- Status Online -->
+                <div class="core-badge-online">
+                    <span class="core-badge-dot"></span>
+                    <span data-i18n="status_online">ONLINE</span>
+                </div>
+
+                <!-- Admin Django -->
+                <a href="/admin/" class="core-btn-admin" title="Painel Administrativo Django" data-i18n="admin_link">
+                    🔒 Admin
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- ========================================================
+         HERO SECTION
+         ======================================================== -->
+    <section class="core-hero">
+        <div class="core-hero-container">
+            <div class="core-pill-badge">
+                <span data-i18n="hero_badge">⚡ Versão 1.9 &bull; Pronto para Produção</span>
+            </div>
+            <h1 data-i18n="hero_title">Gestão Inteligente de Filas, Atendimento e Operações</h1>
+            <p class="core-hero-desc" data-i18n="hero_desc">
+                Controle em tempo real de filas com alternância prioritária por lei, painéis multimídia interativos com veiculação de anúncios, gestão de EPIs e portal de solicitações.
+            </p>
+            <div class="core-hero-actions">
+                <a href="/filas/totem/" class="core-btn core-btn-accent" data-i18n="hero_btn_totem">
+                    🎫 Abrir Totem de Senhas
+                </a>
+                <a href="/filas/tv/" class="core-btn core-btn-white" data-i18n="hero_btn_tv">
+                    📺 Abrir Painel TV de Chamadas
+                </a>
+                <a href="#solucoes-clientes" class="core-btn core-btn-transp" data-i18n="hero_btn_solutions">
+                    💼 Conhecer Solução para Novos Clientes
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================================
+         MAIN CONTENT
+         ======================================================== -->
+    <main class="core-container">
+
+        <!-- ====================================================
+             MÓDULOS OPERACIONAIS (USO DIÁRIO DO SISTEMA)
+             ==================================================== -->
+        <section id="modulos">
+            <div class="core-section-head no-margin-top">
+                <div class="core-section-title-wrap">
+                    <h2 data-i18n="section_modules_title">📁 Módulos da Plataforma</h2>
+                    <p data-i18n="section_modules_desc">Acesse rapidamente as ferramentas operacionais ativas na sua instituição ou empresa.</p>
+                </div>
+            </div>
+
+            <div class="core-grid">
+
+                <!-- CARD 1: TOTEM DE ATENDIMENTO -->
+                <div class="core-card">
+                    <div class="core-card-top">
+                        <div class="core-card-badge-row">
+                            <div class="core-card-icon">🎫</div>
+                            <span class="core-tag" data-i18n="card1_tag">Tempo Real</span>
+                        </div>
+                        <h3 data-i18n="card1_title">Totem de Senhas</h3>
+                        <p class="core-card-desc" data-i18n="card1_desc">
+                            Interface de autoatendimento para retirada de senhas convencionais e preferenciais com geração automática de tickets.
+                        </p>
+                    </div>
+                    <div class="core-card-actions">
+                        <a href="/filas/totem/" class="core-card-btn-main">
+                            <span data-i18n="card1_btn">Acessar Totem</span>
+                            <span>&rarr;</span>
+                        </a>
+                        <div class="core-card-sublinks">
+                            <a href="/filas/gerar/" class="core-sublink" data-i18n="card1_sub_normal">Emitir Senha Normal</a>
+                            <a href="/filas/preferencial/" class="core-sublink" data-i18n="card1_sub_pref">Emitir Preferencial</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CARD 2: PAINEL TV DE CHAMADAS -->
+                <div class="core-card">
+                    <div class="core-card-top">
+                        <div class="core-card-badge-row">
+                            <div class="core-card-icon red">📺</div>
+                            <span class="core-tag" data-i18n="card2_tag">Multimídia</span>
+                        </div>
+                        <h3 data-i18n="card2_title">Painel de TV Institucional</h3>
+                        <p class="core-card-desc" data-i18n="card2_desc">
+                            Exibição visual das chamadas com áudio integrado, histórico de atendimentos e carrossel de propagandas e comunicados em vídeo/imagem.
+                        </p>
+                    </div>
+                    <div class="core-card-actions">
+                        <a href="/filas/tv/" class="core-card-btn-main">
+                            <span data-i18n="card2_btn">Abrir Painel TV Fullscreen</span>
+                            <span>&rarr;</span>
+                        </a>
+                        <div class="core-card-sublinks">
+                            <a href="/painel/" class="core-sublink" data-i18n="card2_sub_simple">Painel Web Simples</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CARD 3: ESTAÇÃO DO ATENDENTE (GUICHÊ) -->
+                <div class="core-card">
+                    <div class="core-card-top">
+                        <div class="core-card-badge-row">
+                            <div class="core-card-icon amber">🖥️</div>
+                            <span class="core-tag" data-i18n="card3_tag">Operador</span>
+                        </div>
+                        <h3 data-i18n="card3_title">Guichê de Atendimento</h3>
+                        <p class="core-card-desc" data-i18n="card3_desc">
+                            Controle de atendimento pelo operador: chamar próxima senha (com alternância inteligente prioritária), repetir chamada e encerrar.
+                        </p>
+                        
+                        <!-- Lista dinâmica de guichês -->
+                        <div class="core-guiche-picker">
+                            <label data-i18n="card3_label_station">Selecione sua estação de trabalho:</label>
+                            <div class="core-guiche-pills">
+                                {% if guiches %}
+                                    {% for g in guiches %}
+                                        <a href="/filas/guiche/{{ g.id }}/" class="core-guiche-pill">
+                                            {{ g.nome }}
+                                        </a>
+                                    {% endfor %}
+                                {% else %}
+                                    <a href="/filas/guiche/1/" class="core-guiche-pill">Guichê 1 (Padrão)</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="core-card-actions">
+                        <a href="/filas/guiche/1/" class="core-card-btn-main">
+                            <span data-i18n="card3_btn">Acessar Guichê Principal</span>
+                            <span>&rarr;</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- CARD 4: GESTÃO DE EPIS -->
+                <div class="core-card">
+                    <div class="core-card-top">
+                        <div class="core-card-badge-row">
+                            <div class="core-card-icon green">🦺</div>
+                            <span class="core-tag" data-i18n="card4_tag">Segurança do Trabalho</span>
+                        </div>
+                        <h3 data-i18n="card4_title">Controle de EPIs</h3>
+                        <p class="core-card-desc" data-i18n="card4_desc">
+                            Gestão de Equipamentos de Proteção Individual: controle de estoque mínimo, registro de entrega para colaboradores e prazos de troca.
+                        </p>
+                    </div>
+                    <div class="core-card-actions">
+                        <a href="/epis/" class="core-card-btn-main">
+                            <span data-i18n="card4_btn">Painel de EPIs</span>
+                            <span>&rarr;</span>
+                        </a>
+                        <div class="core-card-sublinks">
+                            <a href="{% url 'epis:entregas' %}" class="core-sublink" data-i18n="card4_sub_deliveries">Entregas</a>
+                            <a href="{% url 'epis:estoque' %}" class="core-sublink" data-i18n="card4_sub_stock">Estoque</a>
+                            <a href="{% url 'epis:funcionarios' %}" class="core-sublink" data-i18n="card4_sub_employees">Funcionários</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CARD 5: SOLICITAÇÃO DE WI-FI -->
+                <div class="core-card">
+                    <div class="core-card-top">
+                        <div class="core-card-badge-row">
+                            <div class="core-card-icon purple">📶</div>
+                            <span class="core-tag" data-i18n="card5_tag">Autoatendimento</span>
+                        </div>
+                        <h3 data-i18n="card5_title">Portal de Acesso Wi-Fi</h3>
+                        <p class="core-card-desc" data-i18n="card5_desc">
+                            Formulário simplificado para solicitação de acesso à rede sem fio institucional com emissão de protocolo e acompanhamento.
+                        </p>
+                    </div>
+                    <div class="core-card-actions">
+                        <a href="{% url 'wifi:solicitar' %}" class="core-card-btn-main">
+                            <span data-i18n="card5_btn">Solicitar Acesso</span>
+                            <span>&rarr;</span>
+                        </a>
+                        <div class="core-card-sublinks">
+                            <a href="{% url 'wifi:minhas_solicitacoes' %}" class="core-sublink" data-i18n="card5_sub_track">Consultar Protocolo</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CARD 6: RELATÓRIOS & AUDITORIA -->
+                <div class="core-card">
+                    <div class="core-card-top">
+                        <div class="core-card-badge-row">
+                            <div class="core-card-icon">📊</div>
+                            <span class="core-tag" data-i18n="card6_tag">Gestão & BI</span>
+                        </div>
+                        <h3 data-i18n="card6_title">Relatórios de Atendimento</h3>
+                        <p class="core-card-desc" data-i18n="card6_desc">
+                            Estatísticas consolidadas de atendimentos, métricas por atendente, classificação por tipo de demanda e exportação de relatórios em PDF.
+                        </p>
+                    </div>
+                    <div class="core-card-actions">
+                        <a href="/atendimentos/" class="core-card-btn-main">
+                            <span data-i18n="card6_btn">Ver Relatórios</span>
+                            <span>&rarr;</span>
+                        </a>
+                        <div class="core-card-sublinks">
+                            <a href="/atendimentos/pdf/" class="core-sublink" data-i18n="card6_sub_pdf">Gerar PDF</a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ====================================================
+             VITRINE / APRESENTAÇÃO PARA FUTUROS CLIENTES (SAAS/B2B)
+             ==================================================== -->
+        <section id="solucoes-clientes" class="core-showcase-box">
+            <h2 data-i18n="showcase_title">💼 Solução Corporativa para Futuros Clientes</h2>
+            <p class="sub" data-i18n="showcase_sub">
+                Construído para atender faculdades, redes de ensino, clínicas, laboratórios, cartórios e centrais de atendimento que buscam modernização, controle rigoroso e alta confiabilidade operacional.
+            </p>
+
+            <div class="core-features-grid">
+                <div class="core-feature-item">
+                    <div class="core-feature-icon">⚖️</div>
+                    <h4 data-i18n="feat1_title">Alternância Legal de Prioridades</h4>
+                    <p data-i18n="feat1_desc">Algoritmo de balanceamento de senhas que garante o atendimento prioritário legal (idosos, gestantes, PCD) sem sobrecarregar a fila convencional.</p>
+                </div>
+
+                <div class="core-feature-item">
+                    <div class="core-feature-icon">📢</div>
+                    <h4 data-i18n="feat2_title">Painel Multimídia Publicitário</h4>
+                    <p data-i18n="feat2_desc">Monetize ou divulgue comunicados: reprodução de vídeos em alta definição e banners rotativos enquanto o público aguarda a chamada.</p>
+                </div>
+
+                <div class="core-feature-item">
+                    <div class="core-feature-icon">🔒</div>
+                    <h4 data-i18n="feat3_title">Controle Concorrente Confiável</h4>
+                    <p data-i18n="feat3_desc">Arquitetura com travas atômicas no banco de dados contra chamadas duplicadas e perda de integridade em múltiplos guichês simultâneos.</p>
+                </div>
+
+                <div class="core-feature-item">
+                    <div class="core-feature-icon">🧩</div>
+                    <h4 data-i18n="feat4_title">Modular e Personalizável</h4>
+                    <p data-i18n="feat4_desc">Adapte os módulos à sua necessidade: ative apenas filas, adicione segurança do trabalho (EPIs), cadastros ou solicitação de serviços internos.</p>
+                </div>
+
+                <div class="core-feature-item">
+                    <div class="core-feature-icon">🐳</div>
+                    <h4 data-i18n="feat5_title">Implantação Rápida em Nuvem</h4>
+                    <p data-i18n="feat5_desc">Empacotado com Docker, Nginx e PostgreSQL. Fácil de escalar, criar backups automáticos e hospedar em qualquer provedor de nuvem.</p>
+                </div>
+
+                <div class="core-feature-item">
+                    <div class="core-feature-icon">📄</div>
+                    <h4 data-i18n="feat6_title">Auditoria e Relatórios Executivos</h4>
+                    <p data-i18n="feat6_desc">Gere relatórios oficiais em PDF com tempos de atendimento, guichês mais demandados e histórico detalhado para compliance.</p>
+                </div>
+            </div>
+
+            <div class="core-cta-banner">
+                <div class="core-cta-text">
+                    <h3 data-i18n="cta_title">Interessado em levar esta plataforma para a sua organização?</h3>
+                    <p data-i18n="cta_desc">Oferecemos modelos flexíveis de implantação com personalização completa de marca e módulos.</p>
+                </div>
+                <div class="core-cta-buttons">
+                    <!-- Botão WhatsApp com mensagem pré-configurada -->
+                    <a href="https://wa.me/5561995207629?text=Ol%C3%A1!%20Gostaria%20de%20mais%20informa%C3%A7%C3%B5es%20sobre%20a%20plataforma%20de%20gest%C3%A3o%20de%20filas%20e%20atendimento." target="_blank" rel="noopener noreferrer" class="core-btn core-btn-whatsapp" data-i18n="cta_whatsapp">
+                        💬 WhatsApp Comercial
+                    </a>
+                    <a href="mailto:davisouza.pro@hotmail.com?subject=Interesse%20no%20Sistema%20de%20Atendimento" class="core-btn core-btn-white" data-i18n="cta_email">
+                        ✉️ Falar por E-mail
+                    </a>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ========================================================
+         BOTÃO FLUTUANTE DE WHATSAPP (CANTO INFERIOR DIREITO)
+         ======================================================== -->
+    <a href="https://wa.me/5561995207629?text=Ol%C3%A1!%20Gostaria%20de%20conhecer%20mais%20sobre%20a%20plataforma%20de%20atendimento." target="_blank" rel="noopener noreferrer" class="core-whatsapp-float" aria-label="Fale Conosco no WhatsApp">
+        <svg viewBox="0 0 32 32" aria-hidden="true">
+            <path d="M16.002 0C7.164 0 0 7.163 0 16.002c0 2.825.738 5.58 2.14 8.01L.073 31.927l8.13-2.032a15.932 15.932 0 0 0 7.799 2.008h.007c8.834 0 15.998-7.164 15.998-16.002C32.007 7.163 24.84 0 16.002 0zm0 29.21a13.23 13.23 0 0 1-6.744-1.848l-.484-.287-5.008 1.252 1.336-4.88-.316-.502a13.236 13.236 0 0 1-2.032-7.042c0-7.307 5.946-13.253 13.255-13.253 3.541 0 6.87 1.38 9.373 3.885a13.18 13.18 0 0 1 3.881 9.375c0 7.308-5.946 13.252-13.26 13.252zm7.27-9.923c-.398-.2-2.355-1.162-2.704-1.288-.348-.127-.601-.19-.854.2-.253.398-.98 1.288-1.202 1.542-.222.253-.443.285-.841.086s-1.688-.622-3.216-1.984c-1.189-1.06-1.99-2.37-2.224-2.768-.234-.398-.025-.613.174-.811.179-.178.398-.462.597-.693.2-.232.266-.398.399-.663.133-.265.066-.497-.033-.696s-.854-2.058-1.171-2.82c-.309-.742-.623-.641-.854-.653l-.729-.013c-.253 0-.664.095-1.012.474-.348.38-1.328 1.298-1.328 3.165 0 1.867 1.36 3.67 1.55 3.924.19.253 2.677 4.088 6.486 5.733.906.392 1.614.626 2.166.801.91.29 1.738.249 2.393.151.73-.109 2.355-.963 2.687-1.892.332-.93.332-1.727.232-1.892-.099-.165-.353-.264-.751-.464z"/>
+        </svg>
+        <span class="core-whatsapp-tooltip" data-i18n="whatsapp_tooltip">Fale Conosco no WhatsApp</span>
+    </a>
+
+    <!-- ========================================================
+         FOOTER
+         ======================================================== -->
+    <footer class="core-footer">
+        <div class="core-footer-inner">
+            <div>
+                <p>&copy; {% now "Y" %} <span data-i18n="footer_rights">Plataforma de Atendimento e Gestão Integrada &bull; Faculdade ISCON</span></p>
+                <p style="font-size: 0.8rem; color: #64748b; margin-top: 4px;" data-i18n="footer_tech">Desenvolvido com Python & Django &bull; Release v1.9</p>
+            </div>
+            <div class="core-footer-links">
+                <a href="/admin/">Administração</a>
+                <a href="/filas/tv/">Painel TV</a>
+                <a href="/epis/">EPIs</a>
+                <a href="{% url 'wifi:solicitar' %}">Wi-Fi</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Script de Tema e Idioma -->
+    <script src="{% static 'frontend/js/core/index.js' %}"></script>
+    
+</body>
+</html>

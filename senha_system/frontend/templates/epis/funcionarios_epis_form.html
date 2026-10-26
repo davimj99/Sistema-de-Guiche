@@ -1,0 +1,164 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ titulo }} | Controle de EPI</title>
+    <link rel="stylesheet" href="{% static 'frontend/css/epis/epis_base.css' %}">
+    <link rel="stylesheet" href="{% static 'frontend/css/epis/funcionarios_epis.css' %}">
+</head>
+
+<body>
+<header class="epis-header">
+    <div class="epis-logo-area">
+        <img src="{% static 'frontend/img/iscon2.png' %}" alt="Faculdade ISCON" >
+    </div>
+
+    <div class="epis-title-area">
+        <span>GESTÃO INTERNA</span>
+        <h1>CONTROLE DE EPI</h1>
+        <p> Gestão de Equipamentos de Proteção Individual </p>
+    </div>
+
+</header>
+
+<nav class="epis-nav">
+    <div class="epis-nav-container">
+        <a href="{% url 'epis:painel' %}"> Dashboard </a>
+        <a href="{% url 'epis:funcionarios' %}" class="active"> Funcionários </a>
+        <a href="{% url 'epis:epis' %}">EPIs </a>
+        <a href="{% url 'epis:entregas' %}"> Entregas </a>
+        <a href="{% url 'epis:estoque' %}"> Estoque </a>
+    </div>
+</nav>
+
+<main class="epis-container">
+    <!-- CABEÇALHO DA PÁGINA -->
+    <div class="epis-page-header">
+        <div>
+            <span class="epis-kicker"> FUNCIONÁRIOS</span>
+            <h2> {{ titulo }} </h2>
+            <p> Preencha os dados do funcionário para realizar o cadastro.</p>
+        </div>
+
+        <a href="{% url 'epis:funcionarios' %}" class="epis-button">Voltar</a>
+    </div>
+
+    <!-- FORMULÁRIO -->
+    <section class="epis-section">
+        <div class="epis-section-header">
+            <span class="epis-kicker">CADASTRO</span>
+            <h3> Dados do funcionário </h3>
+            <p> Informe os dados abaixo.</p>
+        </div>
+
+        <form method="POST">
+            {% csrf_token %}
+            <!-- ERROS GERAIS -->
+            {% if form.non_field_errors %}
+
+                <div class="form-error">
+                    {% for error in form.non_field_errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <div class="form-grid">
+                <!-- NOME -->
+                <div class="form-group full">
+                    <label for="{{ form.nome.id_for_label }}">
+                        Nome completo
+                    </label>
+
+                    {{ form.nome }}
+                    {% if form.nome.errors %}
+                        <div class="field-error">
+                            {% for error in form.nome.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- MATRÍCULA -->
+                <div class="form-group">
+                    <label for="{{ form.matricula.id_for_label }}">
+                        Matrícula
+                    </label>
+                    {{ form.matricula }}
+                    {% if form.matricula.errors %}
+                        <div class="field-error">
+                            {% for error in form.matricula.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- SETOR -->
+                <div class="form-group">
+                    <label for="{{ form.setor.id_for_label }}">
+                        Setor
+                    </label>
+                    {{ form.setor }}
+                    {% if form.setor.errors %}
+                        <div class="field-error">
+                            {% for error in form.setor.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- CARGO -->
+                <div class="form-group">
+                    <label for="{{ form.cargo.id_for_label }}">
+                        Cargo
+                    </label>
+                    {{ form.cargo }}
+                    {% if form.cargo.errors %}
+                        <div class="field-error">
+                            {% for error in form.cargo.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- STATUS -->
+                <div class="form-group status-group">
+                    <label>
+                        Status
+                    </label>
+                    <label class="checkbox-container">
+                        {{ form.ativo }}
+                        <span> Funcionário ativo</span>
+                    </label>
+                    {% if form.ativo.errors %}
+                        <div class="field-error">
+                            {% for error in form.ativo.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+
+            <!-- BOTÕES -->
+            <div class="form-actions">
+                <a href="{% url 'epis:funcionarios' %}" class="botao-cancelar">
+                    Cancelar
+                </a>
+
+                <button type="submit" class="btn btn-primary">
+                    Salvar funcionário
+                </button>
+            </div>
+        </form>
+    </section>
+</main>
+</body>
+</html>

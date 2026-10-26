@@ -1,5 +1,6 @@
 from django.contrib import admin
 from .models import Senha, Propaganda, Historico
+from . import admin_chat
 
 admin.site.register(Senha)
 admin.site.register(Historico)

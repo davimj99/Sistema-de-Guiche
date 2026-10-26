@@ -1,0 +1,352 @@
+/* ============================================================
+   FILTROS
+============================================================ */
+
+.funcionarios-filtros {
+    display: grid;
+
+    grid-template-columns: 1fr 220px auto;
+
+    gap: 15px;
+
+    align-items: end;
+
+    margin-bottom: 25px;
+
+    padding-bottom: 25px;
+
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.funcionarios-filtros label,
+.form-group label {
+    display: block;
+
+    margin-bottom: 7px;
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    color: #374151;
+}
+
+.funcionarios-filtros input,
+.funcionarios-filtros select,
+.form-control {
+    width: 100%;
+
+    height: 44px;
+
+    padding: 0 13px;
+
+    border: 1px solid #d7dce3;
+
+    border-radius: 7px;
+
+    background: white;
+
+    color: #172033;
+
+    font-size: 14px;
+
+    outline: none;
+
+    transition: .2s;
+}
+
+.funcionarios-filtros input:focus,
+.funcionarios-filtros select:focus,
+.form-control:focus {
+    border-color: #185ec7;
+
+    box-shadow: 0 0 0 3px rgba(24, 94, 199, .08);
+}
+
+.filtro-button {
+    border: 0;
+
+    cursor: pointer;
+
+    height: 44px;
+}
+
+
+/* ============================================================
+   TABELA
+============================================================ */
+
+.funcionarios-tabela-wrapper {
+    width: 100%;
+
+    overflow-x: auto;
+}
+
+.funcionarios-tabela {
+    width: 100%;
+
+    border-collapse: collapse;
+
+    font-size: 14px;
+}
+
+.funcionarios-tabela th {
+    padding: 14px 15px;
+
+    text-align: left;
+
+    background: #f7f8fa;
+
+    border-bottom: 1px solid #e1e5ea;
+
+    color: #596273;
+
+    font-size: 12px;
+
+    text-transform: uppercase;
+
+    letter-spacing: .4px;
+}
+
+.funcionarios-tabela td {
+    padding: 16px 15px;
+
+    border-bottom: 1px solid #edf0f3;
+
+    color: #596273;
+}
+
+.funcionarios-tabela tbody tr:hover {
+    background: #fafcff;
+}
+
+.funcionarios-tabela td strong {
+    color: #172033;
+}
+
+
+/* ============================================================
+   STATUS
+============================================================ */
+
+.status {
+    display: inline-flex;
+
+    padding: 5px 10px;
+
+    border-radius: 20px;
+
+    font-size: 12px;
+
+    font-weight: 700;
+}
+
+.status.ativo {
+    background: #eaf7ed;
+
+    color: #287a39;
+}
+
+.status.inativo {
+    background: #f1f2f4;
+
+    color: #6b7280;
+}
+
+
+/* ============================================================
+   AÇÕES
+============================================================ */
+
+.acoes {
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+}
+
+.acoes form {
+    margin: 0;
+    padding: 0;
+}
+
+.acoes a,
+.acoes button {
+    border: 0;
+
+    background: none;
+
+    cursor: pointer;
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    text-decoration: none;
+}
+
+.acao-editar {
+    color: #185ec7;
+}
+
+.acao-desativar {
+    color: #d12f36;
+}
+
+.acao-ativar {
+    color: #287a39;
+}
+
+
+/* ============================================================
+   TABELA VAZIA
+============================================================ */
+
+.tabela-vazia {
+    text-align: center;
+
+    padding: 40px !important;
+
+    color: #8a929f !important;
+}
+
+
+/* ============================================================
+   FORMULÁRIO
+============================================================ */
+
+.funcionario-form {
+    max-width: 1000px;
+}
+
+.form-grid {
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 22px;
+}
+
+.form-group-status {
+    grid-column: 1 / -1;
+}
+
+.checkbox-label {
+    display: flex !important;
+
+    align-items: center;
+
+    gap: 10px;
+
+    font-weight: 500 !important;
+
+    cursor: pointer;
+}
+
+.form-checkbox {
+    width: 18px;
+
+    height: 18px;
+
+    cursor: pointer;
+}
+
+.form-errors,
+.field-error {
+    margin-top: 7px;
+
+    color: #c62828;
+
+    font-size: 13px;
+}
+
+
+/* ============================================================
+   BOTÕES DO FORMULÁRIO
+============================================================ */
+
+.form-actions {
+    display: flex;
+
+    justify-content: flex-end;
+    align-items: center;
+
+    gap: 12px;
+
+    margin-top: 30px;
+
+    padding-top: 25px;
+
+    border-top: 1px solid #e5e7eb;
+}
+
+.botao-cancelar {
+    height: 44px;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    padding: 0 18px;
+
+    border-radius: 7px;
+
+    border: 1px solid #d7dce3;
+
+    color: #4b5563;
+
+    background: rgb(248, 46, 46);
+
+    text-decoration: none;
+
+    font-size: 14px;
+
+    font-weight: 700;
+}
+
+.btn-primary {
+    background: #185ec7;
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.btn-primary:hover {
+    background: #124d9f;
+}
+
+
+/* ============================================================
+   RESPONSIVO
+============================================================ */
+
+@media (max-width: 800px) {
+
+    .funcionarios-filtros {
+        grid-template-columns: 1fr;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .form-group-status {
+        grid-column: auto;
+    }
+
+    .form-actions {
+        justify-content: stretch;
+
+        flex-direction: column-reverse;
+    }
+
+    .form-actions a,
+    .form-actions button {
+        width: 100%;
+
+        justify-content: center;
+    }
+}

@@ -1,6 +1,8 @@
 from django.db import models
 
 class Atendimento(models.Model):
+    class Meta:
+        db_table = "atendimentos_django"
 
     TIPOS_ATENDIMENTO = [
         ('matricula', 'Matrícula'),
@@ -8,18 +10,30 @@ class Atendimento(models.Model):
         ('secretaria', 'Secretaria'),
         ('declaração', 'Declaração'),
         ('grade', 'Grade'),
+        ('requerimento', 'Requerimento'),
+        ('ementario/historico', 'Ementário/Histórico'),
+        ('lançamento de notas', 'Lançamento de Notas'),
         ('suporte', 'Suporte'),
+        ('ti', 'TI'),
     ]
 
-    senha = models.ForeignKey("filas.Senha", on_delete=models.CASCADE)
-    inicio = models.DateTimeField(auto_now_add=True)
-    tipo = models.CharField(
-        max_length=20,
-        choices=TIPOS_ATENDIMENTO,
-        null=True,
-        blank=True
-    )
+    ATENDENTES = [
+        ('Alessandra', 'Alessandra'),
+        ('Rafael', 'Rafael'),
+        ('Geovanna', 'Geovanna'),
+        ('Fátima', 'Fátima'),
+        ('Fernando', 'Fernando'),
+        ('Jane', 'Jane'),
+        ('Sharon', 'Sharon'),
+    ]
+
+    atendente = models.CharField(max_length=100,choices=ATENDENTES,null=True,blank=True)
+    aluno = models.CharField(max_length=100, null=True, blank=True)
+    guiche = models.IntegerField(null=True, blank=True)
+    senha = models.ForeignKey("filas.Senha", on_delete=models.PROTECT)
+    tipo = models.CharField(max_length=30,choices=TIPOS_ATENDIMENTO,null=True,blank=True)
+    inicio = models.TimeField(null=True, blank=True)
     fim = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
-        return f'{self.senha} - {self.tipo}'
+        return f'{self.senha} - {self.tipo} - {self.guiche}'

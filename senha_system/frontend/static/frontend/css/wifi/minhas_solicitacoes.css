@@ -1,0 +1,321 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+body {
+    min-height: 100vh;
+
+    font-family: Arial, Helvetica, sans-serif;
+
+    background: #f4f7fb;
+
+    color: #1f2937;
+}
+
+
+/* HEADER */
+
+.wifi-header {
+    width: 100%;
+    min-height: 90px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 18px;
+
+    padding: 15px 40px;
+
+    background: #ffffff;
+
+    border-bottom: 1px solid #dbe3ec;
+
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+
+.logo {
+    width: 62px;
+    height: auto;
+}
+
+
+.wifi-header h1 {
+    color: #005baa;
+
+    font-size: 22px;
+
+    margin-bottom: 4px;
+}
+
+
+.wifi-header p {
+    color: #6b7280;
+
+    font-size: 14px;
+}
+
+
+/* CONTAINER */
+
+.container {
+    min-height: calc(100vh - 90px);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 40px 20px;
+}
+
+
+/* CARD */
+
+.consulta-card {
+    width: 100%;
+    max-width: 520px;
+
+    background: #ffffff;
+
+    border-radius: 14px;
+
+    padding: 42px 40px;
+
+    text-align: center;
+
+    border: 1px solid #e2e8f0;
+
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+
+/* ÍCONE */
+
+.consulta-icon {
+    width: 64px;
+    height: 64px;
+
+    margin: 0 auto 22px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #e8f4ff;
+
+    color: #005baa;
+
+    border: 2px solid #b8ddff;
+
+    font-size: 30px;
+
+    font-weight: bold;
+}
+
+
+/* TÍTULO */
+
+.consulta-card h1 {
+    color: #005baa;
+
+    font-size: 27px;
+
+    margin-bottom: 12px;
+}
+
+
+/* DESCRIÇÃO */
+
+.descricao {
+    color: #64748b;
+
+    font-size: 15px;
+
+    line-height: 1.6;
+
+    margin-bottom: 28px;
+}
+
+
+/* FORMULÁRIO */
+
+.form-group {
+    text-align: left;
+
+    margin-bottom: 18px;
+}
+
+
+.form-group label {
+    display: block;
+
+    color: #374151;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    margin-bottom: 8px;
+}
+
+
+.form-group input {
+    width: 100%;
+
+    padding: 13px 14px;
+
+    border: 1px solid #cbd5e1;
+
+    border-radius: 7px;
+
+    outline: none;
+
+    color: #1f2937;
+
+    background: #ffffff;
+
+    font-size: 14px;
+
+    transition: border-color 0.2s ease,
+                box-shadow 0.2s ease;
+}
+
+
+.form-group input:focus {
+    border-color: #005baa;
+
+    box-shadow: 0 0 0 3px rgba(0, 91, 170, 0.10);
+}
+
+
+.form-group input::placeholder {
+    color: #94a3b8;
+}
+
+
+/* BOTÃO CONSULTAR */
+
+.btn-consultar {
+    width: 100%;
+
+    padding: 13px 20px;
+
+    border: none;
+
+    border-radius: 7px;
+
+    background: #005baa;
+
+    color: #ffffff;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: background 0.2s ease;
+}
+
+
+.btn-consultar:hover {
+    background: #004987;
+}
+
+
+/* ERRO */
+
+.erro {
+    margin-top: 18px;
+
+    padding: 12px 14px;
+
+    border-radius: 7px;
+
+    background: #fff1f2;
+
+    border: 1px solid #fecdd3;
+
+    color: #be123c;
+
+    font-size: 14px;
+
+    line-height: 1.5;
+}
+
+
+/* AÇÕES */
+
+.acoes {
+    margin-top: 20px;
+}
+
+
+.btn-nova {
+    display: inline-block;
+
+    padding: 11px 20px;
+
+    border-radius: 7px;
+
+    border: 1px solid #005baa;
+
+    background: #ffffff;
+
+    color: #005baa;
+
+    text-decoration: none;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    transition: background 0.2s ease,
+                color 0.2s ease;
+}
+
+
+.btn-nova:hover {
+    background: #f0f7ff;
+}
+
+
+/* RESPONSIVO */
+
+@media (max-width: 600px) {
+
+    .wifi-header {
+        padding: 15px 20px;
+    }
+
+
+    .consulta-card {
+        padding: 35px 22px;
+    }
+
+
+    .consulta-card h1 {
+        font-size: 24px;
+    }
+
+
+    .consulta-icon {
+        width: 58px;
+        height: 58px;
+
+        font-size: 27px;
+    }
+
+
+    .btn-nova {
+        width: 100%;
+
+        text-align: center;
+    }
+
+}

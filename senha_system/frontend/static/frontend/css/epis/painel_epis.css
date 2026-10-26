@@ -1,0 +1,187 @@
+/* ============================================================
+   CARDS DO DASHBOARD
+============================================================ */
+
+.epis-cards {
+    display: grid;
+
+    grid-template-columns: repeat(4, 1fr);
+
+    gap: 18px;
+
+    margin-bottom: 30px;
+}
+
+.epis-card {
+    background: white;
+
+    border: 1px solid #e1e5ea;
+
+    border-radius: 10px;
+
+    padding: 22px;
+
+    display: flex;
+
+    justify-content: space-between;
+    align-items: center;
+
+    min-height: 145px;
+
+    text-decoration: none;
+
+    color: inherit;
+
+    transition: .2s;
+}
+
+.epis-card:hover {
+    border-color: #185ec7;
+
+    background: #fafcff;
+
+    transform: translateY(-2px);
+}
+
+.epis-card span {
+    display: block;
+
+    color: #697386;
+
+    font-size: 14px;
+}
+
+.epis-card strong {
+    display: block;
+
+    font-size: 32px;
+
+    margin: 8px 0;
+}
+
+.epis-card small {
+    color: #9299a5;
+}
+
+.epis-card-icon {
+    width: 44px;
+    height: 44px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 9px;
+
+    background: #edf3fc;
+
+    color: #185ec7;
+
+    font-weight: 800;
+}
+
+.epis-card-warning .epis-card-icon {
+    background: #fff1f1;
+
+    color: #d82932;
+}
+
+
+/* ============================================================
+   AÇÕES DO DASHBOARD
+============================================================ */
+
+.epis-actions {
+    display: grid;
+
+    grid-template-columns: repeat(3, 1fr);
+
+    gap: 15px;
+}
+
+.epis-action {
+    display: flex;
+
+    align-items: center;
+
+    gap: 15px;
+
+    padding: 18px;
+
+    border: 1px solid #e1e5ea;
+
+    border-radius: 8px;
+
+    text-decoration: none;
+
+    color: inherit;
+
+    transition: .2s;
+}
+
+.epis-action:hover {
+    border-color: #185ec7;
+
+    background: #f8fbff;
+
+    transform: translateY(-2px);
+}
+
+.epis-action-icon {
+    width: 44px;
+    height: 44px;
+
+    flex-shrink: 0;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 8px;
+
+    background: #edf3fc;
+
+    color: #185ec7;
+
+    font-weight: 800;
+}
+
+.epis-action strong {
+    display: block;
+
+    font-size: 15px;
+
+    margin-bottom: 5px;
+}
+
+.epis-action span {
+    color: #737d8d;
+
+    font-size: 13px;
+}
+
+
+/* ============================================================
+   RESPONSIVO
+============================================================ */
+
+@media (max-width: 1000px) {
+
+    .epis-cards {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .epis-actions {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+@media (max-width: 650px) {
+
+    .epis-cards {
+        grid-template-columns: 1fr;
+    }
+}

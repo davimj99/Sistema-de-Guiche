@@ -1,0 +1,532 @@
+
+html,
+body {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+img,
+svg,
+video,
+iframe {
+    max-width: 100%;
+}
+
+/* =========================================
+   TELAS MÉDIAS — NOTEBOOKS E TABLETS
+   ========================================= */
+
+@media (max-width: 1024px) {
+
+    .core-header-inner {
+        flex-wrap: wrap;
+        gap: 16px;
+        padding: 16px 24px;
+    }
+
+    .core-header-inner nav {
+        order: 3;
+        width: 100%;
+    }
+
+    .core-nav-links {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 12px;
+    }
+
+    .core-header-controls {
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 10px;
+    }
+
+    .core-hero {
+        padding: 60px 24px;
+    }
+
+    .core-hero-container {
+        max-width: 100%;
+    }
+
+    .core-hero h1 {
+        font-size: clamp(2rem, 4vw, 3rem);
+        line-height: 1.2;
+        overflow-wrap: break-word;
+    }
+
+    .core-hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 12px;
+    }
+
+    .core-container {
+        width: 100%;
+        max-width: 100%;
+        padding-right: 24px;
+        padding-left: 24px;
+    }
+
+    .core-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 20px;
+    }
+
+    .core-features-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 20px;
+    }
+
+    .core-cta-banner {
+        flex-wrap: wrap;
+        gap: 24px;
+    }
+
+    .core-cta-text,
+    .core-cta-buttons {
+        min-width: 0;
+        max-width: 100%;
+    }
+
+    .core-footer-inner {
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+}
+
+/* =========================================
+   TABLETS E CELULARES GRANDES
+   ========================================= */
+
+@media (max-width: 768px) {
+
+    .core-header-inner {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 16px;
+    }
+
+    .core-brand {
+        justify-content: center;
+        max-width: 100%;
+    }
+
+    .core-brand img {
+        max-width: 60px;
+        height: auto;
+    }
+
+    .core-brand-text {
+        min-width: 0;
+    }
+
+    .core-brand-text h1 {
+        font-size: clamp(1rem, 4vw, 1.3rem);
+        overflow-wrap: break-word;
+    }
+
+    .core-brand-text span {
+        font-size: 0.8rem;
+    }
+
+    .core-header-inner nav {
+        width: 100%;
+    }
+
+    .core-nav-links {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 6px;
+        padding: 0;
+        margin: 0;
+    }
+
+    .core-nav-links li {
+        width: 100%;
+        text-align: center;
+    }
+
+    .core-nav-links a {
+        display: block;
+        padding: 10px;
+    }
+
+    .core-header-controls {
+        justify-content: center;
+        width: 100%;
+    }
+
+    .core-hero {
+        padding: 48px 18px;
+    }
+
+    .core-hero h1 {
+        font-size: clamp(1.8rem, 6vw, 2.5rem);
+    }
+
+    .core-hero-desc {
+        font-size: 1rem;
+        line-height: 1.7;
+    }
+
+    .core-hero-actions {
+        flex-direction: column;
+        align-items: stretch;
+        width: 100%;
+    }
+
+    .core-hero-actions .core-btn {
+        width: 100%;
+        max-width: 100%;
+        text-align: center;
+        justify-content: center;
+        white-space: normal;
+    }
+
+    .core-container {
+        padding-right: 16px;
+        padding-left: 16px;
+    }
+
+    .core-section-head {
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .core-grid {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 18px;
+    }
+
+    .core-card {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .core-card h3 {
+        overflow-wrap: break-word;
+    }
+
+    .core-card-desc {
+        line-height: 1.7;
+        overflow-wrap: break-word;
+    }
+
+    .core-card-actions {
+        width: 100%;
+    }
+
+    .core-card-btn-main {
+        width: 100%;
+        gap: 10px;
+    }
+
+    .core-card-sublinks {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .core-sublink {
+        overflow-wrap: anywhere;
+    }
+
+    .core-guiche-picker {
+        max-width: 100%;
+    }
+
+    .core-guiche-pills {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .core-guiche-pill {
+        max-width: 100%;
+        overflow-wrap: anywhere;
+    }
+
+    .core-showcase-box {
+        padding: 24px 18px;
+    }
+
+    .core-showcase-box h2 {
+        font-size: clamp(1.5rem, 5vw, 2rem);
+        line-height: 1.3;
+        overflow-wrap: break-word;
+    }
+
+    .core-showcase-box .sub {
+        line-height: 1.7;
+    }
+
+    .core-features-grid {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 18px;
+    }
+
+    .core-feature-item {
+        min-width: 0;
+    }
+
+    .core-feature-item h4,
+    .core-feature-item p {
+        overflow-wrap: break-word;
+    }
+
+    .core-cta-banner {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 20px;
+    }
+
+    .core-cta-text,
+    .core-cta-buttons {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .core-cta-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .core-cta-buttons .core-btn {
+        width: 100%;
+        max-width: 100%;
+        justify-content: center;
+        text-align: center;
+        white-space: normal;
+    }
+
+    .core-footer-inner {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 24px 16px;
+    }
+
+    .core-footer-links {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 12px;
+    }
+
+    .core-whatsapp-float {
+        right: 16px;
+        bottom: 16px;
+    }
+
+    .core-whatsapp-tooltip {
+        display: none;
+    }
+}
+
+/* =========================================
+   CELULARES
+   ========================================= */
+
+@media (max-width: 480px) {
+
+    .core-header-inner {
+        padding: 12px;
+        gap: 14px;
+    }
+
+    .core-brand {
+        gap: 10px;
+    }
+
+    .core-brand img {
+        max-width: 46px;
+    }
+
+    .core-brand-text h1 {
+        font-size: 0.95rem;
+    }
+
+    .core-brand-text span {
+        font-size: 0.72rem;
+    }
+
+    .core-header-controls {
+        gap: 8px;
+    }
+
+    .core-hero {
+        padding: 36px 14px;
+    }
+
+    .core-pill-badge {
+        max-width: 100%;
+        overflow-wrap: anywhere;
+    }
+
+    .core-hero h1 {
+        font-size: clamp(1.6rem, 7vw, 2rem);
+    }
+
+    .core-hero-desc {
+        font-size: 0.92rem;
+    }
+
+    .core-container {
+        padding-right: 12px;
+        padding-left: 12px;
+    }
+
+    .core-section-title-wrap h2 {
+        font-size: 1.4rem;
+        line-height: 1.3;
+        overflow-wrap: break-word;
+    }
+
+    .core-section-title-wrap p {
+        font-size: 0.9rem;
+        line-height: 1.6;
+    }
+
+    .core-card {
+        padding: 18px;
+    }
+
+    .core-card-badge-row {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .core-card h3 {
+        font-size: 1.15rem;
+        line-height: 1.4;
+    }
+
+    .core-card-desc {
+        font-size: 0.9rem;
+    }
+
+    .core-card-btn-main {
+        font-size: 0.9rem;
+        padding: 12px;
+    }
+
+    .core-sublink {
+        font-size: 0.85rem;
+    }
+
+    .core-showcase-box {
+        padding: 20px 14px;
+    }
+
+    .core-showcase-box h2 {
+        font-size: 1.4rem;
+    }
+
+    .core-feature-item {
+        padding: 16px;
+    }
+
+    .core-cta-text h3 {
+        font-size: 1.2rem;
+        line-height: 1.4;
+    }
+
+    .core-cta-text p {
+        font-size: 0.9rem;
+        line-height: 1.6;
+    }
+
+    .core-footer-links {
+        gap: 10px;
+    }
+
+    .core-footer-links a {
+        font-size: 0.85rem;
+    }
+
+    .core-whatsapp-float {
+        right: 12px;
+        bottom: 12px;
+    }
+}
+
+/* =========================================
+   CELULARES MUITO PEQUENOS
+   ========================================= */
+
+@media (max-width: 360px) {
+
+    .core-brand img {
+        max-width: 38px;
+    }
+
+    .core-brand-text h1 {
+        font-size: 0.82rem;
+    }
+
+    .core-brand-text span {
+        font-size: 0.65rem;
+    }
+
+    .core-hero h1 {
+        font-size: 1.45rem;
+    }
+
+    .core-container {
+        padding-right: 10px;
+        padding-left: 10px;
+    }
+
+    .core-card {
+        padding: 14px;
+    }
+
+    .core-showcase-box {
+        padding: 16px 12px;
+    }
+}
+
+/* =========================================
+   ACESSIBILIDADE E DISPOSITIVOS TOUCH
+   ========================================= */
+
+@media (hover: none) and (pointer: coarse) {
+
+    .core-nav-links a,
+    .core-btn,
+    .core-card-btn-main,
+    .core-sublink,
+    .core-guiche-pill,
+    .core-footer-links a {
+        min-height: 44px;
+    }
+
+    .core-header-controls button {
+        min-width: 40px;
+        min-height: 40px;
+    }
+}
+
+/* Evita textos e botões ultrapassarem os cards */
+.core-card,
+.core-feature-item,
+.core-cta-banner,
+.core-hero-container {
+    min-width: 0;
+}
+
+.core-card p,
+.core-feature-item p,
+.core-cta-text p {
+    overflow-wrap: break-word;
+}
