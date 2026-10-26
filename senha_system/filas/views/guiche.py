@@ -196,6 +196,7 @@ def chamar_proxima(request, guiche_id):
         f"/filas/guiche/{guiche_id}/"
     )
 
+@login_required
 @require_POST
 def chamar_novamente(request, guiche_id):
     guiche = get_object_or_404(Guiche, id=guiche_id)
