@@ -787,32 +787,3 @@ h1, h2, h3, h4, h5, h6 {
 .core-footer-links a:hover {
     color: #ffffff;
 }
-
-/* ==========================================
-   RESPONSIVO
-   ========================================== */
-@media (max-width: 900px) {
-    .core-hero h1 {
-        font-size: 2.1rem;
-    }
-    .core-grid {
-        grid-template-columns: 1fr;
-    }
-    .core-cta-banner {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-    .core-nav-links {
-        display: none;
-    }
-    .core-whatsapp-float {
-        bottom: 20px;
-        right: 20px;
-        width: 52px;
-        height: 52px;
-    }
-    .core-whatsapp-float svg {
-        width: 28px;
-        height: 28px;
-    }
-}
