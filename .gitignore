@@ -1,0 +1,44 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Backups do banco de dados
+backups/
+*.sql
+*.dump
+
+# Docker e arquivos temporários
+.log.*
+
+# Ambientes virtuais
+venv/
+.venv/
+env/
+
+# Variáveis de ambiente e segredos
+.env
+.env.*
+!.env.example
+!.env.prod.example
+
+# Bancos de dados locais
+db.sqlite3
+*.sqlite3
+
+# Arquivos de mídia e uploads
+media/
+
+# Arquivos estáticos gerados pelo collectstatic
+staticfiles/
+
+# Logs
+*.log
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+
+# IDEs e editores
+.vscode/
+.idea/
