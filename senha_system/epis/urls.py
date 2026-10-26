@@ -28,4 +28,5 @@ urlpatterns = [
     path("estoque/",views.estoque,name="estoque"),
 
     path("relatorios/controle-epi/",views.relatorio_controle_epi,name="relatorio_controle_epi"),
+    path("relatorios/controle-epi/",views.relatorio_controle_epi,name="relatorios"),
 ]

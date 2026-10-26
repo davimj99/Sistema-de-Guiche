@@ -1,7 +1,7 @@
 from datetime import date
 
 from django.conf import settings
-from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.decorators import login_required
 from django.contrib.staticfiles import finders
 from django.http import HttpResponse
 from django.shortcuts import render
@@ -13,9 +13,6 @@ from xhtml2pdf import pisa
 from epis.models import EPI, Funcionario, EntregaEPI
 
 
-
-def usuario_autorizado(user):
-    return user.is_superuser
 
 def link_callback(uri, rel):
     static_url = settings.STATIC_URL or "/static/"
@@ -30,7 +27,6 @@ def link_callback(uri, rel):
     return uri
 
 @login_required
-@user_passes_test(usuario_autorizado)
 def relatorio_controle_epi(request):
     funcionarios = Funcionario.objects.filter(ativo=True)
     epis = EPI.objects.filter(ativo=True)
