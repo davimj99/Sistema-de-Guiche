@@ -388,3 +388,151 @@ class RoutersAndViewSetsTestCase(TestCase):
         self.assertEqual(data["codigo"], 400)
         self.assertIn("mensagem", data)
         self.assertIn("detalhes", data)
+
+
+# ============================================================
+# 6. TESTES DA API ROOT INTERATIVA E NAVEGABILIDADE (BROWSABLE API)
+# ============================================================
+class InteractiveApiRootTestCase(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.guiche = Guiche.objects.create(nome="Guichê 01 Interativo", ativo=True)
+        self.user = User.objects.create_user(
+            username="operador_interativo",
+            password="InterativoPass2026!",
+            email="interativo@iscon.edu.br"
+        )
+        self.staff_user = User.objects.create_user(
+            username="admin_interativo",
+            password="AdminPass2026!",
+            email="admin@iscon.edu.br",
+            is_staff=True
+        )
+        creds = "operador_interativo:InterativoPass2026!"
+        self.auth_header = "Basic " + base64.b64encode(creds.encode()).decode("utf-8")
+        staff_creds = "admin_interativo:AdminPass2026!"
+        self.staff_header = "Basic " + base64.b64encode(staff_creds.encode()).decode("utf-8")
+
+    def test_api_root_returns_200_and_interactive_hyperlinks(self):
+        # 1. Requisição em JSON para /api/v1/
+        response = self.client.get("/api/v1/", HTTP_HOST="localhost:8000")
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+
+        self.assertEqual(data["nome"], "API Sistema de Atendimento & Filas")
+        self.assertEqual(data["versao"], "v1.0")
+        self.assertIn("endpoints", data)
+
+        endpoints = data["endpoints"]
+        # Verifica presença dos endpoints obrigatórios
+        for key in ["painel", "guiches", "filas", "senhas", "atendimentos"]:
+            self.assertIn(key, endpoints)
+            url = endpoints[key]
+            # Valida se é um hyperlink absoluto navegável
+            self.assertTrue(url.startswith("http://") or url.startswith("https://"))
+            self.assertIn("/api/v1/", url)
+
+    def test_browsable_api_html_contains_clickable_anchors(self):
+        # 2. Requisição em text/html (Browsable API do DRF)
+        response = self.client.get("/api/v1/", HTTP_ACCEPT="text/html", HTTP_HOST="localhost:8000")
+        self.assertEqual(response.status_code, 200)
+        html = response.content.decode("utf-8")
+
+        # Verifica se o renderer do DRF converteu os hyperlinks em tags <a href="...">
+        self.assertIn('href="http://localhost:8000/api/v1/painel/"', html)
+        self.assertIn('href="http://localhost:8000/api/v1/guiches/"', html)
+        self.assertIn('href="http://localhost:8000/api/v1/filas/"', html)
+        self.assertIn('href="http://localhost:8000/api/v1/senhas/"', html)
+        self.assertIn('href="http://localhost:8000/api/v1/atendimentos/"', html)
+
+    def test_all_root_hyperlinks_resolve_without_404(self):
+        # 3. Navegação direta: cada link retornado na API Root deve apontar para uma rota válida existente
+        response = self.client.get("/api/v1/", HTTP_HOST="localhost:8000")
+        endpoints = response.json()["endpoints"]
+
+        for name, full_url in endpoints.items():
+            # Extrai o caminho relativo (path) da URL absoluta
+            path = full_url.replace("http://localhost:8000", "")
+            # Endpoints protegidos retornam 401/403 se unauth, endpoints POST-only retornam 405 em GET, nunca 404
+            get_resp = self.client.get(path, HTTP_HOST="localhost:8000")
+            self.assertNotEqual(
+                get_resp.status_code,
+                404,
+                f"Endpoint '{name}' ({path}) retornou 404 Not Found"
+            )
+            self.assertIn(
+                get_resp.status_code,
+                [200, 401, 403, 405],
+                f"Endpoint '{name}' ({path}) retornou status inesperado {get_resp.status_code}"
+            )
+
+    def test_hyperlinked_serializers_in_responses(self):
+        # 4. Verifica se os recursos retornam hyperlinks navegáveis
+        # Guiches listagem
+        guiches_resp = self.client.get("/api/v1/guiches/", HTTP_HOST="localhost:8000")
+        self.assertEqual(guiches_resp.status_code, 200)
+        guiches_data = guiches_resp.json()
+        self.assertTrue(len(guiches_data["guiches"]) > 0)
+        primeiro_guiche = guiches_data["guiches"][0]
+        self.assertIn("url", primeiro_guiche)
+        self.assertTrue(primeiro_guiche["url"].startswith("http://localhost:8000/api/v1/guiches/"))
+
+        # Emissão de senha via POST
+        emitir_resp = self.client.post("/api/v1/senhas/emitir/", {"tipo": "normal"}, format="json", HTTP_HOST="localhost:8000")
+        self.assertEqual(emitir_resp.status_code, 201)
+        senha_data = emitir_resp.json()["senha"]
+        self.assertIn("url", senha_data)
+        self.assertTrue(senha_data["url"].startswith("http://localhost:8000/api/v1/senhas/"))
+
+    def test_action_endpoints_support_get_and_display_forms(self):
+        # 5. Verifica se as actions suportam GET retornando 200 para exibição de formulários interativos
+        # Emitir senha GET (público)
+        emitir_get = self.client.get("/api/v1/senhas/emitir/", HTTP_HOST="localhost:8000")
+        self.assertEqual(emitir_get.status_code, 200)
+        self.assertIn("tipos_suportados", emitir_get.json())
+
+        # Chamar próxima GET (autenticado)
+        chamar_get = self.client.get(
+            "/api/v1/senhas/chamar_proxima/",
+            HTTP_AUTHORIZATION=self.auth_header,
+            HTTP_HOST="localhost:8000"
+        )
+        self.assertEqual(chamar_get.status_code, 200)
+        self.assertIn("guiches_ativos", chamar_get.json())
+
+        # Iniciar atendimento GET (autenticado)
+        iniciar_get = self.client.get(
+            "/api/v1/atendimentos/iniciar/",
+            HTTP_AUTHORIZATION=self.auth_header,
+            HTTP_HOST="localhost:8000"
+        )
+        self.assertEqual(iniciar_get.status_code, 200)
+        self.assertIn("tipos_atendimento", iniciar_get.json())
+
+    def test_guiche_crud_and_permissions(self):
+        # 6. Teste de operações CRUD no GuicheViewSet com controle de permissão
+        # Usuário comum tenta POST -> 403 Forbidden
+        post_unauth = self.client.post(
+            "/api/v1/guiches/",
+            {"nome": "Guichê Não Permitido", "ativo": True},
+            format="json",
+            HTTP_AUTHORIZATION=self.auth_header,
+            HTTP_HOST="localhost:8000"
+        )
+        self.assertEqual(post_unauth.status_code, 403)
+
+        # Staff cria guichê -> 201 Created
+        post_staff = self.client.post(
+            "/api/v1/guiches/",
+            {"nome": "Guichê Novo Staff", "ativo": True},
+            format="json",
+            HTTP_AUTHORIZATION=self.staff_header,
+            HTTP_HOST="localhost:8000"
+        )
+        self.assertEqual(post_staff.status_code, 201)
+        novo_id = post_staff.json()["id"]
+
+        # Staff consulta detalhe via GET
+        detail_resp = self.client.get(f"/api/v1/guiches/{novo_id}/", HTTP_HOST="localhost:8000")
+        self.assertEqual(detail_resp.status_code, 200)
+        self.assertEqual(detail_resp.json()["nome"], "Guichê Novo Staff")

@@ -3,12 +3,13 @@ from rest_framework import status, viewsets
 from rest_framework.decorators import api_view, permission_classes, action, throttle_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.reverse import reverse
 from drf_yasg.utils import swagger_auto_schema
-from drf_yasg import openapi
 
 from accounts.models import Guiche
 from filas.models import Senha, Historico
 from atendimentos.models import Atendimento
+from filas.validators import FilaValidator
 from filas.services import FilaService
 from atendimentos.services import AtendimentoService
 from api.permissions import IsAdminOrReadOnly, IsAtendenteOrAdmin
@@ -31,43 +32,63 @@ from .serializers import (
 
 
 # ============================================================
-# ENDPOINTS LEGADOS / OPERACIONAIS (100% RETROCOMPATÍVEIS)
+# API ROOT INTERATIVA NAVEGÁVEL (BROWSABLE API)
 # ============================================================
 @swagger_auto_schema(
     method='get',
-    operation_summary="Catálogo de Endpoints da API",
-    operation_description="Retorna o mapa de navegação dos endpoints públicos, autenticados e routers da API v1.",
+    operation_summary="Catálogo Interativo de Endpoints da API",
+    operation_description=(
+        "Página inicial interativa da API v1. Apresenta hyperlinks reais e clicáveis "
+        "para navegação ponto a ponto na Browsable API do Django REST Framework."
+    ),
     responses={200: ApiRootResponseSerializer},
     tags=['Catálogo']
 )
 @api_view(['GET'])
 @permission_classes([AllowAny])
-def api_root(request):
+def api_root(request, format=None):
     """
-    Índice da API v1 do Sistema de Atendimento.
-    Documentação navegável dos endpoints públicos e operacionais.
+    Página inicial interativa da API REST (v1).
+    Apresenta hyperlinks clicáveis para todos os recursos operacionais na Browsable API do DRF.
     """
+    def res(name):
+        try:
+            return reverse(f"api:{name}", request=request, format=format)
+        except Exception:
+            try:
+                return reverse(name, request=request, format=format)
+            except Exception:
+                return None
+
+    endpoints = {
+        "painel": res("painel"),
+        "guiches": res("guiches-list") or res("guiches"),
+        "filas": res("filas") or res("status_filas"),
+        "senhas": res("senhas-list"),
+        "atendimentos": res("atendimentos-list"),
+        "status_filas": res("status_filas"),
+        "auth_token": res("token_obtain_pair"),
+        "auth_refresh": res("token_refresh"),
+        "auth_me": res("user_profile"),
+        "swagger": res("schema-swagger-ui"),
+        "redoc": res("schema-redoc"),
+    }
+
     data = {
         "nome": "API Sistema de Atendimento & Filas",
         "versao": "v1.0",
-        "endpoints": {
-            "painel": "/api/v1/painel/",
-            "guiches": "/api/v1/guiches/",
-            "status_filas": "/api/v1/filas/status/",
-            "auth_token": "/api/v1/auth/token/",
-            "auth_refresh": "/api/v1/auth/token/refresh/",
-            "auth_me": "/api/v1/auth/me/",
-            "senhas_router": "/api/v1/senhas/",
-            "atendimentos_router": "/api/v1/atendimentos/",
-            "guiches_router": "/api/v1/routers/guiches/",
-            "swagger": "/swagger/",
-            "redoc": "/redoc/",
-        },
-        "documentacao": "Endpoints em formato JSON REST prontos para consumo por totens, TVs e sistemas externos."
+        "endpoints": {k: v for k, v in endpoints.items() if v is not None},
+        "documentacao": (
+            "Endpoints navegáveis via Django REST Framework Browsable API "
+            "prontos para consumo por totens, TVs e sistemas externos."
+        )
     }
     return Response(data)
 
 
+# ============================================================
+# ENDPOINTS PÚBLICOS DE OPERAÇÃO (TOTEM & PAINEL DE TV)
+# ============================================================
 @swagger_auto_schema(
     method='get',
     operation_summary="Estado em Tempo Real do Painel de TV",
@@ -88,37 +109,6 @@ def painel_api(request):
     Retorna o estado em tempo real do painel de chamadas consumindo o FilaService.
     """
     data = FilaService.obter_estado_painel()
-    return Response(data)
-
-
-@swagger_auto_schema(
-    method='get',
-    operation_summary="Listar Guichês Ativos",
-    operation_description="Retorna a lista de todos os guichês de atendimento ativos cadastrados no sistema.",
-    responses={200: GuichesListResponseSerializer},
-    tags=['Guichês']
-)
-@api_view(['GET'])
-@permission_classes([AllowAny])
-def guiches_api(request):
-    """
-    Retorna a lista de guichês de atendimento cadastrados e ativos.
-    Executa apenas 1 query eficiente no banco.
-    """
-    guiches = list(Guiche.objects.filter(ativo=True).order_by("id"))
-
-    data = {
-        "status": "sucesso",
-        "total": len(guiches),
-        "guiches": [
-            {
-                "id": g.id,
-                "nome": g.nome,
-                "ativo": g.ativo,
-            }
-            for g in guiches
-        ]
-    }
     return Response(data)
 
 
@@ -164,12 +154,13 @@ def user_profile_api(request):
 
 
 # ============================================================
-# VIEWSETS ORGANIZADOS POR ROUTER
+# VIEWSETS ORGANIZADOS POR DOMÍNIO & BROWSABLE API INTERATIVA
 # ============================================================
 class GuicheViewSet(viewsets.ModelViewSet):
     """
-    ViewSet para consulta e gerenciamento de Guichês de Atendimento.
+    ViewSet navegável para consulta e gerenciamento de Guichês de Atendimento.
     Leitura pública para totens e painéis; modificação restrita a administradores.
+    Disponibiliza formulários interativos no Browsable API.
     """
     queryset = Guiche.objects.all().order_by('id')
     serializer_class = GuicheSerializer
@@ -183,16 +174,29 @@ class GuicheViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(ativo=ativo_bool)
         return queryset
 
+    def list(self, request, *args, **kwargs):
+        """
+        Retorna a lista de guichês no contrato consumido por totens e painéis,
+        com hyperlinks individuais para cada guichê.
+        """
+        queryset = self.filter_queryset(self.get_queryset())
+        serializer = self.get_serializer(queryset, many=True)
+        return Response({
+            "status": "sucesso",
+            "total": len(serializer.data),
+            "guiches": serializer.data
+        })
 
-class SenhaViewSet(viewsets.ReadOnlyModelViewSet):
+
+class SenhaViewSet(viewsets.ModelViewSet):
     """
     ViewSet para consulta de senhas e ações operacionais de atendimento.
-    Ações de emissão são públicas (com controle de throttling para totens),
-    enquanto ações de chamada exigem operador autenticado.
+    Ações de emissão são públicas com formulário interativo no Browsable API;
+    ações de chamada exigem operador autenticado.
     """
     queryset = Senha.objects.all().select_related('guiche').order_by('-id')
     serializer_class = SenhaModelSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAdminOrReadOnly]
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -206,6 +210,12 @@ class SenhaViewSet(viewsets.ReadOnlyModelViewSet):
         return queryset
 
     @swagger_auto_schema(
+        method='get',
+        operation_summary="Instruções para Emissão de Senha",
+        tags=['Senhas']
+    )
+    @swagger_auto_schema(
+        method='post',
         operation_summary="Emitir Nova Senha",
         request_body=SenhaEmitirSerializer,
         responses={201: SenhaModelSerializer},
@@ -213,15 +223,23 @@ class SenhaViewSet(viewsets.ReadOnlyModelViewSet):
     )
     @action(
         detail=False,
-        methods=['post'],
+        methods=['get', 'post'],
         permission_classes=[AllowAny],
         throttle_classes=[TotemRateThrottle]
     )
     def emitir(self, request):
         """
         Emite uma nova senha para atendimento no totem.
-        Suporta tipo 'normal' ou 'preferencial'.
+        No Browsable API, exibe o formulário interativo para POST.
         """
+        if request.method == 'GET':
+            return Response({
+                "acao": "emitir_senha",
+                "descricao": "Informe 'tipo' ('normal' ou 'preferencial') via POST para emitir uma nova senha no totem.",
+                "tipos_suportados": list(FilaValidator.TIPOS_PERMITIDOS),
+                "exemplo_payload": {"tipo": "normal"}
+            })
+
         serializer = SenhaEmitirSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         tipo = serializer.validated_data.get('tipo', 'normal')
@@ -231,12 +249,18 @@ class SenhaViewSet(viewsets.ReadOnlyModelViewSet):
             {
                 "status": "sucesso",
                 "mensagem": f"Senha {senha.prefixo}{senha.numero} emitida com sucesso.",
-                "senha": SenhaModelSerializer(senha).data,
+                "senha": SenhaModelSerializer(senha, context={'request': request}).data,
             },
             status=status.HTTP_201_CREATED
         )
 
     @swagger_auto_schema(
+        method='get',
+        operation_summary="Instruções para Chamar Próxima Senha",
+        tags=['Senhas']
+    )
+    @swagger_auto_schema(
+        method='post',
         operation_summary="Chamar Próxima Senha",
         request_body=ChamadaProximaSerializer,
         responses={200: SenhaModelSerializer},
@@ -244,7 +268,7 @@ class SenhaViewSet(viewsets.ReadOnlyModelViewSet):
     )
     @action(
         detail=False,
-        methods=['post'],
+        methods=['get', 'post'],
         permission_classes=[IsAuthenticated],
         throttle_classes=[ChamadaRateThrottle]
     )
@@ -253,6 +277,15 @@ class SenhaViewSet(viewsets.ReadOnlyModelViewSet):
         Chama a próxima senha aguardando na fila para o guichê informado.
         Requer autenticação do operador (BasicAuth ou JWT).
         """
+        if request.method == 'GET':
+            guiches_ativos = list(Guiche.objects.filter(ativo=True).values("id", "nome"))
+            return Response({
+                "acao": "chamar_proxima",
+                "descricao": "Envie 'guiche_id' via POST para chamar a próxima senha da fila.",
+                "guiches_ativos": guiches_ativos,
+                "exemplo_payload": {"guiche_id": guiches_ativos[0]["id"] if guiches_ativos else 1}
+            })
+
         serializer = ChamadaProximaSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         guiche_id = serializer.validated_data['guiche_id']
@@ -272,12 +305,18 @@ class SenhaViewSet(viewsets.ReadOnlyModelViewSet):
             {
                 "status": "sucesso",
                 "mensagem": f"Senha {senha.prefixo}{senha.numero} chamada com sucesso.",
-                "senha": SenhaModelSerializer(senha).data,
+                "senha": SenhaModelSerializer(senha, context={'request': request}).data,
             },
             status=status.HTTP_200_OK
         )
 
     @swagger_auto_schema(
+        method='get',
+        operation_summary="Instruções para Rechamar Senha",
+        tags=['Senhas']
+    )
+    @swagger_auto_schema(
+        method='post',
         operation_summary="Rechamar Senha Atual",
         request_body=ChamadaNovamenteSerializer,
         responses={200: SenhaModelSerializer},
@@ -285,7 +324,7 @@ class SenhaViewSet(viewsets.ReadOnlyModelViewSet):
     )
     @action(
         detail=False,
-        methods=['post'],
+        methods=['get', 'post'],
         permission_classes=[IsAuthenticated],
         throttle_classes=[ChamadaRateThrottle]
     )
@@ -294,6 +333,13 @@ class SenhaViewSet(viewsets.ReadOnlyModelViewSet):
         Rechama a senha atual que está em atendimento no guichê informado.
         Requer autenticação do operador.
         """
+        if request.method == 'GET':
+            return Response({
+                "acao": "chamar_novamente",
+                "descricao": "Envie 'guiche_id' via POST para rechamar a senha atual do guichê.",
+                "exemplo_payload": {"guiche_id": 1}
+            })
+
         serializer = ChamadaNovamenteSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         guiche_id = serializer.validated_data['guiche_id']
@@ -313,12 +359,13 @@ class SenhaViewSet(viewsets.ReadOnlyModelViewSet):
             {
                 "status": "sucesso",
                 "mensagem": f"Senha {senha.prefixo}{senha.numero} rechamada com sucesso.",
-                "senha": SenhaModelSerializer(senha).data,
+                "senha": SenhaModelSerializer(senha, context={'request': request}).data,
             },
             status=status.HTTP_200_OK
         )
 
     @swagger_auto_schema(
+        method='get',
         operation_summary="Listar Senhas em Espera do Dia",
         responses={200: SenhaModelSerializer(many=True)},
         tags=['Senhas']
@@ -326,33 +373,55 @@ class SenhaViewSet(viewsets.ReadOnlyModelViewSet):
     @action(detail=False, methods=['get'], permission_classes=[AllowAny])
     def espera(self, request):
         """
-        Lista as senhas atualmente em espera para o dia de hoje.
+        Lista as senhas atualmente em espera para o dia de hoje com links navegáveis.
         """
         hoje = timezone.localdate()
         senhas = Senha.objects.filter(status="espera", criada_em__date=hoje).order_by("criada_em", "id")
-        return Response(SenhaModelSerializer(senhas, many=True).data)
+        return Response(SenhaModelSerializer(senhas, many=True, context={'request': request}).data)
 
 
 class AtendimentoViewSet(viewsets.ModelViewSet):
     """
     ViewSet para gerenciamento do ciclo de vida de atendimentos nos guichês.
     Requer autenticação (BasicAuth ou JWT) para todas as operações.
+    Disponibiliza formulários interativos no Browsable API.
     """
     queryset = Atendimento.objects.all().select_related('senha').order_by('-id')
     serializer_class = AtendimentoSerializer
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
+        method='get',
+        operation_summary="Instruções para Iniciar Atendimento",
+        tags=['Atendimentos']
+    )
+    @swagger_auto_schema(
+        method='post',
         operation_summary="Iniciar Atendimento",
         request_body=AtendimentoIniciarSerializer,
         responses={201: AtendimentoSerializer},
         tags=['Atendimentos']
     )
-    @action(detail=False, methods=['post'], permission_classes=[IsAuthenticated])
+    @action(detail=False, methods=['get', 'post'], permission_classes=[IsAuthenticated])
     def iniciar(self, request):
         """
         Inicia formalmente o atendimento de uma senha chamada.
+        No Browsable API, disponibiliza o formulário interativo para POST.
         """
+        if request.method == 'GET':
+            return Response({
+                "acao": "iniciar_atendimento",
+                "descricao": "Envie 'senha_id' e 'guiche_id' via POST para iniciar o atendimento.",
+                "tipos_atendimento": [t[0] for t in Atendimento.TIPOS_ATENDIMENTO],
+                "exemplo_payload": {
+                    "senha_id": 1,
+                    "guiche_id": 1,
+                    "atendente": "Rafael",
+                    "aluno": "João Silva",
+                    "tipo": "matricula"
+                }
+            })
+
         serializer = AtendimentoIniciarSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -368,42 +437,81 @@ class AtendimentoViewSet(viewsets.ModelViewSet):
             {
                 "status": "sucesso",
                 "mensagem": f"Atendimento #{atendimento.id} iniciado.",
-                "atendimento": AtendimentoSerializer(atendimento).data,
+                "atendimento": AtendimentoSerializer(atendimento, context={'request': request}).data,
             },
             status=status.HTTP_201_CREATED
         )
 
     @swagger_auto_schema(
+        method='get',
+        operation_summary="Status do Atendimento para Finalização",
+        tags=['Atendimentos']
+    )
+    @swagger_auto_schema(
+        method='post',
         operation_summary="Finalizar Atendimento",
         responses={200: AtendimentoSerializer},
         tags=['Atendimentos']
     )
-    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
+    @action(detail=True, methods=['get', 'post'], permission_classes=[IsAuthenticated])
     def finalizar(self, request, pk=None):
         """
         Encerra um atendimento em andamento.
         """
+        if request.method == 'GET':
+            try:
+                atendimento = Atendimento.objects.get(id=int(pk))
+                return Response({
+                    "acao": "finalizar_atendimento",
+                    "atendimento_id": atendimento.id,
+                    "status_atual": "em_andamento" if atendimento.fim is None else "encerrado",
+                    "instrucao": "Envie uma requisição POST para este endpoint para confirmar o encerramento."
+                })
+            except Atendimento.DoesNotExist:
+                return Response(
+                    {"status": "erro", "codigo": 404, "mensagem": f"Atendimento #{pk} não encontrado."},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+
         atendimento = AtendimentoService.finalizar_atendimento(atendimento_id=int(pk))
         return Response(
             {
                 "status": "sucesso",
                 "mensagem": f"Atendimento #{atendimento.id} finalizado.",
-                "atendimento": AtendimentoSerializer(atendimento).data,
+                "atendimento": AtendimentoSerializer(atendimento, context={'request': request}).data,
             },
             status=status.HTTP_200_OK
         )
 
     @swagger_auto_schema(
+        method='get',
+        operation_summary="Instruções para Transferência de Atendimento",
+        tags=['Atendimentos']
+    )
+    @swagger_auto_schema(
+        method='post',
         operation_summary="Transferir Atendimento para Outro Guichê",
         request_body=AtendimentoTransferirSerializer,
         responses={200: SenhaModelSerializer},
         tags=['Atendimentos']
     )
-    @action(detail=False, methods=['post'], permission_classes=[IsAuthenticated])
+    @action(detail=False, methods=['get', 'post'], permission_classes=[IsAuthenticated])
     def transferir(self, request):
         """
         Transfere uma senha em atendimento para outro guichê ativo.
         """
+        if request.method == 'GET':
+            return Response({
+                "acao": "transferir_atendimento",
+                "descricao": "Envie 'senha_id', 'guiche_origem_id' e 'guiche_destino_id' via POST.",
+                "exemplo_payload": {
+                    "senha_id": 1,
+                    "guiche_origem_id": 1,
+                    "guiche_destino_id": 2,
+                    "motivo": "Encaminhamento para suporte especializado"
+                }
+            })
+
         serializer = AtendimentoTransferirSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -429,7 +537,11 @@ class AtendimentoViewSet(viewsets.ModelViewSet):
             {
                 "status": "sucesso",
                 "mensagem": f"Senha {senha.prefixo}{senha.numero} transferida para guichê #{senha.guiche_id}.",
-                "senha": SenhaModelSerializer(senha).data,
+                "senha": SenhaModelSerializer(senha, context={'request': request}).data,
             },
             status=status.HTTP_200_OK
         )
+
+
+# Alias de compatibilidade com views legadas
+guiches_api = GuicheViewSet.as_view({'get': 'list', 'post': 'create'})

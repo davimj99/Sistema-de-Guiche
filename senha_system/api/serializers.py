@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework.reverse import reverse
 from accounts.models import Guiche
 from filas.models import Senha, Historico
 from atendimentos.models import Atendimento
@@ -7,13 +8,22 @@ from atendimentos.validators import AtendimentoValidator
 
 
 # ============================================================
-# SERIALIZERS DE GUICHÊ
+# SERIALIZERS DE GUICHÊ (HYPERLINKED & RETROCOMPATÍVEL)
 # ============================================================
 class GuicheSerializer(serializers.ModelSerializer):
-    """Representação serializada de um Guichê de Atendimento."""
+    """Representação serializada de um Guichê de Atendimento com link navegável."""
+    url = serializers.SerializerMethodField(help_text="Hyperlink navegável para o detalhe do guichê.")
+
     class Meta:
         model = Guiche
-        fields = ['id', 'nome', 'ativo']
+        fields = ['id', 'url', 'nome', 'ativo']
+
+    def get_url(self, obj) -> str | None:
+        request = self.context.get('request')
+        try:
+            return reverse('api:guiches-detail', kwargs={'pk': obj.pk}, request=request)
+        except Exception:
+            return None
 
 
 class GuichesListResponseSerializer(serializers.Serializer):
@@ -77,12 +87,12 @@ class StatusFilaResponseSerializer(serializers.Serializer):
 
 
 # ============================================================
-# SERIALIZERS DE METADADOS E PERFIL (JWT & BASIC)
+# SERIALIZERS DE METADADOS E PERFIL (API ROOT INTERATIVA)
 # ============================================================
 class ApiRootResponseSerializer(serializers.Serializer):
     nome = serializers.CharField()
     versao = serializers.CharField()
-    endpoints = serializers.DictField(child=serializers.CharField())
+    endpoints = serializers.DictField(child=serializers.URLField(help_text="Hyperlink navegável para o endpoint."))
     documentacao = serializers.CharField()
 
 
@@ -95,10 +105,12 @@ class UserProfileSerializer(serializers.Serializer):
 
 
 # ============================================================
-# SERIALIZERS DE SENHAS (VIEWSETS & ACTIONS)
+# SERIALIZERS DE SENHAS (HYPERLINKED VIEWSETS & ACTIONS)
 # ============================================================
 class SenhaModelSerializer(serializers.ModelSerializer):
-    """Serializer completo do modelo Senha."""
+    """Serializer completo do modelo Senha com links navegáveis de relacionamento."""
+    url = serializers.SerializerMethodField(help_text="Hyperlink para o detalhe da senha.")
+    guiche_url = serializers.SerializerMethodField(help_text="Hyperlink para o guichê associado.")
     codigo = serializers.SerializerMethodField()
     guiche_nome = serializers.CharField(source='guiche.nome', read_only=True, default=None)
 
@@ -106,6 +118,7 @@ class SenhaModelSerializer(serializers.ModelSerializer):
         model = Senha
         fields = [
             'id',
+            'url',
             'codigo',
             'prefixo',
             'numero',
@@ -113,12 +126,29 @@ class SenhaModelSerializer(serializers.ModelSerializer):
             'status',
             'guiche',
             'guiche_nome',
+            'guiche_url',
             'criada_em',
         ]
-        read_only_fields = ['id', 'codigo', 'prefixo', 'numero', 'status', 'criada_em']
+        read_only_fields = ['id', 'url', 'codigo', 'prefixo', 'numero', 'status', 'guiche_url', 'criada_em']
 
     def get_codigo(self, obj) -> str:
         return f"{obj.prefixo}{obj.numero}"
+
+    def get_url(self, obj) -> str | None:
+        request = self.context.get('request')
+        try:
+            return reverse('api:senhas-detail', kwargs={'pk': obj.pk}, request=request)
+        except Exception:
+            return None
+
+    def get_guiche_url(self, obj) -> str | None:
+        if not obj.guiche_id:
+            return None
+        request = self.context.get('request')
+        try:
+            return reverse('api:guiches-detail', kwargs={'pk': obj.guiche_id}, request=request)
+        except Exception:
+            return None
 
 
 class SenhaEmitirSerializer(serializers.Serializer):
@@ -156,26 +186,46 @@ class ChamadaNovamenteSerializer(serializers.Serializer):
 
 
 # ============================================================
-# SERIALIZERS DE ATENDIMENTOS (VIEWSETS & ACTIONS)
+# SERIALIZERS DE ATENDIMENTOS (HYPERLINKED VIEWSETS & ACTIONS)
 # ============================================================
 class AtendimentoSerializer(serializers.ModelSerializer):
-    """Serializer de leitura e persistência do modelo Atendimento."""
+    """Serializer de leitura e persistência de Atendimento com relacionamentos navegáveis."""
+    url = serializers.SerializerMethodField(help_text="Hyperlink para o detalhe do atendimento.")
+    senha_url = serializers.SerializerMethodField(help_text="Hyperlink para a senha atendida.")
     senha_codigo = serializers.CharField(source='senha.__str__', read_only=True, default='')
 
     class Meta:
         model = Atendimento
         fields = [
             'id',
+            'url',
             'atendente',
             'aluno',
             'guiche',
             'senha',
             'senha_codigo',
+            'senha_url',
             'tipo',
             'inicio',
             'fim',
         ]
-        read_only_fields = ['id', 'senha_codigo', 'inicio', 'fim']
+        read_only_fields = ['id', 'url', 'senha_codigo', 'senha_url', 'inicio', 'fim']
+
+    def get_url(self, obj) -> str | None:
+        request = self.context.get('request')
+        try:
+            return reverse('api:atendimentos-detail', kwargs={'pk': obj.pk}, request=request)
+        except Exception:
+            return None
+
+    def get_senha_url(self, obj) -> str | None:
+        if not obj.senha_id:
+            return None
+        request = self.context.get('request')
+        try:
+            return reverse('api:senhas-detail', kwargs={'pk': obj.senha_id}, request=request)
+        except Exception:
+            return None
 
 
 class AtendimentoIniciarSerializer(serializers.Serializer):
