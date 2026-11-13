@@ -1,6 +1,9 @@
 from rest_framework import serializers
 from accounts.models import Guiche
 from filas.models import Senha, Historico
+from atendimentos.models import Atendimento
+from filas.validators import FilaValidator, SenhaValidator
+from atendimentos.validators import AtendimentoValidator
 
 
 # ============================================================
@@ -74,7 +77,7 @@ class StatusFilaResponseSerializer(serializers.Serializer):
 
 
 # ============================================================
-# SERIALIZERS DE METADADOS E PERFIL (JWT)
+# SERIALIZERS DE METADADOS E PERFIL (JWT & BASIC)
 # ============================================================
 class ApiRootResponseSerializer(serializers.Serializer):
     nome = serializers.CharField()
@@ -84,8 +87,120 @@ class ApiRootResponseSerializer(serializers.Serializer):
 
 
 class UserProfileSerializer(serializers.Serializer):
-    """Dados do usuário autenticado via Bearer JWT."""
+    """Dados do usuário autenticado via Bearer JWT ou BasicAuth."""
     id = serializers.IntegerField()
     username = serializers.CharField()
     email = serializers.EmailField()
     is_staff = serializers.BooleanField()
+
+
+# ============================================================
+# SERIALIZERS DE SENHAS (VIEWSETS & ACTIONS)
+# ============================================================
+class SenhaModelSerializer(serializers.ModelSerializer):
+    """Serializer completo do modelo Senha."""
+    codigo = serializers.SerializerMethodField()
+    guiche_nome = serializers.CharField(source='guiche.nome', read_only=True, default=None)
+
+    class Meta:
+        model = Senha
+        fields = [
+            'id',
+            'codigo',
+            'prefixo',
+            'numero',
+            'tipo',
+            'status',
+            'guiche',
+            'guiche_nome',
+            'criada_em',
+        ]
+        read_only_fields = ['id', 'codigo', 'prefixo', 'numero', 'status', 'criada_em']
+
+    def get_codigo(self, obj) -> str:
+        return f"{obj.prefixo}{obj.numero}"
+
+
+class SenhaEmitirSerializer(serializers.Serializer):
+    """Payload para emissão de senha no totem ou via API."""
+    tipo = serializers.ChoiceField(
+        choices=FilaValidator.TIPOS_PERMITIDOS,
+        default="normal",
+        help_text="Tipo da senha a ser gerada: 'normal' ou 'preferencial'."
+    )
+
+    def validate_tipo(self, value):
+        return FilaValidator.validar_tipo_fila(value)
+
+
+class ChamadaProximaSerializer(serializers.Serializer):
+    """Payload para chamar a próxima senha da fila em um guichê."""
+    guiche_id = serializers.IntegerField(
+        help_text="ID do guichê ativo que está realizando a chamada."
+    )
+
+    def validate_guiche_id(self, value):
+        FilaValidator.validar_guiche_ativo(value)
+        return value
+
+
+class ChamadaNovamenteSerializer(serializers.Serializer):
+    """Payload para rechamar a senha atual do guichê."""
+    guiche_id = serializers.IntegerField(
+        help_text="ID do guichê ativo que deseja rechamar a senha."
+    )
+
+    def validate_guiche_id(self, value):
+        FilaValidator.validar_guiche_ativo(value)
+        return value
+
+
+# ============================================================
+# SERIALIZERS DE ATENDIMENTOS (VIEWSETS & ACTIONS)
+# ============================================================
+class AtendimentoSerializer(serializers.ModelSerializer):
+    """Serializer de leitura e persistência do modelo Atendimento."""
+    senha_codigo = serializers.CharField(source='senha.__str__', read_only=True, default='')
+
+    class Meta:
+        model = Atendimento
+        fields = [
+            'id',
+            'atendente',
+            'aluno',
+            'guiche',
+            'senha',
+            'senha_codigo',
+            'tipo',
+            'inicio',
+            'fim',
+        ]
+        read_only_fields = ['id', 'senha_codigo', 'inicio', 'fim']
+
+
+class AtendimentoIniciarSerializer(serializers.Serializer):
+    """Payload para iniciar o atendimento de uma senha no guichê."""
+    senha_id = serializers.IntegerField(help_text="ID da senha que foi chamada.")
+    guiche_id = serializers.IntegerField(help_text="ID do guichê operador.")
+    atendente = serializers.CharField(max_length=100, required=False, allow_blank=True, default="")
+    aluno = serializers.CharField(max_length=100, required=False, allow_blank=True, default="")
+    tipo = serializers.CharField(max_length=30, required=False, allow_blank=True, default="")
+
+    def validate_tipo(self, value):
+        if value:
+            return AtendimentoValidator.validar_tipo_atendimento(value)
+        return value
+
+
+class AtendimentoTransferirSerializer(serializers.Serializer):
+    """Payload para transferência de senha entre guichês."""
+    guiche_origem_id = serializers.IntegerField(help_text="ID do guichê atual.")
+    guiche_destino_id = serializers.IntegerField(help_text="ID do guichê para onde transferir.")
+    motivo = serializers.CharField(max_length=255, required=False, allow_blank=True, default="")
+
+    def validate(self, attrs):
+        AtendimentoValidator.validar_transferencia(
+            attrs.get("guiche_origem_id"),
+            attrs.get("guiche_destino_id")
+        )
+        return attrs

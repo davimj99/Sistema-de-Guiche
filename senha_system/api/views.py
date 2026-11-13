@@ -1,24 +1,42 @@
 from django.utils import timezone
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework import status, viewsets
+from rest_framework.decorators import api_view, permission_classes, action, throttle_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 
 from accounts.models import Guiche
 from filas.models import Senha, Historico
+from atendimentos.models import Atendimento
+from filas.services import FilaService
+from atendimentos.services import AtendimentoService
+from api.permissions import IsAdminOrReadOnly, IsAtendenteOrAdmin
+from api.throttles import TotemRateThrottle, PainelRateThrottle, ChamadaRateThrottle
 from .serializers import (
     ApiRootResponseSerializer,
     PainelResponseSerializer,
     GuichesListResponseSerializer,
     StatusFilaResponseSerializer,
     UserProfileSerializer,
+    GuicheSerializer,
+    SenhaModelSerializer,
+    SenhaEmitirSerializer,
+    ChamadaProximaSerializer,
+    ChamadaNovamenteSerializer,
+    AtendimentoSerializer,
+    AtendimentoIniciarSerializer,
+    AtendimentoTransferirSerializer,
 )
 
 
+# ============================================================
+# ENDPOINTS LEGADOS / OPERACIONAIS (100% RETROCOMPATÍVEIS)
+# ============================================================
 @swagger_auto_schema(
     method='get',
     operation_summary="Catálogo de Endpoints da API",
-    operation_description="Retorna os endpoints públicos e operacionais disponíveis no Sistema de Atendimento.",
+    operation_description="Retorna o mapa de navegação dos endpoints públicos, autenticados e routers da API v1.",
     responses={200: ApiRootResponseSerializer},
     tags=['Catálogo']
 )
@@ -39,6 +57,9 @@ def api_root(request):
             "auth_token": "/api/v1/auth/token/",
             "auth_refresh": "/api/v1/auth/token/refresh/",
             "auth_me": "/api/v1/auth/me/",
+            "senhas_router": "/api/v1/senhas/",
+            "atendimentos_router": "/api/v1/atendimentos/",
+            "guiches_router": "/api/v1/routers/guiches/",
             "swagger": "/swagger/",
             "redoc": "/redoc/",
         },
@@ -61,72 +82,12 @@ def api_root(request):
 )
 @api_view(['GET'])
 @permission_classes([AllowAny])
+@throttle_classes([PainelRateThrottle])
 def painel_api(request):
     """
-    Retorna o estado em tempo real do painel de chamadas:
-    - Última senha chamada (com guichê e tipo)
-    - Histórico recente das últimas 10 chamadas
-    - Fila atual de senhas em espera no dia
+    Retorna o estado em tempo real do painel de chamadas consumindo o FilaService.
     """
-    hoje = timezone.localdate()
-
-    # Última senha sendo chamada
-    ultima_chamada = (
-        Historico.objects
-        .filter(acao__in=["chamando", "chamando_novamente"])
-        .select_related("senha", "guiche")
-        .order_by("-id")
-        .first()
-    )
-
-    # Histórico recente
-    ultimas_chamadas = list(
-        Historico.objects
-        .filter(acao__in=["chamando", "chamando_novamente"])
-        .select_related("senha", "guiche")
-        .order_by("-id")[:10]
-    )
-
-    # Fila de espera do dia
-    fila_espera = list(
-        Senha.objects
-        .filter(status="espera", criada_em__date=hoje)
-        .order_by("criada_em", "id")[:15]
-    )
-
-    dados_ultima = None
-    if ultima_chamada and ultima_chamada.senha:
-        dados_ultima = {
-            "senha": f"{ultima_chamada.senha.prefixo}{ultima_chamada.senha.numero}",
-            "tipo": ultima_chamada.senha.tipo,
-            "guiche": ultima_chamada.guiche.nome if ultima_chamada.guiche else "",
-            "chamada_id": ultima_chamada.id,
-            "acao": ultima_chamada.acao,
-            "hora": timezone.localtime(ultima_chamada.criada_em).strftime("%H:%M:%S") if hasattr(ultima_chamada, "criada_em") and ultima_chamada.criada_em else None,
-        }
-
-    data = {
-        "status": "sucesso",
-        "timestamp": timezone.now().isoformat(),
-        "ultima": dados_ultima,
-        "ultimas": [
-            {
-                "senha": f"{h.senha.prefixo}{h.senha.numero}" if h.senha else "",
-                "guiche": h.guiche.nome if h.guiche else "",
-                "chamada_id": h.id,
-                "acao": h.acao,
-            }
-            for h in ultimas_chamadas
-        ],
-        "fila": [
-            {
-                "senha": f"{s.prefixo}{s.numero}",
-                "tipo": s.tipo,
-                "posicao": idx + 1,
-            }
-            for idx, s in enumerate(fila_espera)
-        ]
-    }
+    data = FilaService.obter_estado_painel()
     return Response(data)
 
 
@@ -164,7 +125,7 @@ def guiches_api(request):
 @swagger_auto_schema(
     method='get',
     operation_summary="Status e Métricas das Filas do Dia",
-    operation_description="Retorna métricas em tempo real das filas: senhas emitidas, em espera, em chamada e finalizadas.",
+    operation_description="Retorna métricas em tempo real das filas do dia atual via FilaService.",
     responses={200: StatusFilaResponseSerializer},
     tags=['Filas']
 )
@@ -172,46 +133,24 @@ def guiches_api(request):
 @permission_classes([AllowAny])
 def status_fila_api(request):
     """
-    Retorna métricas em tempo real das filas do dia:
-    - Quantidade em espera (total, normais, preferenciais)
-    - Quantidade em atendimento
-    - Quantidade finalizada
+    Retorna métricas em tempo real das filas do dia.
     """
-    hoje = timezone.localdate()
-    senhas_hoje = Senha.objects.filter(criada_em__date=hoje)
-
-    espera_normal = senhas_hoje.filter(status="espera", tipo="normal").count()
-    espera_pref = senhas_hoje.filter(status="espera", tipo="preferencial").count()
-    chamando = senhas_hoje.filter(status="chamando").count()
-    finalizadas = senhas_hoje.filter(status="finalizado").count()
-
-    data = {
-        "status": "sucesso",
-        "data": hoje.strftime("%Y-%m-%d"),
-        "total_emitidas_hoje": senhas_hoje.count(),
-        "em_espera": {
-            "total": espera_normal + espera_pref,
-            "normal": espera_normal,
-            "preferencial": espera_pref,
-        },
-        "chamando": chamando,
-        "finalizadas": finalizadas,
-    }
+    data = FilaService.obter_status_filas()
     return Response(data)
 
 
 @swagger_auto_schema(
     method='get',
     operation_summary="Perfil do Usuário Autenticado",
-    operation_description="Retorna os dados do usuário autenticado via cabeçalho HTTP `Authorization: Bearer <token_jwt>`.",
+    operation_description="Retorna os dados do usuário autenticado via BasicAuthentication ou Bearer JWT.",
     responses={200: UserProfileSerializer},
-    tags=['Autenticação JWT']
+    tags=['Autenticação']
 )
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def user_profile_api(request):
     """
-    Endpoint autenticado via Bearer JWT.
+    Endpoint autenticado via BasicAuth ou Bearer JWT.
     Retorna o perfil do usuário atualmente autenticado.
     """
     user = request.user
@@ -222,3 +161,275 @@ def user_profile_api(request):
         "is_staff": user.is_staff,
     }
     return Response(data)
+
+
+# ============================================================
+# VIEWSETS ORGANIZADOS POR ROUTER
+# ============================================================
+class GuicheViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet para consulta e gerenciamento de Guichês de Atendimento.
+    Leitura pública para totens e painéis; modificação restrita a administradores.
+    """
+    queryset = Guiche.objects.all().order_by('id')
+    serializer_class = GuicheSerializer
+    permission_classes = [IsAdminOrReadOnly]
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        apenas_ativos = self.request.query_params.get('ativo', None)
+        if apenas_ativos is not None:
+            ativo_bool = apenas_ativos.lower() in ['true', '1', 't']
+            queryset = queryset.filter(ativo=ativo_bool)
+        return queryset
+
+
+class SenhaViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    ViewSet para consulta de senhas e ações operacionais de atendimento.
+    Ações de emissão são públicas (com controle de throttling para totens),
+    enquanto ações de chamada exigem operador autenticado.
+    """
+    queryset = Senha.objects.all().select_related('guiche').order_by('-id')
+    serializer_class = SenhaModelSerializer
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        hoje = timezone.localdate()
+        dia_param = self.request.query_params.get('hoje', None)
+        if dia_param is not None and dia_param.lower() in ['true', '1', 't']:
+            queryset = queryset.filter(criada_em__date=hoje)
+        status_param = self.request.query_params.get('status', None)
+        if status_param:
+            queryset = queryset.filter(status=status_param)
+        return queryset
+
+    @swagger_auto_schema(
+        operation_summary="Emitir Nova Senha",
+        request_body=SenhaEmitirSerializer,
+        responses={201: SenhaModelSerializer},
+        tags=['Senhas']
+    )
+    @action(
+        detail=False,
+        methods=['post'],
+        permission_classes=[AllowAny],
+        throttle_classes=[TotemRateThrottle]
+    )
+    def emitir(self, request):
+        """
+        Emite uma nova senha para atendimento no totem.
+        Suporta tipo 'normal' ou 'preferencial'.
+        """
+        serializer = SenhaEmitirSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        tipo = serializer.validated_data.get('tipo', 'normal')
+
+        senha = FilaService.emitir_senha(tipo=tipo)
+        return Response(
+            {
+                "status": "sucesso",
+                "mensagem": f"Senha {senha.prefixo}{senha.numero} emitida com sucesso.",
+                "senha": SenhaModelSerializer(senha).data,
+            },
+            status=status.HTTP_201_CREATED
+        )
+
+    @swagger_auto_schema(
+        operation_summary="Chamar Próxima Senha",
+        request_body=ChamadaProximaSerializer,
+        responses={200: SenhaModelSerializer},
+        tags=['Senhas']
+    )
+    @action(
+        detail=False,
+        methods=['post'],
+        permission_classes=[IsAuthenticated],
+        throttle_classes=[ChamadaRateThrottle]
+    )
+    def chamar_proxima(self, request):
+        """
+        Chama a próxima senha aguardando na fila para o guichê informado.
+        Requer autenticação do operador (BasicAuth ou JWT).
+        """
+        serializer = ChamadaProximaSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        guiche_id = serializer.validated_data['guiche_id']
+
+        senha = FilaService.chamar_proxima(guiche_id=guiche_id)
+        if not senha:
+            return Response(
+                {
+                    "status": "sucesso",
+                    "mensagem": "Não há senhas aguardando na fila no momento.",
+                    "senha": None,
+                },
+                status=status.HTTP_200_OK
+            )
+
+        return Response(
+            {
+                "status": "sucesso",
+                "mensagem": f"Senha {senha.prefixo}{senha.numero} chamada com sucesso.",
+                "senha": SenhaModelSerializer(senha).data,
+            },
+            status=status.HTTP_200_OK
+        )
+
+    @swagger_auto_schema(
+        operation_summary="Rechamar Senha Atual",
+        request_body=ChamadaNovamenteSerializer,
+        responses={200: SenhaModelSerializer},
+        tags=['Senhas']
+    )
+    @action(
+        detail=False,
+        methods=['post'],
+        permission_classes=[IsAuthenticated],
+        throttle_classes=[ChamadaRateThrottle]
+    )
+    def chamar_novamente(self, request):
+        """
+        Rechama a senha atual que está em atendimento no guichê informado.
+        Requer autenticação do operador.
+        """
+        serializer = ChamadaNovamenteSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        guiche_id = serializer.validated_data['guiche_id']
+
+        senha = FilaService.chamar_novamente(guiche_id=guiche_id)
+        if not senha:
+            return Response(
+                {
+                    "status": "erro",
+                    "codigo": 404,
+                    "mensagem": "Nenhuma senha em chamada ativa encontrada para este guichê.",
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        return Response(
+            {
+                "status": "sucesso",
+                "mensagem": f"Senha {senha.prefixo}{senha.numero} rechamada com sucesso.",
+                "senha": SenhaModelSerializer(senha).data,
+            },
+            status=status.HTTP_200_OK
+        )
+
+    @swagger_auto_schema(
+        operation_summary="Listar Senhas em Espera do Dia",
+        responses={200: SenhaModelSerializer(many=True)},
+        tags=['Senhas']
+    )
+    @action(detail=False, methods=['get'], permission_classes=[AllowAny])
+    def espera(self, request):
+        """
+        Lista as senhas atualmente em espera para o dia de hoje.
+        """
+        hoje = timezone.localdate()
+        senhas = Senha.objects.filter(status="espera", criada_em__date=hoje).order_by("criada_em", "id")
+        return Response(SenhaModelSerializer(senhas, many=True).data)
+
+
+class AtendimentoViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet para gerenciamento do ciclo de vida de atendimentos nos guichês.
+    Requer autenticação (BasicAuth ou JWT) para todas as operações.
+    """
+    queryset = Atendimento.objects.all().select_related('senha').order_by('-id')
+    serializer_class = AtendimentoSerializer
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_summary="Iniciar Atendimento",
+        request_body=AtendimentoIniciarSerializer,
+        responses={201: AtendimentoSerializer},
+        tags=['Atendimentos']
+    )
+    @action(detail=False, methods=['post'], permission_classes=[IsAuthenticated])
+    def iniciar(self, request):
+        """
+        Inicia formalmente o atendimento de uma senha chamada.
+        """
+        serializer = AtendimentoIniciarSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        atendimento = AtendimentoService.iniciar_atendimento(
+            senha_id=serializer.validated_data['senha_id'],
+            guiche_id=serializer.validated_data['guiche_id'],
+            atendente=serializer.validated_data.get('atendente'),
+            aluno=serializer.validated_data.get('aluno'),
+            tipo=serializer.validated_data.get('tipo'),
+        )
+
+        return Response(
+            {
+                "status": "sucesso",
+                "mensagem": f"Atendimento #{atendimento.id} iniciado.",
+                "atendimento": AtendimentoSerializer(atendimento).data,
+            },
+            status=status.HTTP_201_CREATED
+        )
+
+    @swagger_auto_schema(
+        operation_summary="Finalizar Atendimento",
+        responses={200: AtendimentoSerializer},
+        tags=['Atendimentos']
+    )
+    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
+    def finalizar(self, request, pk=None):
+        """
+        Encerra um atendimento em andamento.
+        """
+        atendimento = AtendimentoService.finalizar_atendimento(atendimento_id=int(pk))
+        return Response(
+            {
+                "status": "sucesso",
+                "mensagem": f"Atendimento #{atendimento.id} finalizado.",
+                "atendimento": AtendimentoSerializer(atendimento).data,
+            },
+            status=status.HTTP_200_OK
+        )
+
+    @swagger_auto_schema(
+        operation_summary="Transferir Atendimento para Outro Guichê",
+        request_body=AtendimentoTransferirSerializer,
+        responses={200: SenhaModelSerializer},
+        tags=['Atendimentos']
+    )
+    @action(detail=False, methods=['post'], permission_classes=[IsAuthenticated])
+    def transferir(self, request):
+        """
+        Transfere uma senha em atendimento para outro guichê ativo.
+        """
+        serializer = AtendimentoTransferirSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        senha_id = request.data.get('senha_id')
+        if not senha_id:
+            return Response(
+                {
+                    "status": "erro",
+                    "codigo": 400,
+                    "mensagem": "O campo 'senha_id' é obrigatório para transferência.",
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        senha = AtendimentoService.transferir_atendimento(
+            senha_id=int(senha_id),
+            guiche_origem_id=serializer.validated_data['guiche_origem_id'],
+            guiche_destino_id=serializer.validated_data['guiche_destino_id'],
+            motivo=serializer.validated_data.get('motivo'),
+        )
+
+        return Response(
+            {
+                "status": "sucesso",
+                "mensagem": f"Senha {senha.prefixo}{senha.numero} transferida para guichê #{senha.guiche_id}.",
+                "senha": SenhaModelSerializer(senha).data,
+            },
+            status=status.HTTP_200_OK
+        )
