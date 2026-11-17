@@ -40,6 +40,7 @@ urlpatterns = [
     path("epis/", include("epis.urls")),
     path('wifi/', include('wifi.urls')),
     path('api/', include('api.urls')),
+    path('dashboard/', include('dashboard.urls')),
 
     # Documentação Swagger & OpenAPI
     re_path(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),

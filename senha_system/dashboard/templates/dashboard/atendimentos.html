@@ -1,0 +1,189 @@
+{% extends "dashboard/base_dashboard.html" %}
+{% load static %}
+
+{% block page_title %}Análise de Atendimentos & Filas{% endblock %}
+{% block page_subtitle %}Evolução temporal, distribuição de atendimentos e categorias de serviços acadêmicos{% endblock %}
+
+{% block content %}
+<!-- Cards de Resumo Rápido do Período -->
+<section class="kpi-grid">
+    <div class="kpi-card card-blue">
+        <div class="kpi-card-header">
+            <span class="kpi-card-title">Atendimentos no Período</span>
+            <div class="kpi-icon-badge badge-blue">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                </svg>
+            </div>
+        </div>
+        <div class="kpi-value" id="kpiAtendVal">{{ kpis.atendimentos_realizados.total }}</div>
+        <div class="kpi-card-footer">
+            <span class="trend-badge trend-{{ kpis.atendimentos_realizados.variacao.tendencia }}">
+                {{ kpis.atendimentos_realizados.variacao.texto }}
+            </span>
+        </div>
+    </div>
+
+    <div class="kpi-card card-green">
+        <div class="kpi-card-header">
+            <span class="kpi-card-title">Senhas Emitidas</span>
+            <div class="kpi-icon-badge badge-green">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+                    <line x1="2" y1="10" x2="22" y2="10"></line>
+                </svg>
+            </div>
+        </div>
+        <div class="kpi-value" id="kpiSenhasVal">{{ kpis.senhas_emitidas.total }}</div>
+        <div class="kpi-card-footer">
+            <span class="trend-badge trend-{{ kpis.senhas_emitidas.variacao.tendencia }}">
+                {{ kpis.senhas_emitidas.variacao.texto }}
+            </span>
+        </div>
+    </div>
+
+    <div class="kpi-card card-purple">
+        <div class="kpi-card-header">
+            <span class="kpi-card-title">Tempo Médio de Atendimento</span>
+            <div class="kpi-icon-badge badge-purple">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 14 10"></polyline>
+                </svg>
+            </div>
+        </div>
+        <div class="kpi-value" id="kpiTempoMedioVal">{{ kpis.tempo_medio.formatado }}</div>
+        <div class="kpi-card-footer">
+            <span class="trend-subtext">Baseado em {{ kpis.tempo_medio.amostras }} registros</span>
+        </div>
+    </div>
+</section>
+
+<!-- Gráficos de Evolução Temporal -->
+<section class="chart-card">
+    <div class="chart-card-header">
+        <div>
+            <h3 class="chart-card-title">Atendimentos Diários</h3>
+            <p class="chart-card-subtitle">Volume de atendimentos realizados dia a dia</p>
+        </div>
+    </div>
+    <div class="chart-canvas-container" style="min-height: 320px;">
+        <canvas id="chartAtendimentosDia"></canvas>
+    </div>
+</section>
+
+<section class="chart-grid-equal">
+    <!-- Atendimentos por Semana -->
+    <div class="chart-card">
+        <div class="chart-card-header">
+            <div>
+                <h3 class="chart-card-title">Atendimentos por Semana</h3>
+                <p class="chart-card-subtitle">Agrupamento consolidado por semana</p>
+            </div>
+        </div>
+        <div class="chart-canvas-container">
+            <canvas id="chartAtendimentosSemana"></canvas>
+        </div>
+    </div>
+
+    <!-- Atendimentos por Mês -->
+    <div class="chart-card">
+        <div class="chart-card-header">
+            <div>
+                <h3 class="chart-card-title">Atendimentos por Mês</h3>
+                <p class="chart-card-subtitle">Histórico consolidado mensal</p>
+            </div>
+        </div>
+        <div class="chart-canvas-container">
+            <canvas id="chartAtendimentosMes"></canvas>
+        </div>
+    </div>
+</section>
+
+<section class="chart-grid-equal">
+    <!-- Distribuição por Atendente -->
+    <div class="chart-card">
+        <div class="chart-card-header">
+            <div>
+                <h3 class="chart-card-title">Distribuição por Atendente</h3>
+                <p class="chart-card-subtitle">Volume atendido por cada profissional da equipe</p>
+            </div>
+        </div>
+        <div class="chart-canvas-container">
+            <canvas id="chartAtendente"></canvas>
+        </div>
+    </div>
+
+    <!-- Distribuição por Tipo de Serviço -->
+    <div class="chart-card">
+        <div class="chart-card-header">
+            <div>
+                <h3 class="chart-card-title">Serviços Acadêmicos Solicitados</h3>
+                <p class="chart-card-subtitle">Matrícula, Financeiro, Secretaria, etc.</p>
+            </div>
+        </div>
+        <div class="chart-canvas-container">
+            <canvas id="chartTipo"></canvas>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const chartData = {{ chart_data|safe }};
+
+        if (chartData) {
+            // Atendimentos por Dia
+            if (chartData.atendimentos_por_dia) {
+                window.IsconDashboard.renderChart(
+                    'chartAtendimentosDia',
+                    'bar',
+                    chartData.atendimentos_por_dia
+                );
+            }
+
+            // Atendimentos por Semana
+            if (chartData.atendimentos_por_semana) {
+                window.IsconDashboard.renderChart(
+                    'chartAtendimentosSemana',
+                    'bar',
+                    chartData.atendimentos_por_semana
+                );
+            }
+
+            // Atendimentos por Mês
+            if (chartData.atendimentos_por_mes) {
+                window.IsconDashboard.renderChart(
+                    'chartAtendimentosMes',
+                    'bar',
+                    chartData.atendimentos_por_mes
+                );
+            }
+
+            // Atendimentos por Atendente
+            if (chartData.distribuicao_atendente) {
+                window.IsconDashboard.renderChart(
+                    'chartAtendente',
+                    'bar',
+                    chartData.distribuicao_atendente
+                );
+            }
+
+            // Distribuição por Tipo
+            if (chartData.distribuicao_tipo) {
+                window.IsconDashboard.renderChart(
+                    'chartTipo',
+                    'doughnut',
+                    chartData.distribuicao_tipo,
+                    {
+                        plugins: { legend: { position: 'bottom' } },
+                        cutout: '60%'
+                    }
+                );
+            }
+        }
+    });
+</script>
+{% endblock %}

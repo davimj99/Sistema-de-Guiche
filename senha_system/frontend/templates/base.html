@@ -42,6 +42,11 @@
                 <a href="/filas/gerar/" {% if request.path == '/filas/gerar/' %}class="ativo"{% endif %}>
                     🎫 Gerar Senha
                 </a>
+                {% if user.is_authenticated and user.is_staff %}
+                    <a href="{% url 'dashboard:index' %}" {% if '/dashboard/' in request.path %}class="ativo"{% endif %}>
+                        📊 Gestão & BI
+                    </a>
+                {% endif %}
                 {% if user.is_authenticated %}
                     <span style="font-family: 'Montserrat', sans-serif; font-weight: 600; color: var(--azul-escuro); align-self: center; font-size: 0.95rem;">
                         👤 {{ user.username }}

@@ -1,0 +1,156 @@
+{% extends "dashboard/base_dashboard.html" %}
+{% load static %}
+
+{% block page_title %}Análise de Produtividade Operacional{% endblock %}
+{% block page_subtitle %}Acompanhamento de eficiência, tempos médios e volume por Guichê e por Atendente{% endblock %}
+
+{% block content %}
+<!-- Cards com Resumo de Produtividade -->
+<section class="kpi-grid">
+    <div class="kpi-card card-blue">
+        <div class="kpi-card-header">
+            <span class="kpi-card-title">Total de Atendimentos</span>
+            <div class="kpi-icon-badge badge-blue">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+            </div>
+        </div>
+        <div class="kpi-value">{{ relatorio.total_atendimentos }}</div>
+        <div class="kpi-card-footer">
+            <span class="trend-subtext">Período anterior: {{ relatorio.total_periodo_anterior }}</span>
+        </div>
+    </div>
+
+    <div class="kpi-card card-green">
+        <div class="kpi-card-header">
+            <span class="kpi-card-title">Média Diária</span>
+            <div class="kpi-icon-badge badge-green">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+            </div>
+        </div>
+        <div class="kpi-value">{{ relatorio.media_diaria }}</div>
+        <div class="kpi-card-footer">
+            <span class="trend-subtext">Atendimentos / dia no período de {{ relatorio.dias_intervalo }} dias</span>
+        </div>
+    </div>
+
+    <div class="kpi-card card-purple">
+        <div class="kpi-card-header">
+            <span class="kpi-card-title">Tempo Médio Geral</span>
+            <div class="kpi-icon-badge badge-purple">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 14 10"></polyline>
+                </svg>
+            </div>
+        </div>
+        <div class="kpi-value">{{ relatorio.tempo_medio_geral.formatado }}</div>
+        <div class="kpi-card-footer">
+            <span class="trend-subtext">Média calculada para {{ relatorio.tempo_medio_geral.amostras }} atendimentos</span>
+        </div>
+    </div>
+</section>
+
+<!-- Tabelas de Produtividade -->
+<section class="chart-grid-equal">
+    <!-- Produtividade por Atendente -->
+    <div class="table-card">
+        <div class="table-card-header">
+            <div>
+                <h3 class="chart-card-title">Produtividade por Atendente</h3>
+                <p class="chart-card-subtitle">Volume, tempo médio e principais áreas de atuação</p>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="dash-table">
+                <thead>
+                    <tr>
+                        <th>Atendente</th>
+                        <th>Atendimentos</th>
+                        <th>% Total</th>
+                        <th>Tempo Médio</th>
+                        <th>Principais Serviços</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for a in relatorio.atendentes %}
+                    <tr>
+                        <td><strong>{{ a.nome }}</strong></td>
+                        <td>{{ a.total }}</td>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span>{{ a.percentual_total }}%</span>
+                                <div style="flex: 1; height: 6px; background: var(--border-color); border-radius: 3px; overflow: hidden; min-width: 50px;">
+                                    <div style="width: {{ a.percentual_total }}%; height: 100%; background: var(--iscon-blue); border-radius: 3px;"></div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>{{ a.tempo_medio }}</td>
+                        <td><small style="color: var(--text-muted);">{{ a.top_servicos }}</small></td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 24px;">
+                            Nenhum atendimento registrado no período selecionado.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Produtividade por Guichê -->
+    <div class="table-card">
+        <div class="table-card-header">
+            <div>
+                <h3 class="chart-card-title">Produtividade por Guichê</h3>
+                <p class="chart-card-subtitle">Carga operacional e eficiência de cada terminal</p>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="dash-table">
+                <thead>
+                    <tr>
+                        <th>Guichê</th>
+                        <th>Atendimentos</th>
+                        <th>% Total</th>
+                        <th>Tempo Médio</th>
+                        <th>Período Ant.</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for g in relatorio.guiches %}
+                    <tr>
+                        <td><strong>{{ g.nome }}</strong></td>
+                        <td>{{ g.total }}</td>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span>{{ g.percentual_total }}%</span>
+                                <div style="flex: 1; height: 6px; background: var(--border-color); border-radius: 3px; overflow: hidden; min-width: 50px;">
+                                    <div style="width: {{ g.percentual_total }}%; height: 100%; background: var(--iscon-teal); border-radius: 3px;"></div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>{{ g.tempo_medio }}</td>
+                        <td style="color: var(--text-muted);">{{ g.anterior }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 24px;">
+                            Nenhum guichê com atendimentos no período.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+{% endblock %}

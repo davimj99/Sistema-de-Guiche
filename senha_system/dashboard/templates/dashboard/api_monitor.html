@@ -1,0 +1,238 @@
+{% extends "dashboard/base_dashboard.html" %}
+{% load static %}
+
+{% block page_title %}Monitoramento da API REST{% endblock %}
+{% block page_subtitle %}Telemetria de tráfego, latência, métodos HTTP e integridade de endpoints — Faculdade ISCON{% endblock %}
+
+{% block content %}
+<!-- Cards de Métricas da API -->
+<section class="kpi-grid">
+    <!-- Total de Requisições -->
+    <div class="kpi-card card-blue">
+        <div class="kpi-card-header">
+            <span class="kpi-card-title">Total de Requisições</span>
+            <div class="kpi-icon-badge badge-blue">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
+                    <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
+                    <line x1="6" y1="6" x2="6.01" y2="6"></line>
+                    <line x1="6" y1="18" x2="6.01" y2="18"></line>
+                </svg>
+            </div>
+        </div>
+        <div class="kpi-value">{{ metricas.total_requisicoes }}</div>
+        <div class="kpi-card-footer">
+            <span class="trend-badge trend-{{ metricas.variacao_total.tendencia }}">
+                {{ metricas.variacao_total.texto }}
+            </span>
+        </div>
+    </div>
+
+    <!-- Taxa de Sucesso -->
+    <div class="kpi-card card-green">
+        <div class="kpi-card-header">
+            <span class="kpi-card-title">Taxa de Sucesso</span>
+            <div class="kpi-icon-badge badge-green">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+            </div>
+        </div>
+        <div class="kpi-value">{{ metricas.taxa_sucesso }}%</div>
+        <div class="kpi-card-footer">
+            <span class="trend-subtext">{{ metricas.sucessos }} sucessos / {{ metricas.erros }} erros</span>
+        </div>
+    </div>
+
+    <!-- Latência Média -->
+    <div class="kpi-card card-purple">
+        <div class="kpi-card-header">
+            <span class="kpi-card-title">Tempo Médio de Resposta</span>
+            <div class="kpi-icon-badge badge-purple">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 14 10"></polyline>
+                </svg>
+            </div>
+        </div>
+        <div class="kpi-value">{{ metricas.tempo_medio_ms }} ms</div>
+        <div class="kpi-card-footer">
+            <span class="trend-subtext">Instrumentação direta do pipeline Django</span>
+        </div>
+    </div>
+
+    <!-- Distribuição de Status -->
+    <div class="kpi-card card-amber">
+        <div class="kpi-card-header">
+            <span class="kpi-card-title">Família de Códigos</span>
+            <div class="kpi-icon-badge badge-amber">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="4 17 10 11 4 5"></polyline>
+                    <line x1="12" y1="19" x2="20" y2="19"></line>
+                </svg>
+            </div>
+        </div>
+        <div class="kpi-value" style="font-size: 1.2rem; font-weight: 700; display: flex; gap: 8px;">
+            <span class="status-badge badge-2xx">2xx: {{ metricas.distribuicao_status.2xx }}</span>
+            <span class="status-badge badge-4xx">4xx: {{ metricas.distribuicao_status.4xx }}</span>
+            <span class="status-badge badge-5xx">5xx: {{ metricas.distribuicao_status.5xx }}</span>
+        </div>
+        <div class="kpi-card-footer">
+            <span class="trend-subtext">Códigos de resposta HTTP</span>
+        </div>
+    </div>
+</section>
+
+<!-- Gráficos de Tráfego e Latência da API -->
+<section class="chart-grid">
+    <!-- Requisições por Dia -->
+    <div class="chart-card">
+        <div class="chart-card-header">
+            <div>
+                <h3 class="chart-card-title">Volume Diário de Requisições da API</h3>
+                <p class="chart-card-subtitle">Demanda de endpoints consumidos por totens, TVs e integrações</p>
+            </div>
+        </div>
+        <div class="chart-canvas-container">
+            <canvas id="chartApiDias"></canvas>
+        </div>
+    </div>
+
+    <!-- Códigos de Status HTTP (Donut) -->
+    <div class="chart-card">
+        <div class="chart-card-header">
+            <div>
+                <h3 class="chart-card-title">Status HTTP</h3>
+                <p class="chart-card-subtitle">Proporção 2xx, 3xx, 4xx e 5xx</p>
+            </div>
+        </div>
+        <div class="chart-canvas-container">
+            <canvas id="chartApiStatus"></canvas>
+        </div>
+    </div>
+</section>
+
+<section class="chart-grid-equal">
+    <!-- Requisições por Hora -->
+    <div class="chart-card">
+        <div class="chart-card-header">
+            <div>
+                <h3 class="chart-card-title">Tráfego por Hora do Dia</h3>
+                <p class="chart-card-subtitle">Picos de utilização dos serviços REST</p>
+            </div>
+        </div>
+        <div class="chart-canvas-container">
+            <canvas id="chartApiHoras"></canvas>
+        </div>
+    </div>
+
+    <!-- Top Endpoints Mais Acessados -->
+    <div class="table-card">
+        <div class="table-card-header">
+            <div>
+                <h3 class="chart-card-title">Top Endpoints da API</h3>
+                <p class="chart-card-subtitle">Rotas com maior volumetria no período</p>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="dash-table">
+                <thead>
+                    <tr>
+                        <th>Endpoint</th>
+                        <th>Chamadas</th>
+                        <th>Latência Média</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ep in metricas.top_endpoints %}
+                    <tr>
+                        <td><code>{{ ep.endpoint }}</code></td>
+                        <td><strong>{{ ep.total }}</strong></td>
+                        <td>{{ ep.media_ms|floatformat:1 }} ms</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3" style="text-align: center; color: var(--text-muted); padding: 24px;">
+                            Nenhuma requisição registrada ainda.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<!-- Histórico Recente de Requisições -->
+<section class="table-card">
+    <div class="table-card-header">
+        <div>
+            <h3 class="chart-card-title">Histórico Recente de Chamadas da API</h3>
+            <p class="chart-card-subtitle">Últimas requisições auditadas sem gravação de dados sensíveis ou tokens</p>
+        </div>
+        <a href="{% url 'dashboard:historico' %}?tabela=requisicoes_api" class="pagination-btn">Ver Todas</a>
+    </div>
+    <div class="table-responsive">
+        <table class="dash-table">
+            <thead>
+                <tr>
+                    <th>Data/Hora</th>
+                    <th>Método</th>
+                    <th>Endpoint</th>
+                    <th>Status</th>
+                    <th>Tempo de Resposta</th>
+                    <th>IP Origem</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for req in metricas.ultimas_requisicoes %}
+                <tr>
+                    <td>{{ req.criado_em|date:"d/m/Y H:i:s" }}</td>
+                    <td><strong>{{ req.metodo }}</strong></td>
+                    <td><code>{{ req.endpoint }}</code></td>
+                    <td>
+                        <span class="status-badge {% if req.status_code < 300 %}badge-2xx{% elif req.status_code < 400 %}badge-3xx{% elif req.status_code < 500 %}badge-4xx{% else %}badge-5xx{% endif %}">
+                            {{ req.status_code }}
+                        </span>
+                    </td>
+                    <td>{{ req.tempo_resposta_ms }} ms</td>
+                    <td><small style="color: var(--text-muted);">{{ req.ip_origem|default:"—" }}</small></td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 24px;">
+                        Nenhuma requisição recente registrada.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const graficoDias = {{ metricas.grafico_dias|safe }};
+        const graficoHoras = {{ metricas.grafico_horas|safe }};
+        const graficoStatus = {{ metricas.grafico_status|safe }};
+
+        if (graficoDias) {
+            window.IsconDashboard.renderChart('chartApiDias', 'line', graficoDias);
+        }
+
+        if (graficoHoras) {
+            window.IsconDashboard.renderChart('chartApiHoras', 'bar', graficoHoras);
+        }
+
+        if (graficoStatus) {
+            window.IsconDashboard.renderChart('chartApiStatus', 'doughnut', graficoStatus, {
+                plugins: { legend: { position: 'bottom' } },
+                cutout: '65%'
+            });
+        }
+    });
+</script>
+{% endblock %}
