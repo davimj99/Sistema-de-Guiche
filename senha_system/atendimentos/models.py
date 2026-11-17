@@ -1,6 +1,8 @@
 from django.db import models
 
 class Atendimento(models.Model):
+    class Meta:
+        db_table = "atendimentos_django"
 
     TIPOS_ATENDIMENTO = [
         ('matricula', 'Matrícula'),
@@ -16,25 +18,20 @@ class Atendimento(models.Model):
     ]
 
     ATENDENTES = [
-    ('Alessandra', 'Alessandra'),
-    ('Rafael', 'Rafael'),
-    ('Geovanna', 'Geovanna'),
-    ('Fátima', 'Fátima'),
-    ('Fernando', 'Fernando'),
-    ('Jane', 'Jane'),
-    ('Sharon', 'Sharon'),
+        ('Alessandra', 'Alessandra'),
+        ('Rafael', 'Rafael'),
+        ('Geovanna', 'Geovanna'),
+        ('Fátima', 'Fátima'),
+        ('Fernando', 'Fernando'),
+        ('Jane', 'Jane'),
+        ('Sharon', 'Sharon'),
     ]
 
     atendente = models.CharField(max_length=100,choices=ATENDENTES,null=True,blank=True)
     aluno = models.CharField(max_length=100, null=True, blank=True)
     guiche = models.IntegerField(null=True, blank=True)
     senha = models.ForeignKey("filas.Senha", on_delete=models.PROTECT)
-    tipo = models.CharField(
-        max_length=20,
-        choices=TIPOS_ATENDIMENTO,
-        null=True,
-        blank=True
-    )
+    tipo = models.CharField(max_length=30,choices=TIPOS_ATENDIMENTO,null=True,blank=True)
     inicio = models.TimeField(null=True, blank=True)
     fim = models.DateTimeField(null=True, blank=True)
 

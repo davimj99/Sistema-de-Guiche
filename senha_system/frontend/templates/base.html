@@ -42,6 +42,21 @@
                 <a href="/filas/gerar/" {% if request.path == '/filas/gerar/' %}class="ativo"{% endif %}>
                     🎫 Gerar Senha
                 </a>
+                {% if user.is_authenticated %}
+                    <span style="font-family: 'Montserrat', sans-serif; font-weight: 600; color: var(--azul-escuro); align-self: center; font-size: 0.95rem;">
+                        👤 {{ user.username }}
+                    </span>
+                    <form action="{% url 'accounts:logout' %}" method="post" style="display:inline; margin: 0; align-self: center;">
+                        {% csrf_token %}
+                        <button type="submit" style="background: none; border: 1px solid var(--vermelho-iscon); color: var(--vermelho-iscon); padding: 6px 14px; border-radius: 6px; font-weight: 700; cursor: pointer; font-family: 'Montserrat', sans-serif; transition: all 0.2s ease;">
+                            Sair
+                        </button>
+                    </form>
+                {% else %}
+                    <a href="{% url 'accounts:login' %}" {% if request.path == '/accounts/login/' %}class="ativo"{% endif %}>
+                        🔒 Entrar
+                    </a>
+                {% endif %}
             </nav>
         {% endif %}
 
