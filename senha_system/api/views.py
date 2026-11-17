@@ -1,5 +1,5 @@
 from django.utils import timezone
-from rest_framework import status, viewsets
+from rest_framework import status, viewsets, filters
 from rest_framework.decorators import api_view, permission_classes, action, throttle_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -14,6 +14,7 @@ from filas.services import FilaService
 from atendimentos.services import AtendimentoService
 from api.permissions import IsAdminOrReadOnly, IsAtendenteOrAdmin
 from api.throttles import TotemRateThrottle, PainelRateThrottle, ChamadaRateThrottle
+from api.filters import GuicheFilter, SenhaFilter, AtendimentoFilter
 from .serializers import (
     ApiRootResponseSerializer,
     PainelResponseSerializer,
@@ -160,19 +161,15 @@ class GuicheViewSet(viewsets.ModelViewSet):
     """
     ViewSet navegável para consulta e gerenciamento de Guichês de Atendimento.
     Leitura pública para totens e painéis; modificação restrita a administradores.
-    Disponibiliza formulários interativos no Browsable API.
+    Disponibiliza formulários interativos no Browsable API e suporte a filtros.
     """
     queryset = Guiche.objects.all().order_by('id')
     serializer_class = GuicheSerializer
     permission_classes = [IsAdminOrReadOnly]
-
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        apenas_ativos = self.request.query_params.get('ativo', None)
-        if apenas_ativos is not None:
-            ativo_bool = apenas_ativos.lower() in ['true', '1', 't']
-            queryset = queryset.filter(ativo=ativo_bool)
-        return queryset
+    filter_backends = [GuicheFilter, filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ['nome']
+    ordering_fields = ['id', 'nome', 'ativo']
+    ordering = ['id']
 
     def list(self, request, *args, **kwargs):
         """
@@ -193,21 +190,15 @@ class SenhaViewSet(viewsets.ModelViewSet):
     ViewSet para consulta de senhas e ações operacionais de atendimento.
     Ações de emissão são públicas com formulário interativo no Browsable API;
     ações de chamada exigem operador autenticado.
+    Suporta filtros por status, tipo, guichê, hoje, data e busca textual.
     """
     queryset = Senha.objects.all().select_related('guiche').order_by('-id')
     serializer_class = SenhaModelSerializer
     permission_classes = [IsAdminOrReadOnly]
-
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        hoje = timezone.localdate()
-        dia_param = self.request.query_params.get('hoje', None)
-        if dia_param is not None and dia_param.lower() in ['true', '1', 't']:
-            queryset = queryset.filter(criada_em__date=hoje)
-        status_param = self.request.query_params.get('status', None)
-        if status_param:
-            queryset = queryset.filter(status=status_param)
-        return queryset
+    filter_backends = [SenhaFilter, filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ['prefixo', 'guiche__nome', 'status', 'tipo']
+    ordering_fields = ['id', 'criada_em', 'numero', 'status', 'tipo']
+    ordering = ['-id']
 
     @swagger_auto_schema(
         method='get',
@@ -384,11 +375,15 @@ class AtendimentoViewSet(viewsets.ModelViewSet):
     """
     ViewSet para gerenciamento do ciclo de vida de atendimentos nos guichês.
     Requer autenticação (BasicAuth ou JWT) para todas as operações.
-    Disponibiliza formulários interativos no Browsable API.
+    Disponibiliza formulários interativos no Browsable API e suporte a filtros.
     """
     queryset = Atendimento.objects.all().select_related('senha').order_by('-id')
     serializer_class = AtendimentoSerializer
     permission_classes = [IsAuthenticated]
+    filter_backends = [AtendimentoFilter, filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ['atendente', 'aluno', 'tipo', 'senha__prefixo']
+    ordering_fields = ['id', 'inicio', 'fim', 'tipo', 'guiche', 'atendente']
+    ordering = ['-id']
 
     @swagger_auto_schema(
         method='get',
