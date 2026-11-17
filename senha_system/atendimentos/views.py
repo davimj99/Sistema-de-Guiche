@@ -8,7 +8,6 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required, user_passes_test
 
 
-# Permissão de administrador
 def is_super_admin(user):
     return user.is_superuser
 
@@ -22,6 +21,8 @@ def relatorio_atendimentos(request):
         'atendimentos': atendimentos
     })
 
+@login_required
+@user_passes_test(is_super_admin)
 
 @login_required
 @user_passes_test(is_super_admin)

@@ -71,7 +71,6 @@
                         <th>EPI</th>
                         <th>Quantidade</th>
                         <th>Data da entrega</th>
-                        <th>Próxima troca</th>
                         <th>Observação</th>
                         <th>Ações</th>
                     </tr>
@@ -98,13 +97,13 @@
                                 {{ entrega.data_entrega|date:"d/m/Y" }}
                             </td>
 
-                            <td>
+                           <!-- <td>
                                 {% if entrega.data_proxima_troca %}
                                     {{ entrega.data_proxima_troca|date:"d/m/Y" }}
                                 {% else %}
                                     —
                                 {% endif %}
-                            </td>
+                            </td> -->
 
                             <td>
                                 {% if entrega.observacao %}

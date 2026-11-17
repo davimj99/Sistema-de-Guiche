@@ -39,6 +39,9 @@ CSRF_TRUSTED_ORIGINS = config("CSRF_TRUSTED_ORIGINS",default="",cast=lambda valu
 )
 
 
+#ALLOWED_HOSTS = ALLOWED_HOSTS = ["10.20.1.86", "localhost", "127.0.0.1"]
+#ALLOWED_HOSTS = ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
+
 # Application definition
 
 INSTALLED_APPS = [
