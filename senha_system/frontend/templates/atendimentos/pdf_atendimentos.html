@@ -104,9 +104,7 @@
   <div class="institution">Relatório de Atendimentos ISCON</div>
   <dialog class="subtitle">INSTITUTO SUPERIOR CONAMAD</dialog> 
 
-  {% if atendimentos %}
-    <h1>Data: {{ atendimentos.0.fim|date:"l, d \d\e F \d\e Y" }}</h1>
-  {% endif %}
+  <div class="report-date">Gerado em {{ gerado_em|date:"d/m/Y H:i" }}</div>
 </div>
 
 <table> 

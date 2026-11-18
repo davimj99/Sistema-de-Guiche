@@ -34,8 +34,8 @@ Sistema robusto desenvolvido em **Django** para gestão de filas, emissão e cha
 | --- | --- |
 | Linguagem | Python 3.x |
 | Framework web | Django |
-| API | Django REST Framework (DRF) / SpringBoot |
-| Banco de dados | SQLite (desenvolvimento) / PostgreSQL (produção) |
+| API | Django REST Framework (DRF), integrado à aplicação Django |
+| Banco de dados | PostgreSQL (configuração padrão); SQLite pode ser habilitado por configuração |
 | Frontend | HTML5, CSS3, JavaScript, Bootstrap |
 | Servidor web / proxy reverso | Nginx |
 | Containerização | Docker e Docker Compose |
@@ -114,6 +114,29 @@ docker compose -f docker-compose.prod.yml exec -T db \
 ```
 
 ---
+
+## Arquitetura e Documentação Técnica
+
+A aplicação usa Django em arquitetura MTV: Models representam os dados, Views processam requisições e Templates renderizam a interface web. A API REST é implementada dentro do mesmo projeto Django com Django REST Framework (serializers, views/viewsets e routers). A configuração padrão usa PostgreSQL; o frontend utiliza templates Django, HTML, CSS e JavaScript.
+
+```mermaid
+flowchart LR
+    U[Usuários] --> W[Interface Web: templates, HTML, CSS, JavaScript]
+    W --> D[Django: URLs e Views]
+    D --> S[Services e regras de negócio]
+    S --> M[Models Django]
+    M --> P[(PostgreSQL)]
+    C[Clientes API] --> R[DRF: serializers, views/viewsets e routers]
+    R --> S
+```
+
+- [Índice da documentação arquitetural](docs/architecture/README.md)
+- [Visão geral](docs/architecture/architecture-overview.md) · [Componentes](docs/architecture/components.md) · [Sequências](docs/architecture/sequence-diagrams.md)
+- [Fluxos de negócio](docs/architecture/business-flows.md) · [Modelo de dados](docs/architecture/database-er.md) · [Implantação](docs/architecture/deployment.md)
+
+### Executar localmente
+
+O ponto de entrada `manage.py` está em `senha_system/`. Instale as dependências de `senha_system/requirements.txt`, configure as variáveis usadas em `senha_system/senha_system/settings.py` (incluindo `DJANGO_SECRET_KEY` e conexão do banco), aplique as migrations com `python manage.py migrate` e inicie com `python manage.py runserver`. Para implantação conteinerizada, consulte `senha_system/docker-compose.yml` e `senha_system/docker-compose.prod.yml`.
 
 ## 📄 Licença
 

@@ -1,0 +1,385 @@
+{% extends "dashboard/base_dashboard.html" %}
+{% load static %}
+
+{% block page_title %}Visão Geral do Atendimento{% endblock %}
+{% block page_subtitle %}Indicadores e métricas consolidadas — Faculdade ISCON (Período: <strong id="periodoRotuloDisplay">{{ periodo_rotulo }}</strong>){% endblock %}
+
+{% block content %}
+<!-- ========================================================================= -->
+<!-- 1. CARDS DE INDICADORES (KPIS)                                            -->
+<!-- ========================================================================= -->
+<section class="kpi-grid" aria-label="Indicadores Chave de Desempenho">
+    <!-- Senhas Emitidas -->
+    <div class="kpi-card card-blue">
+        <div class="kpi-card-header">
+            <span class="kpi-card-title">{{ kpis.senhas_emitidas.titulo }}</span>
+            <div class="kpi-icon-badge badge-blue">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+                    <line x1="2" y1="10" x2="22" y2="10"></line>
+                </svg>
+            </div>
+        </div>
+        <div class="kpi-value" id="kpiSenhasVal">{{ kpis.senhas_emitidas.total }}</div>
+        <div class="kpi-card-footer">
+            <span class="trend-badge trend-{{ kpis.senhas_emitidas.variacao.tendencia }}" id="kpiSenhasTrend">
+                {{ kpis.senhas_emitidas.variacao.texto }}
+            </span>
+        </div>
+    </div>
+
+    <!-- Atendimentos Realizados -->
+    <div class="kpi-card card-green">
+        <div class="kpi-card-header">
+            <span class="kpi-card-title">{{ kpis.atendimentos_realizados.titulo }}</span>
+            <div class="kpi-icon-badge badge-green">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+            </div>
+        </div>
+        <div class="kpi-value" id="kpiAtendVal">{{ kpis.atendimentos_realizados.total }}</div>
+        <div class="kpi-card-footer">
+            <span class="trend-badge trend-{{ kpis.atendimentos_realizados.variacao.tendencia }}" id="kpiAtendTrend">
+                {{ kpis.atendimentos_realizados.variacao.texto }}
+            </span>
+        </div>
+    </div>
+
+    <!-- Em Atendimento Agora (Ao Vivo) -->
+    <div class="kpi-card card-purple">
+        <div class="kpi-card-header">
+            <span class="kpi-card-title">{{ kpis.em_andamento.titulo }}</span>
+            <div class="kpi-icon-badge badge-purple">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+            </div>
+        </div>
+        <div class="kpi-value" id="kpiAndamentoVal">{{ kpis.em_andamento.total }}</div>
+        <div class="kpi-card-footer">
+            <span class="trend-badge" style="background: rgba(111,66,193,0.15); color: var(--iscon-purple);">
+                ● Ao Vivo nos Guichês
+            </span>
+        </div>
+    </div>
+
+    <!-- Aguardando na Fila (Ao Vivo) -->
+    <div class="kpi-card card-amber">
+        <div class="kpi-card-header">
+            <span class="kpi-card-title">{{ kpis.aguardando_espera.titulo }}</span>
+            <div class="kpi-icon-badge badge-amber">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                </svg>
+            </div>
+        </div>
+        <div class="kpi-value" id="kpiEsperaVal">{{ kpis.aguardando_espera.total }}</div>
+        <div class="kpi-card-footer">
+            <span class="trend-badge" style="background: rgba(255,193,7,0.2); color: #b45309;">
+                ● Fila de Espera Atual
+            </span>
+        </div>
+    </div>
+
+    <!-- Tempo Médio de Atendimento -->
+    <div class="kpi-card card-blue">
+        <div class="kpi-card-header">
+            <span class="kpi-card-title">{{ kpis.tempo_medio.titulo }}</span>
+            <div class="kpi-icon-badge badge-blue">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 14 10"></polyline>
+                </svg>
+            </div>
+        </div>
+        <div class="kpi-value" id="kpiTempoMedioVal">{{ kpis.tempo_medio.formatado }}</div>
+        <div class="kpi-card-footer">
+            <span class="trend-subtext">{{ kpis.tempo_medio.amostras }} atendimentos finalizados com timestamp</span>
+        </div>
+    </div>
+
+    <!-- Requisições da API REST -->
+    <div class="kpi-card card-blue">
+        <div class="kpi-card-header">
+            <span class="kpi-card-title">{{ kpis.requisicoes_api.titulo }}</span>
+            <div class="kpi-icon-badge badge-blue">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="2" y="2" width="20" height="8" rx="2"></rect>
+                    <rect x="2" y="14" width="20" height="8" rx="2"></rect>
+                    <line x1="6" y1="6" x2="6.01" y2="6"></line>
+                    <line x1="6" y1="18" x2="6.01" y2="18"></line>
+                </svg>
+            </div>
+        </div>
+        <div class="kpi-value" id="kpiApiVal">{{ kpis.requisicoes_api.total }}</div>
+        <div class="kpi-card-footer">
+            <span class="trend-badge trend-{{ kpis.requisicoes_api.variacao.tendencia }}" id="kpiApiTrend">
+                {{ kpis.requisicoes_api.variacao.texto }}
+            </span>
+        </div>
+    </div>
+
+    <!-- Guichês Ativos -->
+    <div class="kpi-card card-green">
+        <div class="kpi-card-header">
+            <span class="kpi-card-title">{{ kpis.guiches_ativos.titulo }}</span>
+            <div class="kpi-icon-badge badge-green">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+                    <path d="M3 9h18"></path>
+                    <path d="M9 21V9"></path>
+                </svg>
+            </div>
+        </div>
+        <div class="kpi-value" id="kpiGuichesVal">{{ kpis.guiches_ativos.total }} / {{ kpis.guiches_ativos.total_geral }}</div>
+        <div class="kpi-card-footer">
+            <span class="trend-subtext">Disponíveis para chamada de senhas</span>
+        </div>
+    </div>
+
+    <!-- Atendentes Ativos -->
+    <div class="kpi-card card-purple">
+        <div class="kpi-card-header">
+            <span class="kpi-card-title">{{ kpis.atendentes_ativos.titulo }}</span>
+            <div class="kpi-icon-badge badge-purple">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="8.5" cy="7" r="4"></circle>
+                    <polyline points="17 11 19 13 23 9"></polyline>
+                </svg>
+            </div>
+        </div>
+        <div class="kpi-value" id="kpiAtendentesVal">{{ kpis.atendentes_ativos.total }}</div>
+        <div class="kpi-card-footer">
+            <span class="trend-subtext">Equipe de atendimento da Faculdade ISCON</span>
+        </div>
+    </div>
+
+    <!-- Senhas Canceladas -->
+    <div class="kpi-card card-red">
+        <div class="kpi-card-header">
+            <span class="kpi-card-title">{{ kpis.senhas_canceladas.titulo }}</span>
+            <div class="kpi-icon-badge badge-red">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="15" y1="9" x2="9" y2="15"></line>
+                    <line x1="9" y1="9" x2="15" y2="15"></line>
+                </svg>
+            </div>
+        </div>
+        <div class="kpi-value" id="kpiCanceladasVal">{{ kpis.senhas_canceladas.total }}</div>
+        <div class="kpi-card-footer">
+            <span class="trend-subtext">{{ kpis.senhas_canceladas.nota }}</span>
+        </div>
+    </div>
+</section>
+
+<!-- ========================================================================= -->
+<!-- 2. GRÁFICOS PRINCIPAIS DE ATENDIMENTO                                     -->
+<!-- ========================================================================= -->
+<section class="chart-grid">
+    <!-- Série Comparativa: Senhas vs Atendimentos -->
+    <div class="chart-card">
+        <div class="chart-card-header">
+            <div>
+                <h3 class="chart-card-title">Senhas Emitidas vs Atendimentos Realizados</h3>
+                <p class="chart-card-subtitle">Evolução diária comparativa ao longo do período selecionado</p>
+            </div>
+        </div>
+        <div class="chart-canvas-container">
+            <canvas id="chartComparativo"></canvas>
+        </div>
+    </div>
+
+    <!-- Distribuição por Tipo de Serviço -->
+    <div class="chart-card">
+        <div class="chart-card-header">
+            <div>
+                <h3 class="chart-card-title">Tipos de Atendimento</h3>
+                <p class="chart-card-subtitle">Volume por categoria de serviço acadêmico</p>
+            </div>
+        </div>
+        <div class="chart-canvas-container">
+            <canvas id="chartTipo"></canvas>
+        </div>
+    </div>
+</section>
+
+<section class="chart-grid-equal">
+    <!-- Atendimentos por Guichê -->
+    <div class="chart-card">
+        <div class="chart-card-header">
+            <div>
+                <h3 class="chart-card-title">Distribuição por Guichê</h3>
+                <p class="chart-card-subtitle">Total de atendimentos processados em cada guichê</p>
+            </div>
+        </div>
+        <div class="chart-canvas-container">
+            <canvas id="chartGuiche"></canvas>
+        </div>
+    </div>
+
+    <!-- Horários de Maior Movimento -->
+    <div class="chart-card">
+        <div class="chart-card-header">
+            <div>
+                <h3 class="chart-card-title">Horários de Maior Movimento</h3>
+                <p class="chart-card-subtitle">Demanda concentrada ao longo do dia (07h às 22h)</p>
+            </div>
+        </div>
+        <div class="chart-canvas-container">
+            <canvas id="chartHorarios"></canvas>
+        </div>
+    </div>
+</section>
+
+<!-- ========================================================================= -->
+<!-- 3. MONITORAMENTO OPERACIONAL EM TEMPO REAL (TABELAS RÁPIDAS)              -->
+<!-- ========================================================================= -->
+<section class="chart-grid-equal">
+    <!-- Fila de Espera Atual -->
+    <div class="table-card">
+        <div class="table-card-header">
+            <div>
+                <h3 class="chart-card-title">Próximos na Fila de Espera</h3>
+                <p class="chart-card-subtitle">Senhas aguardando chamada imediata</p>
+            </div>
+            <a href="{% url 'dashboard:historico' %}?tabela=senhas&status_senha=espera" class="pagination-btn">Ver Todas</a>
+        </div>
+        <div class="table-responsive">
+            <table class="dash-table">
+                <thead>
+                    <tr>
+                        <th>Senha</th>
+                        <th>Tipo</th>
+                        <th>Emitida em</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in senhas_em_espera %}
+                    <tr>
+                        <td><strong>{{ s.prefixo }}{{ s.numero }}</strong></td>
+                        <td>{{ s.get_tipo_display }}</td>
+                        <td>{{ s.criada_em|date:"H:i:s" }}</td>
+                        <td><span class="status-badge badge-espera">Em Espera</span></td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 24px;">
+                            Nenhuma senha em espera na fila no momento.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Últimos Atendimentos Registrados -->
+    <div class="table-card">
+        <div class="table-card-header">
+            <div>
+                <h3 class="chart-card-title">Últimos Atendimentos Registrados</h3>
+                <p class="chart-card-subtitle">Chamadas e atendimentos concluídos recentemente</p>
+            </div>
+            <a href="{% url 'dashboard:historico' %}?tabela=atendimentos" class="pagination-btn">Ver Histórico</a>
+        </div>
+        <div class="table-responsive">
+            <table class="dash-table">
+                <thead>
+                    <tr>
+                        <th>Senha</th>
+                        <th>Serviço</th>
+                        <th>Atendente</th>
+                        <th>Guichê</th>
+                        <th>Horário</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for a in ultimos_atendimentos %}
+                    <tr>
+                        <td><strong>{{ a.senha.prefixo }}{{ a.senha.numero }}</strong></td>
+                        <td>{{ a.get_tipo_display|default:"Geral" }}</td>
+                        <td>{{ a.atendente|default:"—" }}</td>
+                        <td>Guichê {{ a.guiche|default:"—" }}</td>
+                        <td>
+                            {% if a.fim %}
+                                {{ a.fim|date:"d/m H:i" }}
+                            {% elif a.inicio %}
+                                {{ a.inicio|time:"H:i" }} (Início)
+                            {% else %}
+                                —
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 24px;">
+                            Nenhum atendimento registrado recentemente.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Dados iniciais injetados pelo Django
+        const chartData = {{ chart_data|safe }};
+
+        if (chartData) {
+            // 1. Gráfico Comparativo Senhas vs Atendimentos
+            if (chartData.serie_temporal_comparativa) {
+                window.IsconDashboard.renderChart(
+                    'chartComparativo',
+                    'line',
+                    chartData.serie_temporal_comparativa
+                );
+            }
+
+            // 2. Gráfico Tipos de Atendimento (Donut)
+            if (chartData.distribuicao_tipo) {
+                window.IsconDashboard.renderChart(
+                    'chartTipo',
+                    'doughnut',
+                    chartData.distribuicao_tipo,
+                    {
+                        plugins: {
+                            legend: { position: 'bottom' }
+                        },
+                        cutout: '65%'
+                    }
+                );
+            }
+
+            // 3. Gráfico Atendimentos por Guichê (Bar)
+            if (chartData.distribuicao_guiche) {
+                window.IsconDashboard.renderChart(
+                    'chartGuiche',
+                    'bar',
+                    chartData.distribuicao_guiche
+                );
+            }
+
+            // 4. Gráfico Horários de Maior Movimento
+            if (chartData.horarios_movimento) {
+                window.IsconDashboard.renderChart(
+                    'chartHorarios',
+                    'bar',
+                    chartData.horarios_movimento
+                );
+            }
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,291 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Painel de Gestão e Monitoramento de Atendimento — Faculdade ISCON">
+    <title>{% block title %}Painel de Gestão ISCON{% endblock %}</title>
+
+    <!-- Fontes Google -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800;900&family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- CSS do Dashboard -->
+    <link rel="stylesheet" href="{% static 'dashboard/css/dashboard.css' %}">
+    <link rel="icon" href="{% static 'frontend/img/iscon_logo.png' %}" type="image/png">
+
+    <!-- Chart.js para visualização de dados -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="dashboard-body" data-active-tab="{{ active_tab }}">
+
+    <!-- Backdrop para fechar a sidebar no mobile -->
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+    <div class="dash-wrapper">
+        <!-- ============================================================ -->
+        <!-- SIDEBAR LATERAL                                               -->
+        <!-- ============================================================ -->
+        <aside class="dash-sidebar" id="dashSidebar">
+            <div class="sidebar-brand">
+                <img src="{% static 'frontend/img/iscon_logo.png' %}" alt="Logo Faculdade ISCON">
+                <div class="sidebar-brand-text">
+                    <h2>ISCON GESTÃO</h2>
+                    <span>Sistema de Guichês</span>
+                </div>
+            </div>
+
+            <nav class="sidebar-menu">
+                <div class="menu-category">Estratégico</div>
+
+                <a href="{% url 'dashboard:index' %}" class="nav-item {% if active_tab == 'visao_geral' %}active{% endif %}">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <rect x="3" y="3" width="7" height="9" rx="1"></rect>
+                        <rect x="14" y="3" width="7" height="5" rx="1"></rect>
+                        <rect x="14" y="12" width="7" height="9" rx="1"></rect>
+                        <rect x="3" y="16" width="7" height="5" rx="1"></rect>
+                    </svg>
+                    <span>Visão Geral</span>
+                </a>
+
+                <a href="{% url 'dashboard:atendimentos' %}" class="nav-item {% if active_tab == 'atendimentos' %}active{% endif %}">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                    <span>Atendimentos</span>
+                </a>
+
+                <a href="{% url 'dashboard:produtividade' %}" class="nav-item {% if active_tab == 'produtividade' %}active{% endif %}">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                    </svg>
+                    <span>Produtividade</span>
+                </a>
+
+                <div class="menu-category">Técnico & Operacional</div>
+
+                <a href="{% url 'dashboard:api_monitor' %}" class="nav-item {% if active_tab == 'api_monitor' %}active{% endif %}">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
+                        <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
+                        <line x1="6" y1="6" x2="6.01" y2="6"></line>
+                        <line x1="6" y1="18" x2="6.01" y2="18"></line>
+                    </svg>
+                    <span>Monitor da API</span>
+                </a>
+
+                <a href="{% url 'dashboard:historico' %}" class="nav-item {% if active_tab == 'historico' %}active{% endif %}">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
+                    <span>Histórico & Tabelas</span>
+                </a>
+
+                <div class="menu-category">Atalhos Externos</div>
+
+                <a href="/painel/" target="_blank" class="nav-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect>
+                        <polyline points="17 2 12 7 7 2"></polyline>
+                    </svg>
+                    <span>Painel TV ao Vivo</span>
+                </a>
+
+                <a href="/filas/gerar/" target="_blank" class="nav-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="16"></line>
+                        <line x1="8" y1="12" x2="16" y2="12"></line>
+                    </svg>
+                    <span>Totem de Senhas</span>
+                </a>
+
+                {% if request.user.is_superuser %}
+                <a href="{% url 'schema-swagger-ui' %}" target="_blank" rel="noopener" class="nav-item">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                        <polyline points="2 17 12 22 22 17"></polyline>
+                        <polyline points="2 12 12 17 22 12"></polyline>
+                    </svg>
+                    <span>Swagger API</span>
+                </a>
+                {% endif %}
+            </nav>
+
+            <div class="sidebar-footer">
+                <a href="{% url 'core:index' %}">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    </svg>
+                    <span>Hub Principal</span>
+                </a>
+                <span style="font-size: 0.7rem; color: #64748b;">v2.0</span>
+            </div>
+        </aside>
+
+        <!-- ============================================================ -->
+        <!-- ÁREA PRINCIPAL (HEADER + CONTEÚDO)                            -->
+        <!-- ============================================================ -->
+        <div class="dash-main">
+            <!-- Header Superior -->
+            <header class="dash-header">
+                <div class="header-left">
+                    <button class="btn-sidebar-toggle" id="btnSidebarToggle" aria-label="Abrir menu lateral">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="3" y1="12" x2="21" y2="12"></line>
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <line x1="3" y1="18" x2="21" y2="18"></line>
+                        </svg>
+                    </button>
+                    <div class="header-title-area">
+                        <h1>{% block page_title %}Painel Administrativo{% endblock %}</h1>
+                        <p>{% block page_subtitle %}Monitoramento e Análise de Desempenho Operacional{% endblock %}</p>
+                    </div>
+                </div>
+
+                <div class="header-right">
+                    <!-- Alternador de Tema Dark/Light -->
+                    <button class="btn-theme-toggle" id="btnThemeToggle" title="Alternar Dark/Light Mode">
+                        <svg id="themeIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                        </svg>
+                        <span id="themeLabel">Modo Escuro</span>
+                    </button>
+
+                    <!-- Identificação do Usuário -->
+                    <div class="user-pill">
+                        <div class="user-avatar">
+                            {{ request.user.username|make_list|first|upper }}
+                        </div>
+                        <div class="user-details">
+                            <span class="user-name">{{ request.user.get_full_name|default:request.user.username }}</span>
+                            <span class="user-role">
+                                {% if request.user.is_superuser %}Super Administrador{% else %}Administrador / Gestor{% endif %}
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Botão Sair Seguro -->
+                    <form action="{% url 'accounts:logout' %}" method="post" style="display:inline; margin: 0;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-theme-toggle" style="color: var(--iscon-red); border-color: rgba(211,47,47,0.3);" title="Encerrar sessão">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                                <polyline points="16 17 21 12 16 7"></polyline>
+                                <line x1="21" y1="12" x2="9" y2="12"></line>
+                            </svg>
+                            Sair
+                        </button>
+                    </form>
+                </div>
+            </header>
+
+            <!-- Barra Global de Filtros (Toolbar) -->
+            {% block filter_toolbar %}
+            <section class="filter-toolbar" aria-label="Filtros Globais de Análise">
+                <!-- Seletor de Períodos Rápidos -->
+                <div class="period-pill-group">
+                    <button type="button" class="period-btn {% if periodo == 'hoje' %}active{% endif %}" data-periodo="hoje">Hoje</button>
+                    <button type="button" class="period-btn {% if periodo == 'ontem' %}active{% endif %}" data-periodo="ontem">Ontem</button>
+                    <button type="button" class="period-btn {% if periodo == '7d' or not periodo %}active{% endif %}" data-periodo="7d">Últimos 7 dias</button>
+                    <button type="button" class="period-btn {% if periodo == '30d' %}active{% endif %}" data-periodo="30d">Últimos 30 dias</button>
+                    <button type="button" class="period-btn {% if periodo == 'este_mes' %}active{% endif %}" data-periodo="este_mes">Este Mês</button>
+                    <button type="button" class="period-btn {% if periodo == 'mes_anterior' %}active{% endif %}" data-periodo="mes_anterior">Mês Anterior</button>
+                    <button type="button" class="period-btn {% if periodo == 'personalizado' %}active{% endif %}" data-periodo="personalizado">Personalizado</button>
+                </div>
+
+                <!-- Intervalo de Datas Personalizado (oculto por padrão) -->
+                <div id="customDateRange" style="display: {% if periodo == 'personalizado' %}flex{% else %}none{% endif %}; align-items: center; gap: 8px;">
+                    <input type="date" id="filterDataInicio" class="form-control-sm" value="{{ data_inicio }}" title="Data Início">
+                    <span style="font-size: 0.8rem; color: var(--text-muted);">até</span>
+                    <input type="date" id="filterDataFim" class="form-control-sm" value="{{ data_fim }}" title="Data Fim">
+                    <button type="button" class="btn-theme-toggle" id="btnApplyCustomDate" style="padding: 5px 10px;">Aplicar</button>
+                </div>
+
+                <!-- Filtros Dropdown Específicos -->
+                {% if active_tab != 'api_monitor' %}
+                <div class="dropdown-filters">
+                    <!-- Guichê -->
+                    <select id="filterGuiche" class="form-select-sm filter-select-auto" aria-label="Filtrar por Guichê">
+                        <option value="">Todos os Guichês</option>
+                        {% for g in todos_guiches %}
+                            <option value="{{ g.id }}" {% if guiche_id == g.id %}selected{% endif %}>{{ g.nome }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <!-- Atendente -->
+                    <select id="filterAtendente" class="form-select-sm filter-select-auto" aria-label="Filtrar por Atendente">
+                        <option value="">Todos os Atendentes</option>
+                        {% for nome in lista_atendentes %}
+                            <option value="{{ nome }}" {% if atendente == nome %}selected{% endif %}>{{ nome }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <!-- Tipo de Atendimento -->
+                    <select id="filterTipo" class="form-select-sm filter-select-auto" aria-label="Filtrar por Tipo de Atendimento">
+                        <option value="">Todos os Serviços</option>
+                        {% for cod, label in tipos_atendimento %}
+                            <option value="{{ cod }}" {% if tipo_atendimento == cod %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <!-- Status da Senha (quando aplicável) -->
+                    {% if active_tab != 'produtividade' and status_opcoes %}
+                    <select id="filterStatus" class="form-select-sm filter-select-auto" aria-label="Filtrar por Status da Senha">
+                        <option value="">Todos os Status</option>
+                        {% for st_val, st_lbl in status_opcoes %}
+                            <option value="{{ st_val }}" {% if status_senha == st_val %}selected{% endif %}>{{ st_lbl }}</option>
+                        {% endfor %}
+                    </select>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </section>
+            {% endblock %}
+
+            <!-- Feedback de Carregamento Assíncrono -->
+            <div id="dashLoader" style="display: none; align-items: center; justify-content: center; gap: 10px; padding: 8px; background: rgba(13, 110, 253, 0.1); color: var(--iscon-blue); font-size: 0.8rem; font-weight: 600;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="spin-anim" style="animation: spin 1s linear infinite;">
+                    <line x1="12" y1="2" x2="12" y2="6"></line>
+                    <line x1="12" y1="18" x2="12" y2="22"></line>
+                    <line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line>
+                    <line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line>
+                    <line x1="2" y1="12" x2="6" y2="12"></line>
+                    <line x1="18" y1="12" x2="22" y2="12"></line>
+                    <line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line>
+                    <line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line>
+                </svg>
+                <span>Atualizando dados operacionais com o banco...</span>
+            </div>
+            <div id="dashFeedback" class="dash-feedback" role="status" aria-live="polite" hidden></div>
+
+            <!-- Conteúdo Dinâmico -->
+            <main class="dash-content">
+                {% block content %}{% endblock %}
+            </main>
+        </div>
+    </div>
+
+    <!-- Scripts do Dashboard -->
+    <script src="{% static 'dashboard/js/dashboard.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+
+    <style>
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</body>
+</html>

@@ -1,5 +1,1 @@
-from django.contrib import admin
-#from .models import Senha, Guiche
-
-#admin.site.register(Senha)
-#admin.site.register(Guiche)
+# O app 'api' fornece apenas endpoints REST (não possui models administráveis no Django Admin).

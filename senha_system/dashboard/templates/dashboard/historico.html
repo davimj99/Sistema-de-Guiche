@@ -1,0 +1,211 @@
+{% extends "dashboard/base_dashboard.html" %}
+{% load static %}
+
+{% block page_title %}Histórico & Tabelas Administrativas{% endblock %}
+{% block page_subtitle %}Consultas detalhadas, filtros, paginação e auditoria operacional do sistema{% endblock %}
+
+{% block content %}
+<!-- Seletor de Abas de Tabelas -->
+<div style="display: flex; gap: 8px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 8px; flex-wrap: wrap;">
+    <a href="?tabela={{ tabela }}&periodo=todos" class="period-btn {% if periodo == 'todos' %}active{% endif %}">Todo o histórico</a>
+    <a href="?{{ query_filters }}&tabela=atendimentos" class="period-btn {% if tabela == 'atendimentos' %}active{% endif %}">
+        👥 Atendimentos Realizados
+    </a>
+    <a href="?{{ query_filters }}&tabela=senhas" class="period-btn {% if tabela == 'senhas' %}active{% endif %}">
+        🎫 Senhas Emitidas
+    </a>
+    <a href="?{{ query_filters }}&tabela=historico_operacoes" class="period-btn {% if tabela == 'historico_operacoes' %}active{% endif %}">
+        📋 Histórico de Operações
+    </a>
+    <a href="?{{ query_filters }}&tabela=requisicoes_api" class="period-btn {% if tabela == 'requisicoes_api' %}active{% endif %}">
+        🌐 Requisições da API
+    </a>
+</div>
+
+<!-- Barra de Pesquisa e Filtros -->
+<div class="table-card">
+    <div class="table-card-header">
+        <form method="get" action="" style="display: flex; gap: 10px; width: 100%; max-width: 480px;">
+            <input type="hidden" name="tabela" value="{{ tabela }}">
+            <input type="hidden" name="periodo" value="{{ periodo }}">
+            {% if guiche_id %}<input type="hidden" name="guiche_id" value="{{ guiche_id }}">{% endif %}
+            {% if atendente %}<input type="hidden" name="atendente" value="{{ atendente }}">{% endif %}
+            {% if tipo_atendimento %}<input type="hidden" name="tipo_atendimento" value="{{ tipo_atendimento }}">{% endif %}
+
+            <input type="text" name="busca" value="{{ busca }}" class="form-control-sm" style="flex: 1;" placeholder="Pesquisar registros...">
+            <button type="submit" class="pagination-btn active">Buscar</button>
+            {% if busca %}
+                <a href="?{{ query_sem_busca }}&tabela={{ tabela }}" class="pagination-btn">Limpar</a>
+            {% endif %}
+        </form>
+
+        <span style="font-size: 0.8rem; color: var(--text-muted);">
+            Total: <strong>{{ registros.paginator.count }}</strong> registros encontrados
+        </span>
+    </div>
+
+    <!-- Tabela Conforme Aba Selecionada -->
+    <div class="table-responsive">
+        {% if tabela == 'senhas' %}
+            <!-- TABELA DE SENHAS -->
+            <table class="dash-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Senha</th>
+                        <th>Tipo</th>
+                        <th>Guichê</th>
+                        <th>Emitida em</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in registros %}
+                    <tr>
+                        <td>#{{ s.id }}</td>
+                        <td><strong>{{ s.prefixo }}{{ s.numero }}</strong></td>
+                        <td>{{ s.get_tipo_display }}</td>
+                        <td>{{ s.guiche.nome|default:"—" }}</td>
+                        <td>{{ s.criada_em|date:"d/m/Y H:i:s" }}</td>
+                        <td>
+                            <span class="status-badge badge-{{ s.status }}">
+                                {{ s.get_status_display }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="6" style="text-align: center; padding: 32px; color: var(--text-muted);">Nenhuma senha encontrada para os critérios selecionados.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+        {% elif tabela == 'historico_operacoes' %}
+            <!-- TABELA DE HISTÓRICO DE AUDITORIA -->
+            <table class="dash-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Data/Hora</th>
+                        <th>Senha</th>
+                        <th>Ação Executada</th>
+                        <th>Guichê</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for h in registros %}
+                    <tr>
+                        <td>#{{ h.id }}</td>
+                        <td>{{ h.criada_em|date:"d/m/Y H:i:s" }}</td>
+                        <td><strong>{{ h.senha.prefixo }}{{ h.senha.numero }}</strong></td>
+                        <td><code>{{ h.acao }}</code></td>
+                        <td>{{ h.guiche.nome|default:"—" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="5" style="text-align: center; padding: 32px; color: var(--text-muted);">Nenhum histórico operacional registrado no período.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+        {% elif tabela == 'requisicoes_api' %}
+            <!-- TABELA DE REQUISIÇÕES DA API -->
+            <table class="dash-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Data/Hora</th>
+                        <th>Método</th>
+                        <th>Endpoint</th>
+                        <th>Status</th>
+                        <th>Tempo Resposta</th>
+                        <th>IP Origem</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for req in registros %}
+                    <tr>
+                        <td>#{{ req.id }}</td>
+                        <td>{{ req.criado_em|date:"d/m/Y H:i:s" }}</td>
+                        <td><strong>{{ req.metodo }}</strong></td>
+                        <td><code>{{ req.endpoint }}</code></td>
+                        <td>
+                            <span class="status-badge {% if req.status_code < 300 %}badge-2xx{% elif req.status_code < 400 %}badge-3xx{% elif req.status_code < 500 %}badge-4xx{% else %}badge-5xx{% endif %}">
+                                {{ req.status_code }}
+                            </span>
+                        </td>
+                        <td>{{ req.tempo_resposta_ms }} ms</td>
+                        <td><small style="color: var(--text-muted);">{{ req.ip_origem|default:"—" }}</small></td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="7" style="text-align: center; padding: 32px; color: var(--text-muted);">Nenhuma requisição de API encontrada.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+        {% else %}
+            <!-- TABELA DE ATENDIMENTOS -->
+            <table class="dash-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Senha</th>
+                        <th>Aluno</th>
+                        <th>Serviço</th>
+                        <th>Atendente</th>
+                        <th>Guichê</th>
+                        <th>Início</th>
+                        <th>Conclusão</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for at in registros %}
+                    <tr>
+                        <td>#{{ at.id }}</td>
+                        <td><strong>{{ at.senha.prefixo }}{{ at.senha.numero }}</strong></td>
+                        <td>{{ at.aluno|default:"Aluno Não Identificado" }}</td>
+                        <td><span class="trend-badge" style="background: rgba(13,110,253,0.1); color: var(--iscon-blue);">{{ at.get_tipo_display|default:"Geral" }}</span></td>
+                        <td>{{ at.atendente|default:"—" }}</td>
+                        <td>Guichê {{ at.guiche|default:"—" }}</td>
+                        <td>{{ at.inicio|time:"H:i:s"|default:"—" }}</td>
+                        <td>
+                            {% if at.fim %}
+                                {{ at.fim|date:"d/m/Y H:i" }}
+                            {% else %}
+                                <span class="status-badge badge-atendimento">Em Andamento</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="8" style="text-align: center; padding: 32px; color: var(--text-muted);">Nenhum atendimento encontrado para os filtros aplicados.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </div>
+
+    <!-- Controles de Paginação -->
+    {% if registros.has_other_pages %}
+    <div class="pagination-area">
+        <span>
+            Página {{ registros.number }} de {{ registros.paginator.num_pages }}
+        </span>
+        <div class="pagination-controls">
+            {% if registros.has_previous %}
+                <a href="?{{ query_sem_pagina }}&page=1" class="pagination-btn">Primeira</a>
+                <a href="?{{ query_sem_pagina }}&page={{ registros.previous_page_number }}" class="pagination-btn">Anterior</a>
+            {% else %}
+                <span class="pagination-btn disabled">Anterior</span>
+            {% endif %}
+
+            <span class="pagination-btn active">{{ registros.number }}</span>
+
+            {% if registros.has_next %}
+                <a href="?{{ query_sem_pagina }}&page={{ registros.next_page_number }}" class="pagination-btn">Próxima</a>
+                <a href="?{{ query_sem_pagina }}&page={{ registros.paginator.num_pages }}" class="pagination-btn">Última</a>
+            {% else %}
+                <span class="pagination-btn disabled">Próxima</span>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
