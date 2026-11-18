@@ -1,7 +1,8 @@
 from typing import Optional, Dict, Any, List
-from django.db import transaction
+from django.db import connection, transaction
 from django.utils import timezone
 from rest_framework.exceptions import ValidationError
+from django.db.models import Count, Q
 
 from accounts.models import Guiche
 from filas.models import Senha, ControleFila, Historico
@@ -19,6 +20,23 @@ class FilaService:
         "preferencial": "P",
     }
 
+    @staticmethod
+    def _lock_postgresql_operation(operation: str) -> None:
+        """Serialize queue operations across processes when running on PostgreSQL.
+
+        Row locks cannot lock a row that does not exist yet. Transaction-scoped
+        advisory locks cover first-time issuance and first-time control-row creation.
+        Other database backends retain their existing locking behavior.
+        """
+        if connection.vendor != "postgresql":
+            return
+
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "SELECT pg_advisory_xact_lock(%s, hashtext(%s))",
+                [731042, operation],
+            )
+
     @classmethod
     @transaction.atomic
     def emitir_senha(cls, tipo: str = "normal") -> Senha:
@@ -28,6 +46,9 @@ class FilaService:
         tipo_validado = FilaValidator.validar_tipo_fila(tipo)
         hoje = timezone.localdate()
         prefixo = cls.PREFIXOS.get(tipo_validado, "A")
+
+        # Lock the logical sequence even when no row exists for this date/type.
+        cls._lock_postgresql_operation(f"emissao:{hoje.isoformat()}:{tipo_validado}")
 
         # Busca a última senha do tipo emitida hoje para calcular o próximo número
         ultima = (
@@ -57,6 +78,9 @@ class FilaService:
         """
         guiche = FilaValidator.validar_guiche_ativo(guiche_id)
         hoje = timezone.localdate()
+
+        # The control row may not exist yet, so locking it alone is insufficient.
+        cls._lock_postgresql_operation("chamar_proxima")
 
         # Garante a existência do registro de controle com lock de linha
         controle = ControleFila.objects.select_for_update().first()
@@ -164,22 +188,31 @@ class FilaService:
         hoje = timezone.localdate()
         senhas_hoje = Senha.objects.filter(criada_em__date=hoje)
 
-        espera_normal = senhas_hoje.filter(status="espera", tipo="normal").count()
-        espera_pref = senhas_hoje.filter(status="espera", tipo="preferencial").count()
-        chamando = senhas_hoje.filter(status="chamando").count()
-        finalizadas = senhas_hoje.filter(status="finalizado").count()
+        metricas = senhas_hoje.aggregate(
+            total=Count("id"),
+            espera_normal=Count(
+                "id", filter=Q(status="espera", tipo="normal")
+            ),
+            espera_preferencial=Count(
+                "id", filter=Q(status="espera", tipo="preferencial")
+            ),
+            chamando=Count("id", filter=Q(status="chamando")),
+            finalizadas=Count("id", filter=Q(status="finalizado")),
+        )
+        espera_normal = metricas["espera_normal"]
+        espera_pref = metricas["espera_preferencial"]
 
         return {
             "status": "sucesso",
             "data": hoje.strftime("%Y-%m-%d"),
-            "total_emitidas_hoje": senhas_hoje.count(),
+            "total_emitidas_hoje": metricas["total"],
             "em_espera": {
                 "total": espera_normal + espera_pref,
                 "normal": espera_normal,
                 "preferencial": espera_pref,
             },
-            "chamando": chamando,
-            "finalizadas": finalizadas,
+            "chamando": metricas["chamando"],
+            "finalizadas": metricas["finalizadas"],
         }
 
     @classmethod

@@ -71,3 +71,16 @@ class ServicesTestCase(TestCase):
         self.assertIsNotNone(finalizado.fim)
         senha.refresh_from_db()
         self.assertEqual(senha.status, "finalizado")
+
+    def test_status_filas_usa_uma_consulta_agrupada(self):
+        FilaService.emitir_senha(tipo="normal")
+        FilaService.emitir_senha(tipo="preferencial")
+
+        with self.assertNumQueries(1):
+            status_filas = FilaService.obter_status_filas()
+
+        self.assertEqual(status_filas["total_emitidas_hoje"], 2)
+        self.assertEqual(status_filas["em_espera"]["normal"], 1)
+        self.assertEqual(status_filas["em_espera"]["preferencial"], 1)
+        self.assertEqual(status_filas["chamando"], 0)
+        self.assertEqual(status_filas["finalizadas"], 0)
