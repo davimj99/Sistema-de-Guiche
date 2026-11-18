@@ -20,10 +20,7 @@ class ProductivityService:
         data_fim: str = None,
         guiche_id: int = None,
         atendente: str = None,
-<<<<<<< Updated upstream
-=======
         tipo_atendimento: str = None,
->>>>>>> Stashed changes
     ) -> dict:
         inicio_atual, fim_atual, inicio_ant, fim_ant, rotulo = calcular_intervalo_filtro(
             periodo, data_inicio, data_fim
@@ -38,12 +35,9 @@ class ProductivityService:
         if atendente:
             qs_atual = qs_atual.filter(atendente=atendente)
             qs_ant = qs_ant.filter(atendente=atendente)
-<<<<<<< Updated upstream
-=======
         if tipo_atendimento:
             qs_atual = qs_atual.filter(tipo=tipo_atendimento)
             qs_ant = qs_ant.filter(tipo=tipo_atendimento)
->>>>>>> Stashed changes
 
         total_atual = qs_atual.count()
         total_ant = qs_ant.count()
@@ -128,14 +122,8 @@ class ProductivityService:
             .values_list('atendente', 'total')
         )
 
-<<<<<<< Updated upstream
-        # Também considera a lista oficial predefinida de atendentes
-        nomes_predefinidos = [nome for nome, _ in Atendimento.ATENDENTES]
-        todos_atendentes = set(dados_atual.keys()) | set(nomes_predefinidos)
-=======
         # Usa somente nomes presentes nos registros do período; não fabrica linhas zeradas.
         todos_atendentes = set(dados_atual.keys())
->>>>>>> Stashed changes
 
         resultado = []
         for nome in todos_atendentes:

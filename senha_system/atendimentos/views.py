@@ -7,19 +7,10 @@ from .utils import get_atendimentos
 from .models import Atendimento
 from filas.models import Senha
 from django.shortcuts import render
-<<<<<<< Updated upstream
-from django.contrib.auth.decorators import login_required, user_passes_test
-
-
-# Permissão de administrador
-def is_super_admin(user):
-    return user.is_superuser
-=======
 from django.contrib.auth.decorators import login_required, permission_required
 from django.core.paginator import Paginator
 from django.core.exceptions import ValidationError
 from django.utils import timezone
->>>>>>> Stashed changes
 
 
 @login_required
@@ -45,14 +36,8 @@ def relatorio_atendimentos(request):
         'gerado_em': timezone.localtime(),
     })
 
-<<<<<<< Updated upstream
-
-@login_required
-@user_passes_test(is_super_admin)
-=======
 @login_required
 @permission_required('atendimentos.view_atendimento', raise_exception=True)
->>>>>>> Stashed changes
 def gerar_pdf(request):
     try:
         atendimentos = get_atendimentos(request)

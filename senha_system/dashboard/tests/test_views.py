@@ -76,8 +76,6 @@ class DashboardViewsTestCase(TestCase):
             self.assertEqual(res.status_code, 200, f"Falha ao carregar {u}")
             self.assertContains(res, "ISCON GESTÃO")
 
-<<<<<<< Updated upstream
-=======
         self.assertNotContains(self.client.get(reverse('dashboard:index')), "Swagger API")
 
     def test_documentacao_dashboard_exibida_somente_para_superuser(self):
@@ -112,7 +110,6 @@ class DashboardViewsTestCase(TestCase):
         response = self.client.get(reverse('dashboard:index'))
         self.assertIn("Operador legado", response.context['lista_atendentes'])
 
->>>>>>> Stashed changes
     def test_endpoints_api_json_staff(self):
         """Endpoints assíncronos JSON devem retornar HTTP 200 e payload estruturado para staff."""
         self.client.login(username="gestor_iscon", password="password123")

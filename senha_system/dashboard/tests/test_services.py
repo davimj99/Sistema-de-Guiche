@@ -141,11 +141,7 @@ class DashboardServicesTestCase(TestCase):
         self.assertEqual(kpis["guiches_ativos"]["total"], 2)
         self.assertEqual(kpis["guiches_ativos"]["total_geral"], 3)
         # Atendentes
-<<<<<<< Updated upstream
-        self.assertGreaterEqual(kpis["atendentes_ativos"]["total"], 1)
-=======
         self.assertEqual(kpis["atendentes_ativos"]["total"], 1)
->>>>>>> Stashed changes
         # Tempo Médio (15 minutos = 900s)
         self.assertEqual(kpis["tempo_medio"]["minutos"], 15.0)
         self.assertEqual(kpis["tempo_medio"]["formatado"], "15m 00s")
@@ -187,14 +183,11 @@ class DashboardServicesTestCase(TestCase):
         self.assertIsNotNone(at_rafael)
         self.assertEqual(at_rafael["total"], 1)
 
-<<<<<<< Updated upstream
-=======
         financeiro = ProductivityService.obter_relatorio_produtividade(
             periodo="hoje", tipo_atendimento="financeiro"
         )
         self.assertEqual(financeiro["total_atendimentos"], 0)
 
->>>>>>> Stashed changes
     def test_api_monitoring_service(self):
         """Valida o cálculo de métricas de telemetria da API REST."""
         metricas = ApiMonitoringService.obter_metricas_api(periodo="hoje")

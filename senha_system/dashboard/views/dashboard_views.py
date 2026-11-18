@@ -1,10 +1,7 @@
 from django.shortcuts import render
 from django.core.paginator import Paginator
 from accounts.models import Guiche
-<<<<<<< Updated upstream
-=======
 from django.db.models import Q
->>>>>>> Stashed changes
 from filas.models import Senha, Historico
 from atendimentos.models import Atendimento
 from dashboard.models import ApiRequestLog
@@ -35,14 +32,10 @@ def _obter_contexto_filtros(request):
     # Opções para os seletores
     todos_guiches = Guiche.objects.filter(ativo=True).order_by('id')
     tipos_atendimento = Atendimento.TIPOS_ATENDIMENTO
-<<<<<<< Updated upstream
-    lista_atendentes = [nome for nome, _ in Atendimento.ATENDENTES]
-=======
     lista_atendentes = list(
         Atendimento.objects.exclude(Q(atendente__isnull=True) | Q(atendente=""))
         .order_by("atendente").values_list("atendente", flat=True).distinct()
     )
->>>>>>> Stashed changes
     status_opcoes = Senha.STATUS
 
     return {
@@ -151,10 +144,7 @@ def produtividade_view(request):
         data_fim=filtros['data_fim'],
         guiche_id=filtros['guiche_id'],
         atendente=filtros['atendente'],
-<<<<<<< Updated upstream
-=======
         tipo_atendimento=filtros['tipo_atendimento'],
->>>>>>> Stashed changes
     )
 
     context = {
@@ -203,14 +193,6 @@ def historico_view(request):
     busca = request.GET.get('busca', '').strip()
     pagina = request.GET.get('page', 1)
 
-<<<<<<< Updated upstream
-    inicio_atual, fim_atual, _, _, _ = calcular_intervalo_filtro(
-        filtros['periodo'], filtros['data_inicio'], filtros['data_fim']
-    )
-
-    if aba == 'senhas':
-        qs = Senha.objects.filter(criada_em__range=(inicio_atual, fim_atual)).select_related('guiche').order_by('-id')
-=======
     if filtros['periodo'] == 'todos':
         inicio_atual = fim_atual = None
     else:
@@ -223,7 +205,6 @@ def historico_view(request):
         if inicio_atual:
             qs = qs.filter(criada_em__range=(inicio_atual, fim_atual))
         qs = qs.select_related('guiche').order_by('-id')
->>>>>>> Stashed changes
         if busca:
             qs = qs.filter(numero__icontains=busca) | qs.filter(prefixo__icontains=busca)
         if filtros['status_senha']:
@@ -234,14 +215,10 @@ def historico_view(request):
         registros = paginador.get_page(pagina)
 
     elif aba == 'historico_operacoes':
-<<<<<<< Updated upstream
-        qs = Historico.objects.filter(criada_em__range=(inicio_atual, fim_atual)).select_related('senha', 'guiche').order_by('-id')
-=======
         qs = Historico.objects.all()
         if inicio_atual:
             qs = qs.filter(criada_em__range=(inicio_atual, fim_atual))
         qs = qs.select_related('senha', 'guiche').order_by('-id')
->>>>>>> Stashed changes
         if busca:
             qs = qs.filter(acao__icontains=busca)
         if filtros['guiche_id']:
@@ -250,14 +227,10 @@ def historico_view(request):
         registros = paginador.get_page(pagina)
 
     elif aba == 'requisicoes_api':
-<<<<<<< Updated upstream
-        qs = ApiRequestLog.objects.filter(criado_em__range=(inicio_atual, fim_atual)).order_by('-criado_em')
-=======
         qs = ApiRequestLog.objects.all()
         if inicio_atual:
             qs = qs.filter(criado_em__range=(inicio_atual, fim_atual))
         qs = qs.order_by('-criado_em')
->>>>>>> Stashed changes
         if busca:
             qs = qs.filter(endpoint__icontains=busca) | qs.filter(metodo__icontains=busca)
         paginador = Paginator(qs, 20)
@@ -265,14 +238,10 @@ def historico_view(request):
 
     else:  # Padrão: Atendimentos
         aba = 'atendimentos'
-<<<<<<< Updated upstream
-        qs = Atendimento.objects.filter(fim__range=(inicio_atual, fim_atual)).select_related('senha').order_by('-id')
-=======
         qs = Atendimento.objects.all()
         if inicio_atual:
             qs = qs.filter(fim__range=(inicio_atual, fim_atual))
         qs = qs.select_related('senha').order_by('-id')
->>>>>>> Stashed changes
         if busca:
             qs = qs.filter(aluno__icontains=busca) | qs.filter(atendente__icontains=busca)
         if filtros['tipo_atendimento']:
@@ -281,11 +250,6 @@ def historico_view(request):
             qs = qs.filter(atendente=filtros['atendente'])
         if filtros['guiche_id']:
             qs = qs.filter(guiche=filtros['guiche_id'])
-<<<<<<< Updated upstream
-        paginador = Paginator(qs, 20)
-        registros = paginador.get_page(pagina)
-
-=======
         if filtros['status_senha']:
             qs = qs.filter(senha__status=filtros['status_senha'])
         paginador = Paginator(qs, 20)
@@ -296,16 +260,11 @@ def historico_view(request):
     query_filters.pop('page', None)
     query_sem_busca = query_filters.copy()
     query_sem_busca.pop('busca', None)
->>>>>>> Stashed changes
     context = {
         **filtros,
         "tabela": aba,
         "busca": busca,
         "registros": registros,
-<<<<<<< Updated upstream
-        "active_tab": "historico",
-    }
-=======
         "query_sem_pagina": request.GET.copy(),
         "query_filters": query_filters.urlencode(),
         "query_sem_busca": query_sem_busca.urlencode(),
@@ -313,5 +272,4 @@ def historico_view(request):
     }
     context['query_sem_pagina'].pop('page', None)
     context['query_sem_pagina'] = context['query_sem_pagina'].urlencode()
->>>>>>> Stashed changes
     return render(request, 'dashboard/historico.html', context)

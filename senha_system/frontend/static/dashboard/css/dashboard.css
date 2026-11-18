@@ -742,8 +742,6 @@ body.dashboard-body {
     padding: 16px;
   }
 }
-<<<<<<< Updated upstream
-=======
 
 .dash-feedback {
   margin: 8px 24px;
@@ -759,4 +757,3 @@ body.dashboard-body {
 @media (max-width: 640px) {
   .dash-feedback { margin: 8px 16px; }
 }
->>>>>>> Stashed changes

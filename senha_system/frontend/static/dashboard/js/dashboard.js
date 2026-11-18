@@ -84,21 +84,6 @@
 
     if (toggleBtn && sidebar) {
       toggleBtn.addEventListener('click', () => {
-<<<<<<< Updated upstream
-        sidebar.classList.toggle('sidebar-open');
-        if (backdrop) backdrop.classList.toggle('active');
-      });
-    }
-
-    if (backdrop) {
-      backdrop.addEventListener('click', () => {
-        if (sidebar) sidebar.classList.remove('sidebar-open');
-        backdrop.classList.remove('active');
-      });
-    }
-  }
-
-=======
         const isOpen = sidebar.classList.toggle('sidebar-open');
         toggleBtn.setAttribute('aria-expanded', String(isOpen));
         if (backdrop) backdrop.classList.toggle('active', isOpen);
@@ -165,7 +150,6 @@
     window.location.assign(`${window.location.pathname}?${params.toString()}`);
   }
 
->>>>>>> Stashed changes
   // =========================================================================
   // 3. CRIAÇÃO DE GRÁFICOS (CHART.JS)
   // =========================================================================
@@ -282,34 +266,15 @@
       const kpisRes = await fetch(`/dashboard/api/kpis/?${queryStr}`, {
         headers: { 'X-Requested-With': 'XMLHttpRequest' }
       });
-<<<<<<< Updated upstream
-      if (kpisRes.ok) {
-        const kpisJson = await kpisRes.json();
-        if (kpisJson.status === 'sucesso') {
-          updateKpisUI(kpisJson.dados.kpis, kpisJson.dados.periodo_rotulo);
-        }
-      }
-=======
       if (!kpisRes.ok) throw new Error('Falha ao atualizar indicadores.');
       const kpisJson = await kpisRes.json();
       if (kpisJson.status !== 'sucesso') throw new Error('A API não retornou os indicadores.');
       updateKpisUI(kpisJson.dados.kpis, kpisJson.dados.periodo_rotulo);
->>>>>>> Stashed changes
 
       // 2. Atualizar Gráficos se estiver na visão geral ou atendimentos
       const chartsRes = await fetch(`/dashboard/api/charts/?${queryStr}`, {
         headers: { 'X-Requested-With': 'XMLHttpRequest' }
       });
-<<<<<<< Updated upstream
-      if (chartsRes.ok) {
-        const chartsJson = await chartsRes.json();
-        if (chartsJson.status === 'sucesso') {
-          updateChartsUI(chartsJson.dados);
-        }
-      }
-    } catch (err) {
-      console.warn("Erro ao atualizar dados assíncronos:", err);
-=======
       if (!chartsRes.ok) throw new Error('Falha ao atualizar gráficos.');
       const chartsJson = await chartsRes.json();
       if (chartsJson.status !== 'sucesso') throw new Error('A API não retornou os gráficos.');
@@ -318,7 +283,6 @@
     } catch (err) {
       console.warn("Erro ao atualizar dados assíncronos:", err);
       showFeedback(err.message || 'Não foi possível atualizar os dados. Tente novamente.', 'error');
->>>>>>> Stashed changes
     } finally {
       showLoadingState(false);
     }
@@ -418,10 +382,7 @@
   // 5. LIVE POLLING SUAVE (STATUS DA FILA AO VIVO)
   // =========================================================================
   function initLivePolling() {
-<<<<<<< Updated upstream
-=======
     if (!isAjaxDashboard()) return;
->>>>>>> Stashed changes
     setInterval(async () => {
       try {
         const res = await fetch('/dashboard/api/live-status/', {
@@ -455,29 +416,19 @@
     const periodButtons = document.querySelectorAll('.period-btn');
     periodButtons.forEach(btn => {
       btn.addEventListener('click', (e) => {
-<<<<<<< Updated upstream
-=======
         const period = btn.getAttribute('data-periodo');
         if (!period) return;
->>>>>>> Stashed changes
         periodButtons.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
 
         // Alterna campo de data personalizada se necessário
         const customContainer = document.getElementById('customDateRange');
         if (customContainer) {
-<<<<<<< Updated upstream
-          customContainer.style.display = btn.getAttribute('data-periodo') === 'personalizado' ? 'flex' : 'none';
-        }
-
-        reloadDashboardData();
-=======
           customContainer.style.display = period === 'personalizado' ? 'flex' : 'none';
         }
 
         if (isAjaxDashboard()) reloadDashboardData();
         else navigateWithFilters(period);
->>>>>>> Stashed changes
       });
     });
 
@@ -485,21 +436,14 @@
     const filterSelects = document.querySelectorAll('.filter-select-auto');
     filterSelects.forEach(sel => {
       sel.addEventListener('change', () => {
-<<<<<<< Updated upstream
-        reloadDashboardData();
-=======
         if (isAjaxDashboard()) reloadDashboardData();
         else navigateWithFilters();
->>>>>>> Stashed changes
       });
     });
 
     const btnCustomDate = document.getElementById('btnApplyCustomDate');
     if (btnCustomDate) {
       btnCustomDate.addEventListener('click', () => {
-<<<<<<< Updated upstream
-        reloadDashboardData();
-=======
         const start = document.getElementById('filterDataInicio')?.value;
         const end = document.getElementById('filterDataFim')?.value;
         if (!start || !end || start > end) {
@@ -508,7 +452,6 @@
         }
         if (isAjaxDashboard()) reloadDashboardData();
         else navigateWithFilters('personalizado');
->>>>>>> Stashed changes
       });
     }
   });

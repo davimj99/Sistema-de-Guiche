@@ -5,8 +5,6 @@
 {% block page_subtitle %}Telemetria de tráfego, latência, métodos HTTP e integridade de endpoints — Faculdade ISCON{% endblock %}
 
 {% block content %}
-<<<<<<< Updated upstream
-=======
 <section class="table-card" aria-label="Filtros de monitoramento da API">
     <form method="get" class="filter-toolbar">
         <input type="hidden" name="periodo" value="{{ periodo }}">
@@ -23,7 +21,6 @@
         {% if endpoint_filtro or metodo_filtro %}<a class="pagination-btn" href="?periodo={{ periodo }}">Limpar</a>{% endif %}
     </form>
 </section>
->>>>>>> Stashed changes
 <!-- Cards de Métricas da API -->
 <section class="kpi-grid">
     <!-- Total de Requisições -->
