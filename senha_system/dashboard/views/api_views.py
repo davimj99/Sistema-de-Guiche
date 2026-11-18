@@ -66,6 +66,10 @@ def productivity_api(request):
     data_fim = request.GET.get('data_fim')
     guiche_id = request.GET.get('guiche_id')
     atendente = request.GET.get('atendente')
+<<<<<<< Updated upstream
+=======
+    tipo_atendimento = request.GET.get('tipo_atendimento')
+>>>>>>> Stashed changes
 
     guiche_id_int = int(guiche_id) if guiche_id and guiche_id.isdigit() else None
 
@@ -75,6 +79,10 @@ def productivity_api(request):
         data_fim=data_fim,
         guiche_id=guiche_id_int,
         atendente=atendente,
+<<<<<<< Updated upstream
+=======
+        tipo_atendimento=tipo_atendimento,
+>>>>>>> Stashed changes
     )
     return JsonResponse({"status": "sucesso", "dados": dados})
 

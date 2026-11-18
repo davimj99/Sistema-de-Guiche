@@ -76,17 +76,28 @@ class ApiEndpointsTestCase(TestCase):
         response = self.client.post(reverse("api:painel"), HTTP_HOST="localhost")
         self.assertEqual(response.status_code, 405)
 
-    def test_swagger_ui_endpoint(self):
+    def test_swagger_endpoints_require_superuser(self):
+        response = self.client.get("/swagger/", HTTP_HOST="localhost")
+        self.assertEqual(response.status_code, 302)
+
+        common_admin = User.objects.create_user(
+            username="common_admin", password="AdminPassword123!", is_staff=True
+        )
+        self.client.force_login(common_admin)
+        self.assertEqual(self.client.get("/swagger/", HTTP_HOST="localhost").status_code, 403)
+        self.assertEqual(self.client.get("/redoc/", HTTP_HOST="localhost").status_code, 403)
+        self.assertEqual(self.client.get("/swagger.json", HTTP_HOST="localhost").status_code, 403)
+
+        super_admin = User.objects.create_superuser(
+            username="super_admin", password="SuperPassword123!", email="root@iscon.edu.br"
+        )
+        self.client.force_login(super_admin)
         response = self.client.get("/swagger/", HTTP_HOST="localhost")
         self.assertEqual(response.status_code, 200)
         self.assertIn("swagger", response.content.decode("utf-8").lower())
-
-    def test_redoc_endpoint(self):
         response = self.client.get("/redoc/", HTTP_HOST="localhost")
         self.assertEqual(response.status_code, 200)
         self.assertIn("redoc", response.content.decode("utf-8").lower())
-
-    def test_swagger_schema_json(self):
         response = self.client.get("/swagger.json", HTTP_HOST="localhost")
         self.assertEqual(response.status_code, 200)
         data = response.json()

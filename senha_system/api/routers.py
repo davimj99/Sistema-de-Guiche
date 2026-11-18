@@ -34,9 +34,11 @@ class InteractiveAPIRootView(APIRootView):
             "auth_token": res("token_obtain_pair"),
             "auth_refresh": res("token_refresh"),
             "auth_me": res("user_profile"),
-            "swagger": res("schema-swagger-ui"),
-            "redoc": res("schema-redoc"),
         }
+        # Não anunciar a documentação na raiz pública da API para usuários comuns.
+        if getattr(request.user, "is_superuser", False):
+            endpoints["swagger"] = res("schema-swagger-ui")
+            endpoints["redoc"] = res("schema-redoc")
 
         # Filtra apenas endpoints resolvidos
         valid_endpoints = {k: v for k, v in endpoints.items() if v is not None}

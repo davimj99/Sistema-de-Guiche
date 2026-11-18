@@ -5,6 +5,25 @@
 {% block page_subtitle %}Telemetria de tráfego, latência, métodos HTTP e integridade de endpoints — Faculdade ISCON{% endblock %}
 
 {% block content %}
+<<<<<<< Updated upstream
+=======
+<section class="table-card" aria-label="Filtros de monitoramento da API">
+    <form method="get" class="filter-toolbar">
+        <input type="hidden" name="periodo" value="{{ periodo }}">
+        {% if data_inicio %}<input type="hidden" name="data_inicio" value="{{ data_inicio }}">{% endif %}
+        {% if data_fim %}<input type="hidden" name="data_fim" value="{{ data_fim }}">{% endif %}
+        <label for="api-endpoint-filter">Endpoint</label>
+        <input id="api-endpoint-filter" class="form-control-sm" name="endpoint" value="{{ endpoint_filtro }}" placeholder="Ex.: /api/v1/senhas/">
+        <label for="api-method-filter">Método</label>
+        <select id="api-method-filter" class="form-select-sm" name="metodo">
+            <option value="">Todos</option>
+            {% for metodo in metricas.metodos %}<option value="{{ metodo.metodo }}" {% if metodo_filtro == metodo.metodo %}selected{% endif %}>{{ metodo.metodo }}</option>{% endfor %}
+        </select>
+        <button class="pagination-btn active" type="submit">Aplicar filtros</button>
+        {% if endpoint_filtro or metodo_filtro %}<a class="pagination-btn" href="?periodo={{ periodo }}">Limpar</a>{% endif %}
+    </form>
+</section>
+>>>>>>> Stashed changes
 <!-- Cards de Métricas da API -->
 <section class="kpi-grid">
     <!-- Total de Requisições -->

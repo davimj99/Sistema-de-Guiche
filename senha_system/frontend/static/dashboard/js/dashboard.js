@@ -84,6 +84,7 @@
 
     if (toggleBtn && sidebar) {
       toggleBtn.addEventListener('click', () => {
+<<<<<<< Updated upstream
         sidebar.classList.toggle('sidebar-open');
         if (backdrop) backdrop.classList.toggle('active');
       });
@@ -97,6 +98,74 @@
     }
   }
 
+=======
+        const isOpen = sidebar.classList.toggle('sidebar-open');
+        toggleBtn.setAttribute('aria-expanded', String(isOpen));
+        if (backdrop) backdrop.classList.toggle('active', isOpen);
+      });
+    }
+
+    const closeSidebar = () => {
+      if (sidebar) sidebar.classList.remove('sidebar-open');
+      if (backdrop) backdrop.classList.remove('active');
+      if (toggleBtn) toggleBtn.setAttribute('aria-expanded', 'false');
+    };
+    if (sidebar) sidebar.querySelectorAll('a').forEach(link => link.addEventListener('click', closeSidebar));
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape') closeSidebar();
+    });
+
+    if (backdrop) {
+      backdrop.addEventListener('click', closeSidebar);
+    }
+  }
+
+  function showFeedback(message, type) {
+    const el = document.getElementById('dashFeedback');
+    if (!el) return;
+    el.textContent = message;
+    el.dataset.type = type || 'success';
+    el.hidden = false;
+  }
+
+  function isAjaxDashboard() {
+    const tab = document.body.dataset.activeTab;
+    return tab === 'visao_geral' || tab === 'atendimentos';
+  }
+
+  function navigateWithFilters(periodOverride) {
+    const params = new URLSearchParams(window.location.search);
+    const activePeriod = document.querySelector('.period-btn.active[data-periodo]');
+    const period = periodOverride || (activePeriod && activePeriod.dataset.periodo) || params.get('periodo') || '7d';
+    params.set('periodo', period);
+    params.delete('page');
+
+    [
+      ['filterGuiche', 'guiche_id'],
+      ['filterAtendente', 'atendente'],
+      ['filterTipo', 'tipo_atendimento'],
+      ['filterStatus', 'status_senha'],
+      ['filterDataInicio', 'data_inicio'],
+      ['filterDataFim', 'data_fim'],
+    ].forEach(([elementId, key]) => {
+      const field = document.getElementById(elementId);
+      if (!field) return;
+      if (field.value) params.set(key, field.value);
+      else params.delete(key);
+    });
+
+    if (period === 'personalizado') {
+      const start = params.get('data_inicio');
+      const end = params.get('data_fim');
+      if (!start || !end || start > end) {
+        showFeedback('Informe um período válido, com data inicial anterior à final.', 'error');
+        return;
+      }
+    }
+    window.location.assign(`${window.location.pathname}?${params.toString()}`);
+  }
+
+>>>>>>> Stashed changes
   // =========================================================================
   // 3. CRIAÇÃO DE GRÁFICOS (CHART.JS)
   // =========================================================================
@@ -213,17 +282,25 @@
       const kpisRes = await fetch(`/dashboard/api/kpis/?${queryStr}`, {
         headers: { 'X-Requested-With': 'XMLHttpRequest' }
       });
+<<<<<<< Updated upstream
       if (kpisRes.ok) {
         const kpisJson = await kpisRes.json();
         if (kpisJson.status === 'sucesso') {
           updateKpisUI(kpisJson.dados.kpis, kpisJson.dados.periodo_rotulo);
         }
       }
+=======
+      if (!kpisRes.ok) throw new Error('Falha ao atualizar indicadores.');
+      const kpisJson = await kpisRes.json();
+      if (kpisJson.status !== 'sucesso') throw new Error('A API não retornou os indicadores.');
+      updateKpisUI(kpisJson.dados.kpis, kpisJson.dados.periodo_rotulo);
+>>>>>>> Stashed changes
 
       // 2. Atualizar Gráficos se estiver na visão geral ou atendimentos
       const chartsRes = await fetch(`/dashboard/api/charts/?${queryStr}`, {
         headers: { 'X-Requested-With': 'XMLHttpRequest' }
       });
+<<<<<<< Updated upstream
       if (chartsRes.ok) {
         const chartsJson = await chartsRes.json();
         if (chartsJson.status === 'sucesso') {
@@ -232,6 +309,16 @@
       }
     } catch (err) {
       console.warn("Erro ao atualizar dados assíncronos:", err);
+=======
+      if (!chartsRes.ok) throw new Error('Falha ao atualizar gráficos.');
+      const chartsJson = await chartsRes.json();
+      if (chartsJson.status !== 'sucesso') throw new Error('A API não retornou os gráficos.');
+      updateChartsUI(chartsJson.dados);
+      showFeedback('Indicadores e gráficos atualizados.', 'success');
+    } catch (err) {
+      console.warn("Erro ao atualizar dados assíncronos:", err);
+      showFeedback(err.message || 'Não foi possível atualizar os dados. Tente novamente.', 'error');
+>>>>>>> Stashed changes
     } finally {
       showLoadingState(false);
     }
@@ -331,6 +418,10 @@
   // 5. LIVE POLLING SUAVE (STATUS DA FILA AO VIVO)
   // =========================================================================
   function initLivePolling() {
+<<<<<<< Updated upstream
+=======
+    if (!isAjaxDashboard()) return;
+>>>>>>> Stashed changes
     setInterval(async () => {
       try {
         const res = await fetch('/dashboard/api/live-status/', {
@@ -364,16 +455,29 @@
     const periodButtons = document.querySelectorAll('.period-btn');
     periodButtons.forEach(btn => {
       btn.addEventListener('click', (e) => {
+<<<<<<< Updated upstream
+=======
+        const period = btn.getAttribute('data-periodo');
+        if (!period) return;
+>>>>>>> Stashed changes
         periodButtons.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
 
         // Alterna campo de data personalizada se necessário
         const customContainer = document.getElementById('customDateRange');
         if (customContainer) {
+<<<<<<< Updated upstream
           customContainer.style.display = btn.getAttribute('data-periodo') === 'personalizado' ? 'flex' : 'none';
         }
 
         reloadDashboardData();
+=======
+          customContainer.style.display = period === 'personalizado' ? 'flex' : 'none';
+        }
+
+        if (isAjaxDashboard()) reloadDashboardData();
+        else navigateWithFilters(period);
+>>>>>>> Stashed changes
       });
     });
 
@@ -381,14 +485,30 @@
     const filterSelects = document.querySelectorAll('.filter-select-auto');
     filterSelects.forEach(sel => {
       sel.addEventListener('change', () => {
+<<<<<<< Updated upstream
         reloadDashboardData();
+=======
+        if (isAjaxDashboard()) reloadDashboardData();
+        else navigateWithFilters();
+>>>>>>> Stashed changes
       });
     });
 
     const btnCustomDate = document.getElementById('btnApplyCustomDate');
     if (btnCustomDate) {
       btnCustomDate.addEventListener('click', () => {
+<<<<<<< Updated upstream
         reloadDashboardData();
+=======
+        const start = document.getElementById('filterDataInicio')?.value;
+        const end = document.getElementById('filterDataFim')?.value;
+        if (!start || !end || start > end) {
+          showFeedback('Informe um período válido, com data inicial anterior à final.', 'error');
+          return;
+        }
+        if (isAjaxDashboard()) reloadDashboardData();
+        else navigateWithFilters('personalizado');
+>>>>>>> Stashed changes
       });
     }
   });

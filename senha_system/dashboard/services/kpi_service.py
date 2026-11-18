@@ -1,7 +1,10 @@
 from datetime import datetime, time
 from django.utils import timezone
 from django.db.models import Count, Q
+<<<<<<< Updated upstream
 from django.contrib.auth.models import User
+=======
+>>>>>>> Stashed changes
 from accounts.models import Guiche
 from filas.models import Senha
 from atendimentos.models import Atendimento
@@ -97,8 +100,14 @@ class KpiService:
         # 8. Atendentes Ativos
         # Conta atendentes cadastrados no sistema com perfil ativo ou atendentes com atendimentos recentes
         atendentes_com_atendimentos = qs_atend_atual.exclude(atendente__isnull=True).exclude(atendente="").values('atendente').distinct().count()
+<<<<<<< Updated upstream
         usuarios_staff_ativos = User.objects.filter(is_active=True, is_staff=True).count()
         atendentes_ativos = max(atendentes_com_atendimentos, usuarios_staff_ativos)
+=======
+        # O modelo não relaciona atendimentos a usuários; conte operadores identificados
+        # nos registros reais do período, sem usar is_staff como substituto de função.
+        atendentes_ativos = atendentes_com_atendimentos
+>>>>>>> Stashed changes
 
         # 9. Tempo Médio de Atendimento (em minutos)
         tempo_medio_minutos = cls.calcular_tempo_medio_atendimentos(qs_atend_atual)
@@ -136,7 +145,11 @@ class KpiService:
                 },
                 "senhas_canceladas": {
                     "total": senhas_canceladas,
+<<<<<<< Updated upstream
                     "nota": "Status de cancelamento no fluxo operacional",
+=======
+                    "nota": "O fluxo atual não define um status oficial de cancelamento.",
+>>>>>>> Stashed changes
                     "icone": "x-circle",
                     "titulo": "Senhas Canceladas"
                 },

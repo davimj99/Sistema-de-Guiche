@@ -76,6 +76,43 @@ class DashboardViewsTestCase(TestCase):
             self.assertEqual(res.status_code, 200, f"Falha ao carregar {u}")
             self.assertContains(res, "ISCON GESTÃO")
 
+<<<<<<< Updated upstream
+=======
+        self.assertNotContains(self.client.get(reverse('dashboard:index')), "Swagger API")
+
+    def test_documentacao_dashboard_exibida_somente_para_superuser(self):
+        self.client.login(username="gestor_iscon", password="password123")
+        response = self.client.get(reverse('dashboard:index'))
+        self.assertNotContains(response, "Swagger API")
+
+        root = User.objects.create_superuser(
+            username="supervisor_root", password="RootPass123!", email="root@iscon.edu.br"
+        )
+        self.client.force_login(root)
+        response = self.client.get(reverse('dashboard:index'))
+        self.assertContains(response, "Swagger API")
+
+    def test_historico_completo_inclui_atendimento_sem_fim(self):
+        self.client.login(username="gestor_iscon", password="password123")
+        response = self.client.get(reverse('dashboard:historico'), {
+            "tabela": "atendimentos", "periodo": "todos", "busca": "Rafael"
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['registros'].paginator.count, 1)
+        self.assertContains(response, "Rafael")
+        self.assertContains(response, "Em Andamento")
+
+    def test_lista_de_atendentes_inclui_nome_historico_fora_das_choices(self):
+        Atendimento.objects.create(
+            senha=self.senha,
+            atendente="Operador legado",
+            tipo="matricula",
+        )
+        self.client.login(username="gestor_iscon", password="password123")
+        response = self.client.get(reverse('dashboard:index'))
+        self.assertIn("Operador legado", response.context['lista_atendentes'])
+
+>>>>>>> Stashed changes
     def test_endpoints_api_json_staff(self):
         """Endpoints assíncronos JSON devem retornar HTTP 200 e payload estruturado para staff."""
         self.client.login(username="gestor_iscon", password="password123")

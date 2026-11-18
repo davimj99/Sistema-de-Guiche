@@ -742,3 +742,21 @@ body.dashboard-body {
     padding: 16px;
   }
 }
+<<<<<<< Updated upstream
+=======
+
+.dash-feedback {
+  margin: 8px 24px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+
+.dash-feedback[hidden] { display: none; }
+.dash-feedback[data-type="success"] { color: #146c43; background: #d1e7dd; }
+.dash-feedback[data-type="error"] { color: #842029; background: #f8d7da; }
+
+@media (max-width: 640px) {
+  .dash-feedback { margin: 8px 16px; }
+}
+>>>>>>> Stashed changes

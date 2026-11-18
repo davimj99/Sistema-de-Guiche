@@ -45,6 +45,17 @@ class InteractiveApiRootTestCase(TestCase):
             url = endpoints[key]
             self.assertTrue(url.startswith("http://") or url.startswith("https://"))
             self.assertIn("/api/v1/", url)
+        self.assertNotIn("swagger", endpoints)
+        self.assertNotIn("redoc", endpoints)
+
+    def test_documentation_links_are_only_listed_for_superuser(self):
+        root = User.objects.create_superuser(
+            username="root_docs", password="RootPass123!", email="root@iscon.edu.br"
+        )
+        self.client.force_authenticate(user=root)
+        endpoints = self.client.get("/api/v1/", HTTP_HOST="localhost:8000").json()["endpoints"]
+        self.assertIn("swagger", endpoints)
+        self.assertIn("redoc", endpoints)
 
     def test_browsable_api_html_contains_clickable_anchors(self):
         response = self.client.get("/api/v1/", HTTP_ACCEPT="text/html", HTTP_HOST="localhost:8000")

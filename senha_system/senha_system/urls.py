@@ -6,6 +6,9 @@ from django.urls import path, include, re_path
 from django.conf import settings
 from django.conf.urls.static import static
 from django.views.static import serve
+from django.http import HttpResponseForbidden
+from django.contrib.auth.decorators import login_required
+from functools import wraps
 
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
@@ -26,9 +29,20 @@ schema_view = get_schema_view(
         contact=openapi.Contact(email="ti@iscon.edu.br"),
         license=openapi.License(name="MIT License"),
     ),
-    public=True,
+    public=False,
     permission_classes=[permissions.AllowAny],
 )
+
+
+def super_admin_only(view):
+    """Documentation endpoints are reserved for superusers, not all staff."""
+    @wraps(view)
+    @login_required
+    def protected_view(request, *args, **kwargs):
+        if not request.user.is_superuser:
+            return HttpResponseForbidden("Acesso restrito ao Super Admin.")
+        return view(request, *args, **kwargs)
+    return protected_view
 
 urlpatterns = [
     path('', include('core.urls')),
@@ -43,9 +57,9 @@ urlpatterns = [
     path('dashboard/', include('dashboard.urls')),
 
     # Documentação Swagger & OpenAPI
-    re_path(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
-    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
-    path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
+    re_path(r'^swagger(?P<format>\.json|\.yaml)$', super_admin_only(schema_view.without_ui(cache_timeout=0)), name='schema-json'),
+    path('swagger/', super_admin_only(schema_view.with_ui('swagger', cache_timeout=0)), name='schema-swagger-ui'),
+    path('redoc/', super_admin_only(schema_view.with_ui('redoc', cache_timeout=0)), name='schema-redoc'),
 ]
 
 # Serve media manualmente, funciona mesmo com DEBUG=False

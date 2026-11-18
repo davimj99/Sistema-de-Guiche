@@ -29,57 +29,57 @@
       <form method="get" class="row g-3 align-items-end">
         <!-- TIPO -->
         <div class="col-md-3">
-          <label class="form-label">Tipo de Atendimento</label>
-          <select name="tipo" class="form-select">
+          <label class="form-label" for="categoria">Categoria do atendimento</label>
+          <select id="categoria" name="categoria" class="form-select">
             <option value="">Todos</option>
 
             <option value="matricula"
-              {% if request.GET.tipo == "matricula" %}selected{% endif %}>
+              {% if request.GET.categoria == "matricula" %}selected{% endif %}>
               Matrícula
             </option>
 
             <option value="financeiro"
-              {% if request.GET.tipo == "financeiro" %}selected{% endif %}>
+              {% if request.GET.categoria == "financeiro" %}selected{% endif %}>
               Financeiro
             </option>
 
             <option value="secretaria"
-              {% if request.GET.tipo == "secretaria" %}selected{% endif %}>
+              {% if request.GET.categoria == "secretaria" %}selected{% endif %}>
               Secretaria
             </option>
 
             <option value="declaração"
-              {% if request.GET.tipo == "declaração" %}selected{% endif %}>
+              {% if request.GET.categoria == "declaração" %}selected{% endif %}>
               Declaração
             </option>
 
             <option value="grade"
-              {% if request.GET.tipo == "grade" %}selected{% endif %}>
+              {% if request.GET.categoria == "grade" %}selected{% endif %}>
               Grade
             </option>
 
             <option value="requerimento"
-              {% if request.GET.tipo == "requerimento" %}selected{% endif %}>
+              {% if request.GET.categoria == "requerimento" %}selected{% endif %}>
               Requerimento
             </option>
 
             <option value="ementario/historico"
-              {% if request.GET.tipo == "ementario/historico" %}selected{% endif %}>
+              {% if request.GET.categoria == "ementario/historico" %}selected{% endif %}>
               Ementário/Histórico
             </option>
 
-            <option value="ti"
-              {% if request.GET.tipo == "ti" %}selected{% endif %}>
+            <option value="lançamento de notas"
+              {% if request.GET.categoria == "lançamento de notas" %}selected{% endif %}>
               Lançamento de notas
             </option>
 
             <option value="ti"
-              {% if request.GET.tipo == "ti" %}selected{% endif %}>
+              {% if request.GET.categoria == "ti" %}selected{% endif %}>
               TI
             </option>
 
             <option value="suporte"
-              {% if request.GET.tipo == "suporte" %}selected{% endif %}>
+              {% if request.GET.categoria == "suporte" %}selected{% endif %}>
               Suporte
             </option>
 
@@ -110,6 +110,11 @@
           >
         </div>
 
+        <div class="col-md-3"><label class="form-label" for="atendente">Atendente</label><input id="atendente" name="atendente" class="form-control" value="{{ request.GET.atendente }}"></div>
+        <div class="col-md-3"><label class="form-label" for="guiche">Guichê (ID)</label><input id="guiche" name="guiche" inputmode="numeric" class="form-control" value="{{ request.GET.guiche }}"></div>
+        <div class="col-md-3"><label class="form-label" for="senha">Número da senha</label><input id="senha" name="senha" class="form-control" value="{{ request.GET.senha }}"></div>
+        <div class="col-md-3"><label class="form-label" for="status">Status da senha</label><select id="status" name="status" class="form-select"><option value="">Todos</option>{% for valor, rotulo in status_senha %}<option value="{{ valor }}" {% if request.GET.status == valor %}selected{% endif %}>{{ rotulo }}</option>{% endfor %}</select></div>
+
         <!-- BOTÃO FILTRAR -->
         <div class="col-md-3">
           <button
@@ -123,7 +128,7 @@
         <!-- BOTÃO PDF -->
         <div class="col-12">
           <a
-            href="{% url 'gerar_pdf' %}?tipo={{ request.GET.tipo }}&data_inicio={{ request.GET.data_inicio }}&data_fim={{ request.GET.data_fim }}"
+            href="{% url 'gerar_pdf' %}?{{ query_sem_pagina }}"
             class="btn btn-danger w-100"
           >
             Gerar Relatório PDF
@@ -131,6 +136,8 @@
         </div>
       </form>
     </section>
+    {% if erro_filtro %}<div class="alert alert-danger" role="alert">{{ erro_filtro }}</div>{% endif %}
+    <p class="text-muted">Gerado em {{ gerado_em|date:"d/m/Y H:i" }}{% if pagina %} · {{ pagina.paginator.count }} registro(s){% endif %}</p>
 
 
     <!-- TABELA -->
@@ -156,7 +163,7 @@
                 <td>{{ a.senha }}</td>
                 <td>{{ a.aluno }}</td>
                 <td>{{ a.tipo }}</td>
-                <td>{{ a.guiche }}</td>
+                <td>{% if a.guiche %}{{ a.guiche }}{% else %}Não informado{% endif %}</td>
                 <td>{{ a.atendente }}</td>
                 <td> {{ a.inicio }}</td>
                 <td>{{ a.fim|date:"d/m/Y H:i" }}</td>
@@ -175,6 +182,12 @@
 
       </div>
     </section>
+    {% if pagina.paginator.num_pages > 1 %}
+    <nav class="mt-3" aria-label="Paginação do relatório"><ul class="pagination justify-content-center">
+      {% if pagina.has_previous %}<li class="page-item"><a class="page-link" href="?{{ query_sem_pagina }}&page={{ pagina.previous_page_number }}">Anterior</a></li>{% endif %}
+      <li class="page-item disabled"><span class="page-link">Página {{ pagina.number }} de {{ pagina.paginator.num_pages }}</span></li>
+      {% if pagina.has_next %}<li class="page-item"><a class="page-link" href="?{{ query_sem_pagina }}&page={{ pagina.next_page_number }}">Próxima</a></li>{% endif %}
+    </ul></nav>{% endif %}
   </main>
 
 

@@ -7,6 +7,7 @@
 {% block content %}
 <!-- Seletor de Abas de Tabelas -->
 <div style="display: flex; gap: 8px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 8px; flex-wrap: wrap;">
+<<<<<<< Updated upstream
     <a href="?tabela=atendimentos&periodo={{ periodo }}" class="period-btn {% if tabela == 'atendimentos' %}active{% endif %}">
         👥 Atendimentos Realizados
     </a>
@@ -17,6 +18,19 @@
         📋 Histórico de Operações
     </a>
     <a href="?tabela=requisicoes_api&periodo={{ periodo }}" class="period-btn {% if tabela == 'requisicoes_api' %}active{% endif %}">
+=======
+    <a href="?tabela={{ tabela }}&periodo=todos" class="period-btn {% if periodo == 'todos' %}active{% endif %}">Todo o histórico</a>
+    <a href="?{{ query_filters }}&tabela=atendimentos" class="period-btn {% if tabela == 'atendimentos' %}active{% endif %}">
+        👥 Atendimentos Realizados
+    </a>
+    <a href="?{{ query_filters }}&tabela=senhas" class="period-btn {% if tabela == 'senhas' %}active{% endif %}">
+        🎫 Senhas Emitidas
+    </a>
+    <a href="?{{ query_filters }}&tabela=historico_operacoes" class="period-btn {% if tabela == 'historico_operacoes' %}active{% endif %}">
+        📋 Histórico de Operações
+    </a>
+    <a href="?{{ query_filters }}&tabela=requisicoes_api" class="period-btn {% if tabela == 'requisicoes_api' %}active{% endif %}">
+>>>>>>> Stashed changes
         🌐 Requisições da API
     </a>
 </div>
@@ -34,7 +48,11 @@
             <input type="text" name="busca" value="{{ busca }}" class="form-control-sm" style="flex: 1;" placeholder="Pesquisar registros...">
             <button type="submit" class="pagination-btn active">Buscar</button>
             {% if busca %}
+<<<<<<< Updated upstream
                 <a href="?tabela={{ tabela }}&periodo={{ periodo }}" class="pagination-btn">Limpar</a>
+=======
+                <a href="?{{ query_sem_busca }}&tabela={{ tabela }}" class="pagination-btn">Limpar</a>
+>>>>>>> Stashed changes
             {% endif %}
         </form>
 
@@ -189,8 +207,13 @@
         </span>
         <div class="pagination-controls">
             {% if registros.has_previous %}
+<<<<<<< Updated upstream
                 <a href="?tabela={{ tabela }}&page=1&periodo={{ periodo }}&busca={{ busca }}" class="pagination-btn">Primeira</a>
                 <a href="?tabela={{ tabela }}&page={{ registros.previous_page_number }}&periodo={{ periodo }}&busca={{ busca }}" class="pagination-btn">Anterior</a>
+=======
+                <a href="?{{ query_sem_pagina }}&page=1" class="pagination-btn">Primeira</a>
+                <a href="?{{ query_sem_pagina }}&page={{ registros.previous_page_number }}" class="pagination-btn">Anterior</a>
+>>>>>>> Stashed changes
             {% else %}
                 <span class="pagination-btn disabled">Anterior</span>
             {% endif %}
@@ -198,8 +221,13 @@
             <span class="pagination-btn active">{{ registros.number }}</span>
 
             {% if registros.has_next %}
+<<<<<<< Updated upstream
                 <a href="?tabela={{ tabela }}&page={{ registros.next_page_number }}&periodo={{ periodo }}&busca={{ busca }}" class="pagination-btn">Próxima</a>
                 <a href="?tabela={{ tabela }}&page={{ registros.paginator.num_pages }}&periodo={{ periodo }}&busca={{ busca }}" class="pagination-btn">Última</a>
+=======
+                <a href="?{{ query_sem_pagina }}&page={{ registros.next_page_number }}" class="pagination-btn">Próxima</a>
+                <a href="?{{ query_sem_pagina }}&page={{ registros.paginator.num_pages }}" class="pagination-btn">Última</a>
+>>>>>>> Stashed changes
             {% else %}
                 <span class="pagination-btn disabled">Próxima</span>
             {% endif %}

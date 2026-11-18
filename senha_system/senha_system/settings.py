@@ -61,7 +61,11 @@ INSTALLED_APPS = [
     "epis",
     'api',
     'wifi',
+<<<<<<< Updated upstream
     'dashboard',
+=======
+    'dashboard.apps.DashboardConfig',
+>>>>>>> Stashed changes
 
 ]
 

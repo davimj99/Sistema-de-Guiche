@@ -71,9 +71,10 @@ def api_root(request, format=None):
         "auth_token": res("token_obtain_pair"),
         "auth_refresh": res("token_refresh"),
         "auth_me": res("user_profile"),
-        "swagger": res("schema-swagger-ui"),
-        "redoc": res("schema-redoc"),
     }
+    if request.user.is_authenticated and request.user.is_superuser:
+        endpoints["swagger"] = res("schema-swagger-ui")
+        endpoints["redoc"] = res("schema-redoc")
 
     data = {
         "nome": "API Sistema de Atendimento & Filas",

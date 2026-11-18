@@ -21,7 +21,11 @@
 
     {% block extra_head %}{% endblock %}
 </head>
+<<<<<<< Updated upstream
 <body class="dashboard-body">
+=======
+<body class="dashboard-body" data-active-tab="{{ active_tab }}">
+>>>>>>> Stashed changes
 
     <!-- Backdrop para fechar a sidebar no mobile -->
     <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
@@ -111,7 +115,12 @@
                     <span>Totem de Senhas</span>
                 </a>
 
+<<<<<<< Updated upstream
                 <a href="/swagger/" target="_blank" class="nav-item">
+=======
+                {% if request.user.is_superuser %}
+                <a href="{% url 'schema-swagger-ui' %}" target="_blank" rel="noopener" class="nav-item">
+>>>>>>> Stashed changes
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                         <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
                         <polyline points="2 17 12 22 22 17"></polyline>
@@ -119,10 +128,18 @@
                     </svg>
                     <span>Swagger API</span>
                 </a>
+<<<<<<< Updated upstream
             </nav>
 
             <div class="sidebar-footer">
                 <a href="/core/">
+=======
+                {% endif %}
+            </nav>
+
+            <div class="sidebar-footer">
+                <a href="{% url 'core:index' %}">
+>>>>>>> Stashed changes
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
                     </svg>
@@ -212,6 +229,10 @@
                 </div>
 
                 <!-- Filtros Dropdown Específicos -->
+<<<<<<< Updated upstream
+=======
+                {% if active_tab != 'api_monitor' %}
+>>>>>>> Stashed changes
                 <div class="dropdown-filters">
                     <!-- Guichê -->
                     <select id="filterGuiche" class="form-select-sm filter-select-auto" aria-label="Filtrar por Guichê">
@@ -238,7 +259,11 @@
                     </select>
 
                     <!-- Status da Senha (quando aplicável) -->
+<<<<<<< Updated upstream
                     {% if status_opcoes %}
+=======
+                    {% if active_tab != 'produtividade' and status_opcoes %}
+>>>>>>> Stashed changes
                     <select id="filterStatus" class="form-select-sm filter-select-auto" aria-label="Filtrar por Status da Senha">
                         <option value="">Todos os Status</option>
                         {% for st_val, st_lbl in status_opcoes %}
@@ -247,6 +272,10 @@
                     </select>
                     {% endif %}
                 </div>
+<<<<<<< Updated upstream
+=======
+                {% endif %}
+>>>>>>> Stashed changes
             </section>
             {% endblock %}
 
@@ -264,6 +293,10 @@
                 </svg>
                 <span>Atualizando dados operacionais com o banco...</span>
             </div>
+<<<<<<< Updated upstream
+=======
+            <div id="dashFeedback" class="dash-feedback" role="status" aria-live="polite" hidden></div>
+>>>>>>> Stashed changes
 
             <!-- Conteúdo Dinâmico -->
             <main class="dash-content">
