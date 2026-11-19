@@ -23,15 +23,18 @@ def kpis_api(request):
 
     guiche_id_int = int(guiche_id) if guiche_id and guiche_id.isdigit() else None
 
-    dados = KpiService.obter_kpis_completos(
+    try:
+        dados = KpiService.obter_kpis_completos(
         periodo=periodo,
         data_inicio=data_inicio,
         data_fim=data_fim,
         guiche_id=guiche_id_int,
         atendente=atendente,
         tipo_atendimento=tipo_atendimento,
-        status_senha=status_senha,
-    )
+            status_senha=status_senha,
+        )
+    except ValueError as exc:
+        return JsonResponse({"status": "erro", "mensagem": str(exc)}, status=400)
     return JsonResponse({"status": "sucesso", "dados": dados})
 
 
@@ -47,14 +50,17 @@ def charts_api(request):
 
     guiche_id_int = int(guiche_id) if guiche_id and guiche_id.isdigit() else None
 
-    dados = ChartService.obter_graficos_dashboard(
+    try:
+        dados = ChartService.obter_graficos_dashboard(
         periodo=periodo,
         data_inicio=data_inicio,
         data_fim=data_fim,
         guiche_id=guiche_id_int,
         atendente=atendente,
-        tipo_atendimento=tipo_atendimento,
-    )
+            tipo_atendimento=tipo_atendimento,
+        )
+    except ValueError as exc:
+        return JsonResponse({"status": "erro", "mensagem": str(exc)}, status=400)
     return JsonResponse({"status": "sucesso", "dados": dados})
 
 

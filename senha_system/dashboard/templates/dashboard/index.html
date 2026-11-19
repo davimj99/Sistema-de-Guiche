@@ -9,6 +9,10 @@
 <!-- 1. CARDS DE INDICADORES (KPIS)                                            -->
 <!-- ========================================================================= -->
 <section class="kpi-grid" aria-label="Indicadores Chave de Desempenho">
+    <div class="kpi-card card-blue"><div class="kpi-card-header"><span class="kpi-card-title">Total de Atendimentos</span></div><div class="kpi-value" id="kpiTotalAtendimentos">{{ kpis.total_atendimentos.total }}</div><div class="kpi-card-footer"><span class="trend-subtext">Registros ligados a senhas emitidas no período</span></div></div>
+    <div class="kpi-card card-green"><div class="kpi-card-header"><span class="kpi-card-title">Concluídos</span></div><div class="kpi-value" id="kpiConcluidos">{{ kpis.atendimentos_concluidos.total }}</div><div class="kpi-card-footer"><span class="trend-subtext">Da coorte de senhas emitidas no período</span></div></div>
+    <div class="kpi-card card-purple"><div class="kpi-card-header"><span class="kpi-card-title">Média por Dia</span></div><div class="kpi-value" id="kpiMediaDiaria">{{ kpis.media_diaria.valor }}</div><div class="kpi-card-footer"><span class="trend-subtext">Concluídos ÷ dias do período</span></div></div>
+    <div class="kpi-card card-amber"><div class="kpi-card-header"><span class="kpi-card-title">Taxa de Conclusão</span></div><div class="kpi-value" id="kpiTaxaConclusao">{{ kpis.taxa_conclusao.percentual }}%</div><div class="kpi-card-footer"><span class="trend-subtext">Concluídos ÷ total de atendimentos da coorte</span></div></div>
     <!-- Senhas Emitidas -->
     <div class="kpi-card card-blue">
         <div class="kpi-card-header">

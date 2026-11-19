@@ -53,6 +53,14 @@ def calcular_intervalo_filtro(
         fim_ant_date = inicio_atual_date - datetime.timedelta(days=1)
         rotulo = "Últimos 30 dias"
 
+    elif periodo == "90d":
+        inicio_atual_date = hoje - datetime.timedelta(days=89)
+        fim_atual_date = hoje
+        duracao = 90
+        inicio_ant_date = inicio_atual_date - datetime.timedelta(days=duracao)
+        fim_ant_date = inicio_atual_date - datetime.timedelta(days=1)
+        rotulo = "Últimos 90 dias"
+
     elif periodo == "este_mes":
         inicio_atual_date = hoje.replace(day=1)
         fim_atual_date = hoje
@@ -80,12 +88,12 @@ def calcular_intervalo_filtro(
     elif periodo == "personalizado":
         d_inicio = parse_date_safe(data_inicio_str)
         d_fim = parse_date_safe(data_fim_str)
-        if not d_inicio:
-            d_inicio = hoje - datetime.timedelta(days=6)
-        if not d_fim:
-            d_fim = hoje
+        if not d_inicio or not d_fim:
+            raise ValueError("Informe as datas inicial e final do período personalizado.")
         if d_inicio > d_fim:
-            d_inicio, d_fim = d_fim, d_inicio
+            raise ValueError("A data inicial deve ser anterior ou igual à data final.")
+        if (d_fim - d_inicio).days > 365:
+            raise ValueError("O período personalizado não pode exceder 366 dias.")
 
         inicio_atual_date = d_inicio
         fim_atual_date = d_fim

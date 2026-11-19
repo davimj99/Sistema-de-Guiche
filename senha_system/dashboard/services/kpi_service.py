@@ -70,6 +70,23 @@ class KpiService:
         total_atend_ant = qs_atend_ant.filter(fim__isnull=False).count()
         var_atend = calcular_variacao_percentual(total_atend_atual, total_atend_ant)
 
+        # O model Atendimento não armazena data de início (inicio é apenas TimeField).
+        # Para um denominador reproduzível, total representa atendimentos vinculados a
+        # senhas emitidas no período; concluídos são os encerrados no período.
+        qs_atend_por_emissao = Atendimento.objects.filter(
+            senha__criada_em__range=(inicio_atual, fim_atual)
+        )
+        if guiche_id:
+            qs_atend_por_emissao = qs_atend_por_emissao.filter(guiche=guiche_id)
+        if atendente:
+            qs_atend_por_emissao = qs_atend_por_emissao.filter(atendente=atendente)
+        if tipo_atendimento:
+            qs_atend_por_emissao = qs_atend_por_emissao.filter(tipo=tipo_atendimento)
+        total_atendimentos = qs_atend_por_emissao.count()
+        concluidos_coorte = qs_atend_por_emissao.filter(fim__isnull=False).count()
+        dias_periodo = max(1, (fim_atual.date() - inicio_atual.date()).days + 1)
+        taxa_conclusao = round(concluidos_coorte * 100 / total_atendimentos, 1) if total_atendimentos else 0.0
+
         # 3. Total de Atendimentos em Andamento (instantâneo / ao vivo)
         # Identificado por atendimentos com fim nulo ou senhas com status "atendimento"
         atendimentos_em_andamento = Atendimento.objects.filter(fim__isnull=True).count()
@@ -109,6 +126,10 @@ class KpiService:
             "inicio_atual": inicio_atual.isoformat(),
             "fim_atual": fim_atual.isoformat(),
             "kpis": {
+                "total_atendimentos": {"total": total_atendimentos},
+                "atendimentos_concluidos": {"total": concluidos_coorte},
+                "media_diaria": {"valor": round(total_atend_atual / dias_periodo, 1)},
+                "taxa_conclusao": {"percentual": taxa_conclusao},
                 "senhas_emitidas": {
                     "total": total_senhas_atual,
                     "anterior": total_senhas_ant,

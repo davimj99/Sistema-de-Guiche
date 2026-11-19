@@ -106,6 +106,25 @@ class DashboardServicesTestCase(TestCase):
         self.assertEqual(rotulo_7d, "Últimos 7 dias")
         self.assertEqual((fim_7d.date() - inicio_7d.date()).days, 6)
 
+        inicio_90, fim_90, _, _, rotulo_90 = calcular_intervalo_filtro("90d")
+        self.assertEqual(rotulo_90, "Últimos 90 dias")
+        self.assertEqual((fim_90.date() - inicio_90.date()).days, 89)
+
+    def test_intervalo_personalizado_valida_datas(self):
+        with self.assertRaises(ValueError):
+            calcular_intervalo_filtro("personalizado", "2026-03-02", "2026-03-01")
+        with self.assertRaises(ValueError):
+            calcular_intervalo_filtro("personalizado", "", "2026-03-01")
+        with self.assertRaises(ValueError):
+            calcular_intervalo_filtro("personalizado", "2024-01-01", "2026-01-01")
+
+    def test_kpis_gerenciais_coerentes_sem_dados(self):
+        dados = KpiService.obter_kpis_completos(periodo="hoje")['kpis']
+        self.assertEqual(dados['total_atendimentos']['total'], 0)
+        self.assertEqual(dados['atendimentos_concluidos']['total'], 0)
+        self.assertEqual(dados['media_diaria']['valor'], 0)
+        self.assertEqual(dados['taxa_conclusao']['percentual'], 0)
+
     def test_calcular_variacao_percentual(self):
         """Valida o cálculo de tendência e percentual."""
         var_alta = calcular_variacao_percentual(20, 10)

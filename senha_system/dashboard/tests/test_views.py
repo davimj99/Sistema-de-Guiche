@@ -155,6 +155,14 @@ class DashboardViewsTestCase(TestCase):
         response = self.client.get(reverse('dashboard:api_charts'))
         self.assertEqual(response.status_code, 403)
 
+    def test_api_rejeita_intervalo_personalizado_invalido(self):
+        self.client.login(username="gestor_iscon", password="password123")
+        response = self.client.get(reverse('dashboard:api_charts'), {
+            'periodo': 'personalizado', 'data_inicio': '2026-03-02', 'data_fim': '2026-03-01'
+        })
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json()['status'], 'erro')
+
     def test_tabela_historico_filtros_e_busca(self):
         """Valida que a página de histórico responde a filtros e buscas."""
         self.client.login(username="gestor_iscon", password="password123")

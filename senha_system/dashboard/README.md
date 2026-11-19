@@ -120,3 +120,19 @@ Para rodar todos os testes:
 ```bash
 python manage.py test dashboard
 ```
+# Métricas gerenciais
+
+Os gráficos de atendimentos usam `Atendimento.fim` como data de referência e
+contam conclusões dentro do intervalo selecionado. O model atual guarda
+`Atendimento.inicio` apenas como `TimeField`, portanto não há como atribuir a
+data real de início a um período histórico. Para a taxa gerencial, a coorte é
+formada pelos registros `Atendimento` ligados a senhas (`Senha.criada_em`) no
+período; sua taxa é a proporção desses registros que já possuem `fim`. A média
+diária divide as conclusões do período pelo número de dias corridos selecionado.
+Essa limitação impede interpretar a taxa como taxa de conclusão da mesma coorte
+de início operacional; uma evolução futura exigiria armazenar `inicio` como
+`DateTimeField`.
+
+Intervalos personalizados exigem ambas as datas, rejeitam início posterior ao
+fim e são limitados a 366 dias. Os limites de dia são convertidos no fuso
+configurado pelo Django.

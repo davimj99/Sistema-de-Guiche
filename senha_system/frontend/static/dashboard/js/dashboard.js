@@ -323,6 +323,15 @@
 
     if (!kpis) return;
 
+    const setMetric = (id, value) => {
+      const element = document.getElementById(id);
+      if (element) element.textContent = value;
+    };
+    if (kpis.total_atendimentos) setMetric('kpiTotalAtendimentos', Number(kpis.total_atendimentos.total).toLocaleString('pt-BR'));
+    if (kpis.atendimentos_concluidos) setMetric('kpiConcluidos', Number(kpis.atendimentos_concluidos.total).toLocaleString('pt-BR'));
+    if (kpis.media_diaria) setMetric('kpiMediaDiaria', Number(kpis.media_diaria.valor).toLocaleString('pt-BR', { maximumFractionDigits: 1 }));
+    if (kpis.taxa_conclusao) setMetric('kpiTaxaConclusao', `${Number(kpis.taxa_conclusao.percentual).toLocaleString('pt-BR', { maximumFractionDigits: 1 })}%`);
+
     function setCardValue(valId, trendId, kpiObj) {
       const valEl = document.getElementById(valId);
       if (valEl && kpiObj) {
