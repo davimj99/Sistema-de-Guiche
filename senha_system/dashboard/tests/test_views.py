@@ -155,6 +155,33 @@ class DashboardViewsTestCase(TestCase):
         self.assertEqual(res_prod.status_code, 200)
         data_prod = res_prod.json()
         self.assertEqual(data_prod["status"], "sucesso")
+        self.assertIn("guiches", data_prod["dados"])
+        self.assertIn("atendentes", data_prod["dados"])
+        guiche_data = next(
+            item for item in data_prod["dados"]["guiches"]
+            if item["guiche_id"] == self.guiche.id
+        )
+        self.assertEqual(guiche_data["total"], 1)
+        self.assertEqual(guiche_data["percentual_total"], 100.0)
+
+        filtrada = self.client.get(reverse('dashboard:api_productivity'), {
+            "periodo": "hoje", "guiche_id": self.guiche.id,
+            "atendente": "Rafael", "tipo_atendimento": "matricula",
+        })
+        self.assertEqual(filtrada.status_code, 200)
+        self.assertEqual(filtrada.json()["dados"]["total_atendimentos"], 1)
+
+        periodo_invalido = self.client.get(reverse('dashboard:api_productivity'), {
+            "periodo": "personalizado", "data_inicio": "2026-03-02",
+            "data_fim": "2026-03-01",
+        })
+        self.assertEqual(periodo_invalido.status_code, 400)
+        self.assertEqual(periodo_invalido.json()["status"], "erro")
+
+        guiche_invalido = self.client.get(reverse('dashboard:api_productivity'), {
+            "guiche_id": "abc",
+        })
+        self.assertEqual(guiche_invalido.status_code, 400)
 
         # Live Status API
         res_live = self.client.get(reverse('dashboard:api_live_status'))

@@ -262,6 +262,40 @@ class DashboardServicesTestCase(TestCase):
         self.assertNotIn(999, por_id)
         self.assertNotIn(-4, por_id)
 
+    def test_productivity_respects_combined_filters_and_guiche_metrics(self):
+        agora = timezone.localtime()
+        # Duas linhas equivalentes permitem validar que os filtros se combinam
+        # sobre a mesma consulta usada para calcular tabela, percentuais e tempos.
+        for guiche, atendente, tipo, minutos in (
+            (self.guiche_1, "Jane", "matricula", 15),
+            (self.guiche_1, "Jane", "financeiro", 10),
+            (self.guiche_2, "Alessandra", "matricula", 20),
+        ):
+            senha = Senha.objects.create(
+                prefixo="T", numero=Atendimento.objects.count() + 10,
+                status="finalizado", guiche=guiche,
+            )
+            fim = agora.replace(hour=11, minute=0, second=0, microsecond=0)
+            Atendimento.objects.create(
+                senha=senha, guiche=guiche.id, atendente=atendente, tipo=tipo,
+                inicio=(fim - datetime.timedelta(minutes=minutos)).time(), fim=fim,
+            )
+
+        relatorio = ProductivityService.obter_relatorio_produtividade(
+            periodo="hoje", guiche_id=self.guiche_1.id,
+            atendente="Jane", tipo_atendimento="matricula",
+        )
+        self.assertEqual(relatorio["total_atendimentos"], 1)
+        self.assertEqual(len(relatorio["guiches"]), 2)  # Ambos os cadastros ativos
+        por_id = {item["guiche_id"]: item for item in relatorio["guiches"]}
+        self.assertEqual(por_id[self.guiche_1.id]["total"], 1)
+        self.assertEqual(por_id[self.guiche_1.id]["percentual_total"], 100.0)
+        self.assertEqual(por_id[self.guiche_1.id]["tempo_medio"], "15m 00s")
+        self.assertEqual(por_id[self.guiche_2.id]["total"], 0)
+        self.assertEqual(
+            [item["nome"] for item in relatorio["atendentes"]], ["Jane"]
+        )
+
     def test_api_monitoring_service(self):
         """Valida o cálculo de métricas de telemetria da API REST."""
         metricas = ApiMonitoringService.obter_metricas_api(periodo="hoje")

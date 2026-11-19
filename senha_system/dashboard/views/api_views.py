@@ -74,16 +74,21 @@ def productivity_api(request):
     atendente = request.GET.get('atendente')
     tipo_atendimento = request.GET.get('tipo_atendimento')
 
-    guiche_id_int = int(guiche_id) if guiche_id and guiche_id.isdigit() else None
+    if guiche_id and not guiche_id.isdigit():
+        return JsonResponse({"status": "erro", "mensagem": "Guichê inválido."}, status=400)
+    guiche_id_int = int(guiche_id) if guiche_id else None
 
-    dados = ProductivityService.obter_relatorio_produtividade(
-        periodo=periodo,
-        data_inicio=data_inicio,
-        data_fim=data_fim,
-        guiche_id=guiche_id_int,
-        atendente=atendente,
-        tipo_atendimento=tipo_atendimento,
-    )
+    try:
+        dados = ProductivityService.obter_relatorio_produtividade(
+            periodo=periodo,
+            data_inicio=data_inicio,
+            data_fim=data_fim,
+            guiche_id=guiche_id_int,
+            atendente=atendente,
+            tipo_atendimento=tipo_atendimento,
+        )
+    except ValueError as exc:
+        return JsonResponse({"status": "erro", "mensagem": str(exc)}, status=400)
     return JsonResponse({"status": "sucesso", "dados": dados})
 
 
