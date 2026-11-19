@@ -79,6 +79,24 @@ class DashboardViewsTestCase(TestCase):
         self.assertNotContains(self.client.get(reverse('dashboard:index')), "Swagger API")
         self.assertContains(self.client.get(reverse('dashboard:index')), 'id="dashboard-chart-data"')
 
+    def test_pagina_atendimentos_publica_dados_json_e_tres_canvas(self):
+        self.client.login(username="gestor_iscon", password="password123")
+        response = self.client.get(reverse('dashboard:atendimentos'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'id="dashboard-chart-data"')
+        for canvas_id in (
+            "chartAtendimentosDia",
+            "chartAtendimentosSemana",
+            "chartAtendimentosMes",
+        ):
+            self.assertContains(response, f'id="{canvas_id}"')
+
+        chart_data = response.context["chart_data"]
+        self.assertIn("labels", chart_data["atendimentos_por_dia"])
+        self.assertIn("datasets", chart_data["atendimentos_por_semana"])
+        self.assertIn("datasets", chart_data["atendimentos_por_mes"])
+
     def test_documentacao_dashboard_exibida_somente_para_superuser(self):
         self.client.login(username="gestor_iscon", password="password123")
         response = self.client.get(reverse('dashboard:index'))

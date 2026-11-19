@@ -130,38 +130,15 @@
 {% endblock %}
 
 {% block extra_js %}
+{{ chart_data|json_script:"dashboard-chart-data" }}
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        const chartData = {{ chart_data|safe }};
+        const chartDataElement = document.getElementById('dashboard-chart-data');
+        const chartData = chartDataElement ? JSON.parse(chartDataElement.textContent) : null;
 
         if (chartData) {
+            window.IsconDashboard.updateChartsUI(chartData);
             // Atendimentos por Dia
-            if (chartData.atendimentos_por_dia) {
-                window.IsconDashboard.renderChart(
-                    'chartAtendimentosDia',
-                    'bar',
-                    chartData.atendimentos_por_dia
-                );
-            }
-
-            // Atendimentos por Semana
-            if (chartData.atendimentos_por_semana) {
-                window.IsconDashboard.renderChart(
-                    'chartAtendimentosSemana',
-                    'bar',
-                    chartData.atendimentos_por_semana
-                );
-            }
-
-            // Atendimentos por Mês
-            if (chartData.atendimentos_por_mes) {
-                window.IsconDashboard.renderChart(
-                    'chartAtendimentosMes',
-                    'bar',
-                    chartData.atendimentos_por_mes
-                );
-            }
-
             // Atendimentos por Atendente
             if (chartData.distribuicao_atendente) {
                 window.IsconDashboard.renderChart(

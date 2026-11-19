@@ -304,6 +304,12 @@
       showFeedback('Indicadores e gráficos atualizados.', 'success');
     } catch (err) {
       console.warn("Erro ao atualizar dados assíncronos:", err);
+      if (isAjaxDashboard()) {
+        ['chartAtendimentosDia', 'chartAtendimentosSemana', 'chartAtendimentosMes'].forEach(id => {
+          const canvas = document.getElementById(id);
+          if (canvas) setChartStatus(canvas, 'Não foi possível carregar os gráficos. Verifique a conexão e tente novamente.');
+        });
+      }
       showFeedback(err.message || 'Não foi possível atualizar os dados. Tente novamente.', 'error');
     } finally {
       showLoadingState(false);
