@@ -1,5 +1,5 @@
 import datetime
-from django.db.models import Count
+from django.db.models import Case, Count, F, IntegerField, Q, When
 from django.utils import timezone
 from atendimentos.models import Atendimento
 from accounts.models import Guiche
@@ -30,8 +30,16 @@ class ProductivityService:
         qs_ant = Atendimento.objects.filter(fim__range=(inicio_ant, fim_ant))
 
         if guiche_id:
-            qs_atual = qs_atual.filter(guiche=guiche_id)
-            qs_ant = qs_ant.filter(guiche=guiche_id)
+            # Atendimento.guiche é um inteiro legado e pode estar nulo ou
+            # apontar para um cadastro removido. Nesses casos, a FK da senha
+            # associada é a fonte oficial do guichê usado no atendimento.
+            guiches_validos = Guiche.objects.filter(ativo=True).values_list("id", flat=True)
+            filtro_guiche = (
+                Q(guiche=guiche_id)
+                | (Q(senha__guiche_id=guiche_id) & ~Q(guiche__in=guiches_validos))
+            )
+            qs_atual = qs_atual.filter(filtro_guiche)
+            qs_ant = qs_ant.filter(filtro_guiche)
         if atendente:
             qs_atual = qs_atual.filter(atendente=atendente)
             qs_ant = qs_ant.filter(atendente=atendente)
@@ -68,24 +76,25 @@ class ProductivityService:
 
     @classmethod
     def _calcular_produtividade_guiches(cls, qs_atual, qs_ant, total_geral) -> list:
-        # Atendimento.guiche guarda o ID do cadastro como inteiro legado, sem
-        # ForeignKey. Use o cadastro ativo como fonte de verdade e ignore IDs
-        # históricos sem correspondência ou associados a guichês inativos.
+        # Atendimento.guiche guarda o ID como inteiro legado, sem ForeignKey.
+        # A anotação também recupera registros inválidos pela FK da senha.
         guiches_cadastrados = {
             g.id: g.nome
             for g in Guiche.objects.filter(ativo=True).order_by("id")
         }
         dados_atual = dict(
-            qs_atual.filter(guiche__in=guiches_cadastrados)
-            .values('guiche')
+            cls._com_guiche_efetivo(qs_atual, guiches_cadastrados)
+            .filter(guiche_dashboard__in=guiches_cadastrados)
+            .values('guiche_dashboard')
             .annotate(total=Count('id'))
-            .values_list('guiche', 'total')
+            .values_list('guiche_dashboard', 'total')
         )
         dados_ant = dict(
-            qs_ant.filter(guiche__in=guiches_cadastrados)
-            .values('guiche')
+            cls._com_guiche_efetivo(qs_ant, guiches_cadastrados)
+            .filter(guiche_dashboard__in=guiches_cadastrados)
+            .values('guiche_dashboard')
             .annotate(total=Count('id'))
-            .values_list('guiche', 'total')
+            .values_list('guiche_dashboard', 'total')
         )
 
         resultado = []
@@ -96,7 +105,9 @@ class ProductivityService:
             percentual = round((total / total_geral) * 100, 1) if total_geral > 0 else 0.0
 
             # Tempo médio específico do guichê
-            qs_g = qs_atual.filter(guiche=gid)
+            qs_g = cls._com_guiche_efetivo(qs_atual, guiches_cadastrados).filter(
+                guiche_dashboard=gid
+            )
             t_medio = KpiService.calcular_tempo_medio_atendimentos(qs_g)
 
             resultado.append({
@@ -111,6 +122,18 @@ class ProductivityService:
 
         resultado.sort(key=lambda x: x["total"], reverse=True)
         return resultado
+
+    @staticmethod
+    def _com_guiche_efetivo(queryset, guiches_cadastrados):
+        """Anota o ID do guichê usando a FK da senha para dados legados inválidos."""
+        ids_validos = list(guiches_cadastrados)
+        return queryset.annotate(
+            guiche_dashboard=Case(
+                When(guiche__in=ids_validos, then=F("guiche")),
+                default=F("senha__guiche_id"),
+                output_field=IntegerField(),
+            )
+        )
 
     @classmethod
     def _calcular_produtividade_atendentes(cls, qs_atual, qs_ant, total_geral) -> list:

@@ -243,9 +243,12 @@ class DashboardServicesTestCase(TestCase):
 
         # O model Atendimento mantém o ID do guichê em IntegerField, então
         # dados legados podem não ter correspondência com o cadastro oficial.
+        senha_sem_guiche = Senha.objects.create(
+            prefixo="L", numero=99, status="finalizado", guiche=None
+        )
         for identificador in (999, -4, self.guiche_inativo.id):
             Atendimento.objects.create(
-                senha=self.senha_1,
+                senha=senha_sem_guiche,
                 guiche=identificador,
                 tipo="matricula",
                 fim=timezone.localtime(),
@@ -261,6 +264,20 @@ class DashboardServicesTestCase(TestCase):
         self.assertNotIn(self.guiche_inativo.id, por_id)
         self.assertNotIn(999, por_id)
         self.assertNotIn(-4, por_id)
+
+    def test_productivity_recovers_invalid_legacy_guiche_from_related_ticket(self):
+        Atendimento.objects.create(
+            senha=self.senha_1, guiche=999, atendente="Jane",
+            tipo="matricula", inicio=datetime.time(10, 0),
+            fim=timezone.localtime().replace(hour=10, minute=15, second=0, microsecond=0),
+        )
+        relatorio = ProductivityService.obter_relatorio_produtividade(
+            periodo="hoje", guiche_id=self.guiche_1.id,
+        )
+        self.assertEqual(relatorio["total_atendimentos"], 2)
+        guiche = next(g for g in relatorio["guiches"] if g["guiche_id"] == self.guiche_1.id)
+        self.assertEqual(guiche["total"], 2)
+        self.assertEqual(guiche["percentual_total"], 100.0)
 
     def test_productivity_respects_combined_filters_and_guiche_metrics(self):
         agora = timezone.localtime()
