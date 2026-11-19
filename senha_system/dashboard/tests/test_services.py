@@ -229,6 +229,33 @@ class DashboardServicesTestCase(TestCase):
         )
         self.assertEqual(financeiro["total_atendimentos"], 0)
 
+    def test_productivity_guiches_uses_only_active_registered_ids(self):
+        """IDs soltos e IDs de guichês inativos não viram linhas da tabela."""
+        guiche_sem_atendimentos = Guiche.objects.create(
+            nome="Guichê 04", ativo=True
+        )
+
+        # O model Atendimento mantém o ID do guichê em IntegerField, então
+        # dados legados podem não ter correspondência com o cadastro oficial.
+        for identificador in (999, -4, self.guiche_inativo.id):
+            Atendimento.objects.create(
+                senha=self.senha_1,
+                guiche=identificador,
+                tipo="matricula",
+                fim=timezone.localtime(),
+            )
+
+        relatorio = ProductivityService.obter_relatorio_produtividade(periodo="hoje")
+        por_id = {item["guiche_id"]: item for item in relatorio["guiches"]}
+
+        self.assertEqual(set(por_id), {self.guiche_1.id, self.guiche_2.id, guiche_sem_atendimentos.id})
+        self.assertEqual(por_id[self.guiche_1.id]["total"], 1)
+        self.assertEqual(por_id[self.guiche_2.id]["total"], 0)
+        self.assertEqual(por_id[guiche_sem_atendimentos.id]["total"], 0)
+        self.assertNotIn(self.guiche_inativo.id, por_id)
+        self.assertNotIn(999, por_id)
+        self.assertNotIn(-4, por_id)
+
     def test_api_monitoring_service(self):
         """Valida o cálculo de métricas de telemetria da API REST."""
         metricas = ApiMonitoringService.obter_metricas_api(periodo="hoje")

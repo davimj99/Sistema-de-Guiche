@@ -68,26 +68,29 @@ class ProductivityService:
 
     @classmethod
     def _calcular_produtividade_guiches(cls, qs_atual, qs_ant, total_geral) -> list:
-        guiches_cadastrados = {g.id: g.nome for g in Guiche.objects.all()}
+        # Atendimento.guiche guarda o ID do cadastro como inteiro legado, sem
+        # ForeignKey. Use o cadastro ativo como fonte de verdade e ignore IDs
+        # históricos sem correspondência ou associados a guichês inativos.
+        guiches_cadastrados = {
+            g.id: g.nome
+            for g in Guiche.objects.filter(ativo=True).order_by("id")
+        }
         dados_atual = dict(
-            qs_atual.values('guiche')
+            qs_atual.filter(guiche__in=guiches_cadastrados)
+            .values('guiche')
             .annotate(total=Count('id'))
             .values_list('guiche', 'total')
         )
         dados_ant = dict(
-            qs_ant.values('guiche')
+            qs_ant.filter(guiche__in=guiches_cadastrados)
+            .values('guiche')
             .annotate(total=Count('id'))
             .values_list('guiche', 'total')
         )
 
-        todos_guiches_ids = set(dados_atual.keys()) | set(guiches_cadastrados.keys())
         resultado = []
 
-        for gid in sorted(todos_guiches_ids, key=lambda x: (x is None, x)):
-            if gid is None and dados_atual.get(None, 0) == 0:
-                continue
-            
-            nome = guiches_cadastrados.get(gid, f"Guichê {gid}" if gid else "Não Informado")
+        for gid, nome in guiches_cadastrados.items():
             total = dados_atual.get(gid, 0)
             anterior = dados_ant.get(gid, 0)
             percentual = round((total / total_geral) * 100, 1) if total_geral > 0 else 0.0
