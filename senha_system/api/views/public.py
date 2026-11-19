@@ -1,5 +1,7 @@
 from rest_framework.decorators import api_view, permission_classes, throttle_classes
+from rest_framework.decorators import renderer_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.renderers import BrowsableAPIRenderer, JSONRenderer
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from drf_yasg.utils import swagger_auto_schema
@@ -12,6 +14,13 @@ from api.serializers import (
     StatusFilaResponseSerializer,
     UserProfileSerializer,
 )
+
+
+class ApiRootBrowsableRenderer(BrowsableAPIRenderer):
+    """Browsable renderer with the API Root's Portuguese auth controls."""
+    template = 'api/root.html'
+
+
 @swagger_auto_schema(
     method='get',
     operation_summary="Catálogo Interativo de Endpoints da API",
@@ -23,6 +32,7 @@ from api.serializers import (
     tags=['Catálogo']
 )
 @api_view(['GET'])
+@renderer_classes([JSONRenderer, ApiRootBrowsableRenderer])
 @permission_classes([AllowAny])
 def api_root(request, format=None):
     """

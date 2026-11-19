@@ -1,0 +1,15 @@
+{% extends "rest_framework/api.html" %}
+
+{% block userlinks %}
+  {% if user.is_authenticated %}
+    <li class="navbar-text">Autenticado: {{ user.get_username }}</li>
+    <li>
+      <form method="post" action="{% url 'rest_framework:logout' %}?next={{ request.path|urlencode }}" class="navbar-form">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-link navbar-btn">Sair</button>
+      </form>
+    </li>
+  {% else %}
+    <li><a href="{% url 'rest_framework:login' %}?next={{ request.path|urlencode }}">Login</a></li>
+  {% endif %}
+{% endblock %}

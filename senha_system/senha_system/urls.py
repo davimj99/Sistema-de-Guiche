@@ -54,6 +54,8 @@ urlpatterns = [
     path("epis/", include("epis.urls")),
     path('wifi/', include('wifi.urls')),
     path('api/', include('api.urls')),
+    # Namespace global esperado pelos controles de autenticação da Browsable API.
+    path('api-auth/', include('rest_framework.urls')),
     path('dashboard/', include('dashboard.urls')),
 
     # Documentação Swagger & OpenAPI

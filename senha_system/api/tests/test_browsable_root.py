@@ -1,5 +1,5 @@
 import base64
-from django.test import TestCase
+from django.test import Client, TestCase
 from django.contrib.auth.models import User
 from rest_framework.test import APIClient
 
@@ -145,3 +145,92 @@ class InteractiveApiRootTestCase(TestCase):
         detail_resp = self.client.get(f"/api/v1/guiches/{novo_id}/", HTTP_HOST="localhost:8000")
         self.assertEqual(detail_resp.status_code, 200)
         self.assertEqual(detail_resp.json()["nome"], "Guichê Novo Staff")
+
+
+class BrowsableApiSessionAuthTestCase(TestCase):
+    """Login/logout controls on the API Root use Django's session auth safely."""
+
+    def setUp(self):
+        self.client = Client(enforce_csrf_checks=True)
+        self.first_user = User.objects.create_user(
+            username="root_login_um", password="SenhaUm2026!"
+        )
+        self.second_user = User.objects.create_user(
+            username="root_login_dois", password="SenhaDois2026!"
+        )
+
+    def test_anonymous_root_displays_login(self):
+        response = self.client.get("/api/v1/", HTTP_ACCEPT="text/html")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, ">Login</a>")
+        self.assertNotContains(response, ">Sair</button>")
+
+    def test_login_failure_and_success_from_browsable_api(self):
+        login_url = "/api-auth/login/"
+        self.client.get(login_url)
+        csrf_token = self.client.cookies["csrftoken"].value
+
+        invalid = self.client.post(login_url, {
+            "username": self.first_user.username,
+            "password": "senha-incorreta",
+            "csrfmiddlewaretoken": csrf_token,
+            "next": "/api/v1/",
+        })
+        self.assertEqual(invalid.status_code, 200)
+        self.assertFalse("_auth_user_id" in self.client.session)
+
+        self.client.get(login_url)
+        csrf_token = self.client.cookies["csrftoken"].value
+        valid = self.client.post(login_url, {
+            "username": self.first_user.username,
+            "password": "SenhaUm2026!",
+            "csrfmiddlewaretoken": csrf_token,
+            "next": "/api/v1/",
+        })
+        self.assertRedirects(valid, "/api/v1/", fetch_redirect_response=False)
+
+        root = self.client.get("/api/v1/", HTTP_ACCEPT="text/html")
+        self.assertContains(root, "Autenticado: root_login_um")
+        self.assertContains(root, ">Sair</button>")
+
+    def test_logout_requires_post_and_allows_login_as_another_user(self):
+        self.client.get("/api-auth/login/")
+        token = self.client.cookies["csrftoken"].value
+        login = self.client.post("/api-auth/login/", {
+            "username": self.first_user.username,
+            "password": "SenhaUm2026!",
+            "csrfmiddlewaretoken": token,
+            "next": "/api/v1/",
+        })
+        self.assertRedirects(login, "/api/v1/", fetch_redirect_response=False)
+
+        logout_url = "/api-auth/logout/"
+        self.assertEqual(self.client.get(logout_url).status_code, 405)
+        self.assertIn("_auth_user_id", self.client.session)
+
+        token = self.client.cookies["csrftoken"].value
+        logout = self.client.post(logout_url, {
+            "csrfmiddlewaretoken": token,
+            "next": "/api/v1/",
+        })
+        self.assertRedirects(logout, "/api/v1/", fetch_redirect_response=False)
+        self.assertNotIn("_auth_user_id", self.client.session)
+
+        root = self.client.get("/api/v1/", HTTP_ACCEPT="text/html")
+        self.assertContains(root, ">Login</a>")
+        self.assertNotContains(root, "Autenticado: root_login_um")
+
+        self.client.get("/api-auth/login/")
+        token = self.client.cookies["csrftoken"].value
+        relogin = self.client.post("/api-auth/login/", {
+            "username": self.second_user.username,
+            "password": "SenhaDois2026!",
+            "csrfmiddlewaretoken": token,
+            "next": "/api/v1/",
+        })
+        self.assertRedirects(relogin, "/api/v1/", fetch_redirect_response=False)
+        self.assertContains(
+            self.client.get("/api/v1/", HTTP_ACCEPT="text/html"),
+            "Autenticado: root_login_dois",
+        )
