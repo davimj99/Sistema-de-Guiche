@@ -164,6 +164,28 @@ class DashboardServicesTestCase(TestCase):
         tipo = dados["distribuicao_tipo"]
         self.assertIn("Matrícula", tipo["labels"])
 
+    def test_series_temporais_contam_apenas_atendimentos_concluidos(self):
+        hoje = timezone.localtime()
+        concluido = Atendimento.objects.create(
+            senha=self.senha_1, guiche=self.guiche_1.id, tipo="matricula",
+            inicio=datetime.time(9, 0), fim=hoje,
+        )
+        dados = ChartService.obter_graficos_dashboard(periodo="7d")
+
+        diario = dados["atendimentos_por_dia"]
+        self.assertEqual(len(diario["labels"]), len(diario["datasets"][0]["data"]))
+        self.assertEqual(sum(diario["datasets"][0]["data"]), 2)
+        self.assertEqual(sum(dados["atendimentos_por_semana"]["datasets"][0]["data"]), 2)
+        self.assertEqual(sum(dados["atendimentos_por_mes"]["datasets"][0]["data"]), 2)
+        self.assertTrue(concluido.fim)
+
+    def test_series_temporais_representam_periodo_vazio(self):
+        Atendimento.objects.all().delete()
+        dados = ChartService.obter_graficos_dashboard(periodo="hoje")
+        self.assertEqual(dados["atendimentos_por_dia"]["datasets"][0]["data"], [0])
+        self.assertEqual(dados["atendimentos_por_semana"]["datasets"][0]["data"], [0])
+        self.assertEqual(dados["atendimentos_por_mes"]["datasets"][0]["data"], [0])
+
     def test_productivity_service(self):
         """Valida a consolidação de produtividade por atendente e guichê."""
         relatorio = ProductivityService.obter_relatorio_produtividade(periodo="hoje")

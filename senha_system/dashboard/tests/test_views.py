@@ -77,6 +77,7 @@ class DashboardViewsTestCase(TestCase):
             self.assertContains(res, "ISCON GESTÃO")
 
         self.assertNotContains(self.client.get(reverse('dashboard:index')), "Swagger API")
+        self.assertContains(self.client.get(reverse('dashboard:index')), 'id="dashboard-chart-data"')
 
     def test_documentacao_dashboard_exibida_somente_para_superuser(self):
         self.client.login(username="gestor_iscon", password="password123")
@@ -126,6 +127,10 @@ class DashboardViewsTestCase(TestCase):
         self.assertEqual(res_charts.status_code, 200)
         data_charts = res_charts.json()
         self.assertEqual(data_charts["status"], "sucesso")
+        for key in ("atendimentos_por_dia", "atendimentos_por_semana", "atendimentos_por_mes"):
+            self.assertIn(key, data_charts["dados"])
+            self.assertIn("labels", data_charts["dados"][key])
+            self.assertIn("datasets", data_charts["dados"][key])
 
         # Productivity API
         res_prod = self.client.get(reverse('dashboard:api_productivity'))
@@ -144,6 +149,11 @@ class DashboardViewsTestCase(TestCase):
         res = self.client.get(reverse('dashboard:api_kpis'))
         self.assertEqual(res.status_code, 401)
         self.assertEqual(res.json()["codigo"], 401)
+
+    def test_charts_api_bloqueia_usuario_sem_permissao(self):
+        self.client.login(username="aluno_comum", password="password123")
+        response = self.client.get(reverse('dashboard:api_charts'))
+        self.assertEqual(response.status_code, 403)
 
     def test_tabela_historico_filtros_e_busca(self):
         """Valida que a página de histórico responde a filtros e buscas."""

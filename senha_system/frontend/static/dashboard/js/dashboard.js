@@ -155,7 +155,11 @@
   // =========================================================================
   function renderChart(canvasId, type, data, customOptions = {}) {
     const canvas = document.getElementById(canvasId);
-    if (!canvas || !window.Chart) return null;
+    if (!canvas) return null;
+    if (!window.Chart) {
+      setChartStatus(canvas, 'Não foi possível carregar a biblioteca de gráficos. Atualize a página para tentar novamente.');
+      return null;
+    }
 
     if (chartInstances[canvasId]) {
       chartInstances[canvasId].destroy();
@@ -209,8 +213,26 @@
       data: data,
       options: finalOptions
     });
+    const hasValues = (data.datasets || []).some(dataset =>
+      (dataset.data || []).some(value => Number(value) > 0)
+    );
+    setChartStatus(canvas, hasValues ? '' : 'Sem atendimentos no período selecionado.');
 
     return chartInstances[canvasId];
+  }
+
+  function setChartStatus(canvas, message) {
+    const container = canvas.closest('.chart-canvas-container');
+    if (!container) return;
+    let status = container.querySelector('.chart-status');
+    if (!status) {
+      status = document.createElement('p');
+      status.className = 'chart-status';
+      status.setAttribute('role', 'status');
+      container.appendChild(status);
+    }
+    status.textContent = message;
+    status.hidden = !message;
   }
 
   function deepMerge(target, source) {
@@ -352,6 +374,27 @@
   function updateChartsUI(chartData) {
     if (!chartData) return;
 
+    [
+      ['chartAtendimentosDia', chartData.atendimentos_por_dia, 'line'],
+      ['chartAtendimentosSemana', chartData.atendimentos_por_semana, 'bar'],
+      ['chartAtendimentosMes', chartData.atendimentos_por_mes, 'bar'],
+    ].forEach(([id, data, type]) => {
+      if (!data) return;
+      if (chartInstances[id]) {
+        chartInstances[id].data = data;
+        chartInstances[id].update();
+        const hasValues = (data.datasets || []).some(dataset =>
+          (dataset.data || []).some(value => Number(value) > 0)
+        );
+        setChartStatus(document.getElementById(id), hasValues ? '' : 'Sem atendimentos no período selecionado.');
+      } else {
+        renderChart(id, type, data, {
+          plugins: { legend: { display: false } },
+          ...(type === 'line' ? { elements: { line: { tension: 0.3 } } } : {})
+        });
+      }
+    });
+
     if (chartInstances['chartComparativo'] && chartData.serie_temporal_comparativa) {
       chartInstances['chartComparativo'].data = chartData.serie_temporal_comparativa;
       chartInstances['chartComparativo'].update();
@@ -460,6 +503,7 @@
   window.IsconDashboard = {
     renderChart,
     reloadDashboardData,
+    updateChartsUI,
   };
 
 })();

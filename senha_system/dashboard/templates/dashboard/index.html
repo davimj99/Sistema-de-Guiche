@@ -182,6 +182,33 @@
 <!-- 2. GRÁFICOS PRINCIPAIS DE ATENDIMENTO                                     -->
 <!-- ========================================================================= -->
 <section class="chart-grid">
+    <div class="chart-card chart-card-wide">
+        <div class="chart-card-header"><div>
+            <h3 class="chart-card-title">Atendimentos Diários</h3>
+            <p class="chart-card-subtitle">Volume de atendimentos realizados dia a dia</p>
+        </div></div>
+        <div class="chart-canvas-container"><canvas id="chartAtendimentosDia" aria-label="Atendimentos realizados por dia" role="img"></canvas></div>
+    </div>
+</section>
+
+<section class="chart-grid-equal">
+    <div class="chart-card">
+        <div class="chart-card-header"><div>
+            <h3 class="chart-card-title">Atendimentos por Semana</h3>
+            <p class="chart-card-subtitle">Agrupamento consolidado por semana</p>
+        </div></div>
+        <div class="chart-canvas-container"><canvas id="chartAtendimentosSemana" aria-label="Atendimentos agrupados por semana" role="img"></canvas></div>
+    </div>
+    <div class="chart-card">
+        <div class="chart-card-header"><div>
+            <h3 class="chart-card-title">Atendimentos por Mês</h3>
+            <p class="chart-card-subtitle">Histórico consolidado mensal</p>
+        </div></div>
+        <div class="chart-canvas-container"><canvas id="chartAtendimentosMes" aria-label="Atendimentos agrupados por mês" role="img"></canvas></div>
+    </div>
+</section>
+
+<section class="chart-grid">
     <!-- Série Comparativa: Senhas vs Atendimentos -->
     <div class="chart-card">
         <div class="chart-card-header">
@@ -332,12 +359,14 @@
 {% endblock %}
 
 {% block extra_js %}
+{{ chart_data|json_script:"dashboard-chart-data" }}
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        // Dados iniciais injetados pelo Django
-        const chartData = {{ chart_data|safe }};
+        const chartDataElement = document.getElementById('dashboard-chart-data');
+        const chartData = chartDataElement ? JSON.parse(chartDataElement.textContent) : null;
 
         if (chartData) {
+            window.IsconDashboard.updateChartsUI(chartData);
             // 1. Gráfico Comparativo Senhas vs Atendimentos
             if (chartData.serie_temporal_comparativa) {
                 window.IsconDashboard.renderChart(

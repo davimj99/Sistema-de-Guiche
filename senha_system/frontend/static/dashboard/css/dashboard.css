@@ -529,6 +529,10 @@ body.dashboard-body {
   flex-direction: column;
 }
 
+.chart-card-wide {
+  grid-column: 1 / -1;
+}
+
 .chart-card-header {
   display: flex;
   align-items: center;
@@ -555,6 +559,20 @@ body.dashboard-body {
   min-height: 280px;
   flex: 1;
 }
+
+.chart-status {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  padding: 20px;
+  color: var(--text-muted);
+  text-align: center;
+  pointer-events: none;
+}
+
+.chart-status[hidden] { display: none; }
 
 /* Tabelas Administrativas */
 .table-card {
