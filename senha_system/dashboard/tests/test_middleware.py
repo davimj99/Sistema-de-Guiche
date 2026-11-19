@@ -26,6 +26,7 @@ class ApiMonitoringMiddlewareTestCase(TestCase):
         self.assertEqual(ultimo_log.metodo, 'GET')
         self.assertEqual(ultimo_log.status_code, 200)
         self.assertGreaterEqual(ultimo_log.tempo_resposta_ms, 0.0)
+        self.assertIsNone(ultimo_log.ip_origem)
 
     def test_ignora_rotas_fora_da_api(self):
         """Requisições a páginas normais (fora de /api/) não devem poluir a tabela de logs da API."""

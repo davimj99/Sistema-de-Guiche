@@ -1,7 +1,6 @@
 import datetime
-from collections import defaultdict
 from django.db.models import Count, Avg
-from django.db.models.functions import TruncDate
+from django.db.models.functions import TruncDate, ExtractHour
 from dashboard.models import ApiRequestLog
 from .date_filter import calcular_intervalo_filtro, calcular_variacao_percentual
 
@@ -89,12 +88,17 @@ class ApiMonitoringService:
             curr += datetime.timedelta(days=1)
 
         # Distribuição por Hora (00:00 às 23:00)
-        horas_req = defaultdict(int)
-        for req in qs.only('criado_em'):
-            horas_req[req.criado_em.hour] += 1
+        # ExtractHour applies Django's active timezone to aware datetimes, so
+        # persisted UTC timestamps are grouped by the configured local hour.
+        horas_req = dict(
+            qs.annotate(hora=ExtractHour('criado_em'))
+            .values('hora')
+            .annotate(total=Count('id'))
+            .values_list('hora', 'total')
+        )
         
         labels_horas = [f"{h:02d}:00" for h in range(24)]
-        dados_horas = [horas_req[h] for h in range(24)]
+        dados_horas = [horas_req.get(h, 0) for h in range(24)]
 
         return {
             "periodo": rotulo,

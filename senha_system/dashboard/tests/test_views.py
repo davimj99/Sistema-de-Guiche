@@ -195,6 +195,24 @@ class DashboardViewsTestCase(TestCase):
         self.assertEqual(res.status_code, 401)
         self.assertEqual(res.json()["codigo"], 401)
 
+    def test_api_monitoramento_json_e_dashboard_serializam_datasets(self):
+        ApiRequestLog.objects.create(
+            endpoint="/api/v1/filas/", metodo="GET", status_code=200,
+            tempo_resposta_ms=4.5,
+        )
+        self.client.login(username="gestor_iscon", password="password123")
+        response = self.client.get(reverse('dashboard:api_monitoring'), {'periodo': 'hoje'})
+        self.assertEqual(response.status_code, 200)
+        dados = response.json()['dados']
+        self.assertEqual(dados['total_requisicoes'], 1)
+        self.assertEqual(sum(dados['grafico_dias']['datasets'][0]['data']), 1)
+        self.assertEqual(len(dados['grafico_horas']['datasets'][0]['data']), 24)
+
+        page = self.client.get(reverse('dashboard:api_monitor'), {'periodo': 'hoje'})
+        self.assertEqual(page.status_code, 200)
+        self.assertContains(page, 'api-chart-days-data')
+        self.assertContains(page, '"label": "Requisições por Dia"')
+
     def test_charts_api_bloqueia_usuario_sem_permissao(self):
         self.client.login(username="aluno_comum", password="password123")
         response = self.client.get(reverse('dashboard:api_charts'))

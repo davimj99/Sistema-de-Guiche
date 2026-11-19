@@ -229,26 +229,49 @@
 {% endblock %}
 
 {% block extra_js %}
+{{ metricas.grafico_dias|json_script:"api-chart-days-data" }}
+{{ metricas.grafico_horas|json_script:"api-chart-hours-data" }}
+{{ metricas.grafico_status|json_script:"api-chart-status-data" }}
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const graficoDias = {{ metricas.grafico_dias|safe }};
-        const graficoHoras = {{ metricas.grafico_horas|safe }};
-        const graficoStatus = {{ metricas.grafico_status|safe }};
-
-        if (graficoDias) {
-            window.IsconDashboard.renderChart('chartApiDias', 'line', graficoDias);
-        }
-
-        if (graficoHoras) {
-            window.IsconDashboard.renderChart('chartApiHoras', 'bar', graficoHoras);
-        }
-
-        if (graficoStatus) {
-            window.IsconDashboard.renderChart('chartApiStatus', 'doughnut', graficoStatus, {
-                plugins: { legend: { position: 'bottom' } },
-                cutout: '65%'
-            });
-        }
-    });
+    (() => {
+        const parseData = (id) => JSON.parse(document.getElementById(id).textContent);
+        const showError = (id, message) => {
+            const canvas = document.getElementById(id);
+            const container = canvas && canvas.closest('.chart-canvas-container');
+            if (!container) return;
+            let status = container.querySelector('.chart-status');
+            if (!status) {
+                status = document.createElement('p');
+                status.className = 'chart-status';
+                status.setAttribute('role', 'status');
+                container.appendChild(status);
+            }
+            status.textContent = message;
+            status.hidden = false;
+        };
+        const render = () => {
+            const renderer = window.IsconDashboard && window.IsconDashboard.renderChart;
+            if (!renderer || !window.Chart) {
+                ['chartApiDias', 'chartApiHoras', 'chartApiStatus'].forEach(id =>
+                    showError(id, 'Não foi possível carregar os gráficos. Atualize a página para tentar novamente.')
+                );
+                return;
+            }
+            try {
+                renderer('chartApiDias', 'line', parseData('api-chart-days-data'));
+                renderer('chartApiHoras', 'bar', parseData('api-chart-hours-data'));
+                renderer('chartApiStatus', 'doughnut', parseData('api-chart-status-data'), {
+                    plugins: { legend: { position: 'bottom' } }, cutout: '65%'
+                });
+            } catch (error) {
+                console.error('Falha ao renderizar métricas da API:', error);
+                ['chartApiDias', 'chartApiHoras', 'chartApiStatus'].forEach(id =>
+                    showError(id, 'Ocorreu um erro ao exibir as métricas. Tente atualizar a página.')
+                );
+            }
+        };
+        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', render, { once: true });
+        else render();
+    })();
 </script>
 {% endblock %}

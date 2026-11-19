@@ -22,19 +22,13 @@ class ApiMonitoringMiddleware(MiddlewareMixin):
             try:
                 duracao = (time.perf_counter() - request._api_start_time) * 1000.0  # ms
                 
-                # Obter IP mascarado ou direto de forma segura
-                x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
-                if x_forwarded_for:
-                    ip = x_forwarded_for.split(',')[0].strip()
-                else:
-                    ip = request.META.get('REMOTE_ADDR')
-
-                # Validação básica de IP para evitar erros de campo
-                if ip and len(ip) > 45:
-                    ip = ip[:45]
-
-                # Endpoint normalizado (limitar até 255 caracteres)
-                endpoint = request.path[:255]
+                # Prefer Django's resolved route: /resource/<int:pk>/ keeps
+                # dynamic IDs from fragmenting top-endpoint aggregates.
+                route = getattr(getattr(request, 'resolver_match', None), 'route', None)
+                endpoint = request.path
+                if route:
+                    endpoint = route if route.startswith('/api/') else f'/api/{route.lstrip("/")}'
+                endpoint = endpoint[:255]
                 metodo = request.method[:10]
                 status_code = response.status_code
 
@@ -43,7 +37,8 @@ class ApiMonitoringMiddleware(MiddlewareMixin):
                     metodo=metodo,
                     status_code=status_code,
                     tempo_resposta_ms=round(duracao, 2),
-                    ip_origem=ip,
+                    # Client IP is not needed for aggregate monitoring metrics.
+                    ip_origem=None,
                 )
             except Exception as e:
                 # Falhas de auditoria/log não devem afetar a entrega da resposta ao cliente

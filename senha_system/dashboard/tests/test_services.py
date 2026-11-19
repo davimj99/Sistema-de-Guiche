@@ -327,6 +327,20 @@ class DashboardServicesTestCase(TestCase):
         self.assertEqual(metricas["distribuicao_status"]["2xx"], 2)
         self.assertEqual(metricas["distribuicao_status"]["4xx"], 1)
         self.assertEqual(metricas["distribuicao_status"]["5xx"], 0)
+        self.assertEqual(len(metricas["grafico_horas"]["datasets"][0]["data"]), 24)
+        self.assertEqual(sum(metricas["grafico_dias"]["datasets"][0]["data"]), 3)
+        endpoint = next(item for item in metricas["top_endpoints"] if item["endpoint"] == "/api/v1/painel/")
+        self.assertEqual(endpoint["total"], 1)
+        self.assertEqual(endpoint["media_ms"], 12.5)
+
+    def test_api_monitoring_empty_period_returns_zero_series(self):
+        metricas = ApiMonitoringService.obter_metricas_api(
+            periodo="personalizado", data_inicio="2000-01-01", data_fim="2000-01-02"
+        )
+        self.assertEqual(metricas["total_requisicoes"], 0)
+        self.assertEqual(sum(metricas["grafico_dias"]["datasets"][0]["data"]), 0)
+        self.assertEqual(metricas["grafico_horas"]["datasets"][0]["data"], [0] * 24)
+        self.assertEqual(metricas["top_endpoints"], [])
 
     def test_cenario_sem_dados(self):
         """Garante resiliência e ausência de divisões por zero quando o banco estiver vazio."""
