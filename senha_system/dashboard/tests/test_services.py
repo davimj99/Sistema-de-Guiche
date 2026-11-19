@@ -119,7 +119,13 @@ class DashboardServicesTestCase(TestCase):
             calcular_intervalo_filtro("personalizado", "2024-01-01", "2026-01-01")
 
     def test_kpis_gerenciais_coerentes_sem_dados(self):
-        dados = KpiService.obter_kpis_completos(periodo="hoje")['kpis']
+        # O setUp cria dados com timestamp atual. Use um período fixo e anterior
+        # à existência de qualquer fixture para validar uma janela realmente vazia.
+        dados = KpiService.obter_kpis_completos(
+            periodo="personalizado",
+            data_inicio="2000-01-01",
+            data_fim="2000-01-01",
+        )["kpis"]
         self.assertEqual(dados['total_atendimentos']['total'], 0)
         self.assertEqual(dados['atendimentos_concluidos']['total'], 0)
         self.assertEqual(dados['media_diaria']['valor'], 0)
@@ -277,7 +283,11 @@ class DashboardServicesTestCase(TestCase):
         Senha.objects.all().delete()
         ApiRequestLog.objects.all().delete()
 
-        kpis = KpiService.obter_kpis_completos(periodo="hoje")["kpis"]
+        kpis = KpiService.obter_kpis_completos(
+            periodo="personalizado",
+            data_inicio="2000-01-01",
+            data_fim="2000-01-01",
+        )["kpis"]
         self.assertEqual(kpis["senhas_emitidas"]["total"], 0)
         self.assertEqual(kpis["atendimentos_realizados"]["total"], 0)
         self.assertEqual(kpis["tempo_medio"]["minutos"], 0.0)
